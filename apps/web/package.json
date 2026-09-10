@@ -30,8 +30,12 @@
     "recharts": "^3.2.1",
     "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
+    "lightningcss": "^1.29.1",
     "tailwind-merge": "^2.5.4",
     "zod": "^3.23.8"
+  },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "^1.29.1"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.59.16",

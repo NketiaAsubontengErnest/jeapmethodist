@@ -6,22 +6,22 @@ This guide provides the exact setup for hosting **BOTH the Next.js Frontend AND 
 
 ## 🎯 Target Production Domains
 
-| Component | Vercel Project Name | Production URL |
-| :--- | :--- | :--- |
-| **Frontend Web App** | `jeapmethodist` | `https://jeapmethodist.vercel.app` |
+| Component                    | Vercel Project Name  | Production URL                          |
+| :--------------------------- | :------------------- | :-------------------------------------- |
+| **Frontend Web App**   | `jeapmethodist`    | `https://jeapmethodist.vercel.app`    |
 | **Backend NestJS API** | `jeapmethodistapi` | `https://jeapmethodistapi.vercel.app` |
 
 ---
 
 ## 💎 The 100% Free All-on-Vercel Architecture
 
-| Service Layer | Platform | Free Tier Allowances | Cost |
-| :--- | :--- | :--- | :--- |
-| **Code Repository** | **GitHub** | Unlimited public/private repos, free GitHub Actions CI/CD | **$0.00 / mo** |
-| **Frontend Web App** | **Vercel Project 1** (`jeapmethodist`) | Unlimited deployments, 100 GB/mo bandwidth, global CDN, SSL | **$0.00 / mo** |
-| **Backend NestJS API** | **Vercel Project 2** (`jeapmethodistapi`) | Serverless Node.js functions, instant scaling, SSL | **$0.00 / mo** |
-| **Database** | **Neon.tech** | Serverless PostgreSQL (500 MB DB, Pooled connections) | **$0.00 / mo** |
-| **File / Media Storage** | **Cloudflare R2** or **Supabase** | 10 GB storage, 0 egress fees (unlimited bandwidth downloads) | **$0.00 / mo** |
+| Service Layer                  | Platform                                          | Free Tier Allowances                                         | Cost                 |
+| :----------------------------- | :------------------------------------------------ | :----------------------------------------------------------- | :------------------- |
+| **Code Repository**      | **GitHub**                                  | Unlimited public/private repos, free GitHub Actions CI/CD    | **$0.00 / mo** |
+| **Frontend Web App**     | **Vercel Project 1** (`jeapmethodist`)    | Unlimited deployments, 100 GB/mo bandwidth, global CDN, SSL  | **$0.00 / mo** |
+| **Backend NestJS API**   | **Vercel Project 2** (`jeapmethodistapi`) | Serverless Node.js functions, instant scaling, SSL           | **$0.00 / mo** |
+| **Database**             | **Neon.tech**                               | Serverless PostgreSQL (500 MB DB, Pooled connections)        | **$0.00 / mo** |
+| **File / Media Storage** | **Cloudflare R2** or **Supabase**     | 10 GB storage, 0 egress fees (unlimited bandwidth downloads) | **$0.00 / mo** |
 
 ---
 
@@ -31,7 +31,7 @@ This guide provides the exact setup for hosting **BOTH the Next.js Frontend AND 
 2. [Step 2: Database Setup (Neon PostgreSQL)](#step-2-database-setup-neon-postgresql)
 3. [Step 3: Deploy Next.js Frontend (`jeapmethodist`)](#step-3-deploy-nextjs-frontend-jeapmethodist)
 4. [Step 4: Deploy NestJS API Backend (`jeapmethodistapi`)](#step-4-deploy-nestjs-api-backend-jeapmethodistapi)
-5. [Step 5: Connect Frontend to Backend (CORS & URLs)](#step-5-connect-frontend-to-backend-cors--urls)
+5. [Step 5: Connect Frontend to Backend (CORS &amp; URLs)](#step-5-connect-frontend-to-backend-cors--urls)
 6. [Complete Environment Variables Matrix](#complete-environment-variables-matrix)
 7. [Post-Deployment Verification Checklist](#post-deployment-verification-checklist)
 
@@ -55,6 +55,7 @@ git push origin main
 ## 🗄️ Step 2: Database Setup (Neon PostgreSQL)
 
 Your Neon PostgreSQL database is already configured and synced:
+
 - **Pooled Connection String** (`DATABASE_URL`): `postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require`
 - **Direct Connection String** (`DIRECT_URL`): `postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require`
 
@@ -65,8 +66,10 @@ Your Neon PostgreSQL database is already configured and synced:
 1. Log into your [Vercel Dashboard](https://vercel.com/new) and click **Add New... → Project**.
 2. Select your GitHub repository (`jeapmethodist`).
 3. Configure Project Settings:
+
    > [!IMPORTANT]
    > **Root Directory MUST be set to `apps/web`** in Vercel settings.
+   >
 
    - **Project Name**: `jeapmethodist`
    - **Framework Preset**: `Next.js`
@@ -75,6 +78,7 @@ Your Neon PostgreSQL database is already configured and synced:
    - **Output Directory**: `.next`
    - **Install Command**: `npm install`
 4. Add Environment Variables:
+
    - `NEXT_PUBLIC_API_URL` = `https://jeapmethodistapi.vercel.app/api/v1`
    - `DEFAULT_CURRENCY` = `GHS`
    - `DEFAULT_TIMEZONE` = `Africa/Accra`
@@ -111,10 +115,11 @@ Host your NestJS API as a second Vercel Serverless Project under the same free a
 Once both Vercel projects are deployed:
 
 1. **Frontend Environment Variable (`jeapmethodist`)**:
+
    - In `jeapmethodist` Vercel Settings → Environment Variables:
    - Verify `NEXT_PUBLIC_API_URL` is set to `https://jeapmethodistapi.vercel.app/api/v1`.
-
 2. **API Environment Variable (`jeapmethodistapi`)**:
+
    - In `jeapmethodistapi` Vercel Settings → Environment Variables:
    - Verify `CORS_ORIGIN` is set to `https://jeapmethodist.vercel.app`.
 
@@ -123,6 +128,7 @@ Once both Vercel projects are deployed:
 ## 📋 Complete Environment Variables Matrix
 
 ### 1. Frontend Project (`jeapmethodist`) on Vercel:
+
 ```env
 NEXT_PUBLIC_API_URL="https://jeapmethodistapi.vercel.app/api/v1"
 DEFAULT_CURRENCY="GHS"
@@ -130,6 +136,7 @@ DEFAULT_TIMEZONE="Africa/Accra"
 ```
 
 ### 2. Backend Project (`jeapmethodistapi`) on Vercel:
+
 ```env
 DATABASE_URL="postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require"
 DIRECT_URL="postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require"
@@ -146,11 +153,11 @@ CORS_ORIGIN="https://jeapmethodist.vercel.app"
 
 ## 🛡️ Post-Deployment Verification Checklist
 
-- [x] **`apps/api/vercel.json` Present**: Serverless API routes configured.
-- [x] **Frontend Deployed (`jeapmethodist`)**: Live on `https://jeapmethodist.vercel.app`.
-- [x] **Backend Deployed (`jeapmethodistapi`)**: Live on `https://jeapmethodistapi.vercel.app`.
-- [x] **Neon Database Connected**: Both projects configured with your Neon PostgreSQL strings.
-- [x] **CORS Configured**: Secure cross-origin requests allowed between `jeapmethodist.vercel.app` and `jeapmethodistapi.vercel.app`.
+- [X] **`apps/api/vercel.json` Present**: Serverless API routes configured.
+- [X] **Frontend Deployed (`jeapmethodist`)**: Live on `https://jeapmethodist.vercel.app`.
+- [X] **Backend Deployed (`jeapmethodistapi`)**: Live on `https://jeapmethodistapi.vercel.app`.
+- [X] **Neon Database Connected**: Both projects configured with your Neon PostgreSQL strings.
+- [X] **CORS Configured**: Secure cross-origin requests allowed between `jeapmethodist.vercel.app` and `jeapmethodistapi.vercel.app`.
 
 ---
 
