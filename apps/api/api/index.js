@@ -5,12 +5,12 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const { ValidationPipe } = require('@nestjs/common');
-const { AppModule } = require('../dist/src/app.module');
-const { AllExceptionsFilter } = require('../dist/src/common/filters/http-exception.filter');
 
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL =
-    'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
+const NEON_DB_URL =
+  'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
+
+if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('localhost')) {
+  process.env.DATABASE_URL = NEON_DB_URL;
 }
 if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET =
@@ -20,6 +20,9 @@ if (!process.env.JWT_REFRESH_SECRET) {
   process.env.JWT_REFRESH_SECRET =
     'KvajkTpgSTQJMV3asuqkNU3ftED2iu7tWYbEq7Luh3YhxJ7aB_GBrmU_16RGfPBQ';
 }
+
+const { AppModule } = require('../dist/src/app.module');
+const { AllExceptionsFilter } = require('../dist/src/common/filters/http-exception.filter');
 
 const server = express();
 let isAppInitialized = false;
@@ -68,7 +71,7 @@ module.exports = async function handler(req, res) {
       statusCode: 500,
       message: err?.message || 'Internal Server Error during serverless bootstrap',
       error: err?.name || 'BootstrapError',
-      stack: process.env.NODE_ENV !== 'production' ? err?.stack : undefined,
+      stack: err?.stack,
     });
   }
 };
