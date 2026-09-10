@@ -20,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import 'multer';
 import { MediaType } from '@prisma/client';
 import { MediaService } from './media.service';
 import { UploadMediaDto } from './dto/upload-media.dto';
