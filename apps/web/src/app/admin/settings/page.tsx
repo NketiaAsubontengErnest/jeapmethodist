@@ -114,7 +114,7 @@ export default function SettingsPage() {
   const faviconFileRef = useRef<HTMLInputElement>(null);
 
   const settingsQuery = useQuery({ queryKey: ['settings'], queryFn: fetchSettings });
-  const { register, handleSubmit, reset, setValue, watch } = useForm<SettingsMap>();
+  const { register, handleSubmit, reset, setValue, watch, getValues } = useForm<SettingsMap>();
 
   const formValues = watch();
   const logoUrl = watch('logo_url');
@@ -144,8 +144,17 @@ export default function SettingsPage() {
     try {
       setUploadingField(field);
       setError(null);
+
+      // Instant local browser preview
+      const localPreview = URL.createObjectURL(file);
+      setValue(field, localPreview);
+
       const res = await uploadMedia(file, { category: 'identity', title: field });
       setValue(field, res.url);
+
+      // Auto-save setting to database
+      const currentValues = getValues();
+      await mutation.mutateAsync({ ...currentValues, [field]: res.url });
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload image file');

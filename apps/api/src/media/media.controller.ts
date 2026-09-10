@@ -37,7 +37,7 @@ import {
   MEDIA_UPLOAD_DIR,
 } from './media.constants';
 
-
+import { memoryStorage } from 'multer';
 
 @ApiTags('media')
 @Controller('media')
@@ -108,19 +108,7 @@ export class MediaController {
   @RequirePermissions(PERMISSIONS.MEDIA_UPLOAD)
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (_req, _file, callback) => {
-          try {
-            if (!existsSync(MEDIA_UPLOAD_DIR)) {
-              mkdirSync(MEDIA_UPLOAD_DIR, { recursive: true });
-            }
-          } catch {}
-          callback(null, MEDIA_UPLOAD_DIR);
-        },
-        filename: (_req, file, callback) => {
-          callback(null, `${randomUUID()}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
       limits: {
         fileSize: MEDIA_MAX_FILE_SIZE_BYTES,
         files: 1,
@@ -143,14 +131,18 @@ export class MediaController {
     @CurrentUser() actor: AuthenticatedUser,
     @Req() req: Request,
   ) {
-    if (!file) {
+    if (!file || !file.buffer) {
       throw new BadRequestException('No file uploaded');
     }
+    const storedName = `${randomUUID()}${extname(file.originalname || 'file')}`;
+    const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+
     const media = await this.service.create({
-      filename: file.originalname,
-      storedName: file.filename,
+      filename: file.originalname || 'uploaded_image',
+      storedName,
       mimeType: file.mimetype,
       size: file.size,
+      url: dataUrl,
       category: dto.category,
       title: dto.title,
       description: dto.description,

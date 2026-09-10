@@ -20,6 +20,7 @@ export class MediaService {
     storedName: string;
     mimeType: string;
     size: number;
+    url?: string;
     category?: string;
     title?: string;
     description?: string;
@@ -28,6 +29,7 @@ export class MediaService {
     uploadedById: string;
   }) {
     const publicOrigin = this.configService.get<string>('publicOrigin') ?? '';
+    const finalUrl = params.url || `${publicOrigin}/uploads/media/${params.storedName}`;
     return this.prisma.media.create({
       data: {
         filename: params.filename,
@@ -40,7 +42,7 @@ export class MediaService {
         type: params.type || MediaType.PHOTO,
         albumId: params.albumId || null,
         uploadedById: params.uploadedById,
-        url: `${publicOrigin}/uploads/media/${params.storedName}`,
+        url: finalUrl,
       },
       include: {
         album: { select: { id: true, title: true } },
