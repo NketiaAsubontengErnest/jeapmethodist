@@ -40,6 +40,21 @@ export function createUser(input: CreateUserInput) {
   return apiFetch<UserListItem>('/users', { method: 'POST', body: JSON.stringify(input) });
 }
 
+export interface UpdateUserInput {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  roleId?: string;
+  isActive?: boolean;
+  /** Only provide to reset the password directly. */
+  password?: string;
+}
+
+export function updateUser(id: string, input: UpdateUserInput) {
+  return apiFetch<UserListItem>(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(input) });
+}
+
 export function deactivateUser(id: string) {
   return apiFetch<UserListItem>(`/users/${id}`, { method: 'DELETE' });
 }

@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2, Plus, Search, UserX, Shield, ShieldCheck, Pencil, Trash2, CheckSquare, Square, Users as UsersIcon } from 'lucide-react';
-import { fetchUsers, createUser, deactivateUser, type UserListItem } from '@/lib/api/users';
+import { fetchUsers, createUser, updateUser, deactivateUser, type UserListItem } from '@/lib/api/users';
 import {
   fetchRoles,
   fetchPermissions,
@@ -58,6 +58,20 @@ const createUserSchema = z.object({
 });
 type CreateUserValues = z.infer<typeof createUserSchema>;
 
+const editUserSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Enter a valid email address'),
+  phone: z.string().optional(),
+  roleId: z.string().min(1, 'Select a role'),
+  isActive: z.boolean(),
+  password: z
+    .string()
+    .optional()
+    .refine((v) => !v || v.length >= 8, { message: 'Password must be at least 8 characters' }),
+});
+type EditUserValues = z.infer<typeof editUserSchema>;
+
 function initials(user: UserListItem) {
   return `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
 }
@@ -71,6 +85,9 @@ export default function UsersPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [userFormError, setUserFormError] = useState<string | null>(null);
+  const [editUserSheetOpen, setEditUserSheetOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserListItem | null>(null);
+  const [editUserFormError, setEditUserFormError] = useState<string | null>(null);
 
   // Roles / Permissions State
   const [roleSheetOpen, setRoleSheetOpen] = useState(false);
@@ -115,6 +132,15 @@ export default function UsersPage() {
     formState: { errors, isSubmitting },
   } = useForm<CreateUserValues>({ resolver: zodResolver(createUserSchema) });
 
+  // Edit User Form
+  const {
+    register: registerEditUser,
+    handleSubmit: handleEditUserSubmit,
+    control: editUserControl,
+    reset: resetEditUserForm,
+    formState: { errors: editUserErrors, isSubmitting: isEditUserSubmitting },
+  } = useForm<EditUserValues>({ resolver: zodResolver(editUserSchema) });
+
   const createMutation = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
@@ -123,6 +149,16 @@ export default function UsersPage() {
       reset();
     },
     onError: (error) => setUserFormError(error instanceof ApiError ? error.message : 'Failed to create user'),
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof updateUser>[1] }) => updateUser(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setEditUserSheetOpen(false);
+      setEditingUser(null);
+    },
+    onError: (error) => setEditUserFormError(error instanceof ApiError ? error.message : 'Failed to update user'),
   });
 
   const deactivateMutation = useMutation({
@@ -163,8 +199,41 @@ export default function UsersPage() {
   });
 
   const canCreateUser = hasPermission('user.create');
+  const canEditUser = hasPermission('user.update');
   const canDeleteUser = hasPermission('user.delete');
   const canManageSettings = hasPermission('settings.manage') || hasPermission('user.update');
+
+  const openEditUserModal = (user: UserListItem) => {
+    setEditingUser(user);
+    setEditUserFormError(null);
+    resetEditUserForm({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone || '',
+      roleId: user.role.id,
+      isActive: user.isActive,
+      password: '',
+    });
+    setEditUserSheetOpen(true);
+  };
+
+  const onSubmitEditUser = (values: EditUserValues) => {
+    if (!editingUser) return;
+    setEditUserFormError(null);
+    updateUserMutation.mutate({
+      id: editingUser.id,
+      data: {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone || undefined,
+        roleId: values.roleId,
+        isActive: values.isActive,
+        ...(values.password ? { password: values.password } : {}),
+      },
+    });
+  };
 
   const resetRoleForm = () => {
     setEditingRole(null);
@@ -409,7 +478,9 @@ export default function UsersPage() {
                       <TableHead>User Type / Role</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Last login</TableHead>
-                      {canDeleteUser && <TableHead className="text-right print:hidden">Actions</TableHead>}
+                      {(canEditUser || canDeleteUser) && (
+                        <TableHead className="text-right print:hidden">Actions</TableHead>
+                      )}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -435,19 +506,31 @@ export default function UsersPage() {
                         <TableCell className="text-muted-foreground">
                           {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Never'}
                         </TableCell>
-                        {canDeleteUser && (
+                        {(canEditUser || canDeleteUser) && (
                           <TableCell className="text-right print:hidden">
-                            {user.isActive && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deactivateMutation.mutate(user.id)}
-                                disabled={deactivateMutation.isPending}
-                              >
-                                <UserX className="h-4 w-4" />
-                                Deactivate
-                              </Button>
-                            )}
+                            <div className="flex items-center justify-end gap-1">
+                              {canEditUser && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openEditUserModal(user)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                  Edit
+                                </Button>
+                              )}
+                              {canDeleteUser && user.isActive && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => deactivateMutation.mutate(user.id)}
+                                  disabled={deactivateMutation.isPending}
+                                >
+                                  <UserX className="h-4 w-4" />
+                                  Deactivate
+                                </Button>
+                              )}
+                            </div>
                           </TableCell>
                         )}
                       </TableRow>
@@ -574,6 +657,106 @@ export default function UsersPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Sheet: Edit User */}
+      <Sheet
+        open={editUserSheetOpen}
+        onOpenChange={(open: boolean) => {
+          setEditUserSheetOpen(open);
+          if (!open) setEditingUser(null);
+        }}
+      >
+        <SheetContent>
+          <form onSubmit={handleEditUserSubmit(onSubmitEditUser)} className="flex h-full flex-col" noValidate>
+            <SheetHeader>
+              <SheetTitle>Edit user account</SheetTitle>
+              <SheetDescription>Update {editingUser?.firstName}&rsquo;s details, role, status, or reset their password.</SheetDescription>
+            </SheetHeader>
+            <SheetBody className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="editFirstName">First name</Label>
+                  <Input id="editFirstName" {...registerEditUser('firstName')} />
+                  {editUserErrors.firstName && <p className="text-sm text-destructive">{editUserErrors.firstName.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editLastName">Last name</Label>
+                  <Input id="editLastName" {...registerEditUser('lastName')} />
+                  {editUserErrors.lastName && <p className="text-sm text-destructive">{editUserErrors.lastName.message}</p>}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editEmail">Email address</Label>
+                <Input id="editEmail" type="email" {...registerEditUser('email')} />
+                {editUserErrors.email && <p className="text-sm text-destructive">{editUserErrors.email.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editPhone">Phone (optional)</Label>
+                <Input id="editPhone" placeholder="+233…" {...registerEditUser('phone')} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editRoleId">User Type / Role</Label>
+                <Controller
+                  control={editUserControl}
+                  name="roleId"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="editRoleId">
+                        <SelectValue placeholder="Select a role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rolesQuery.data?.map((role) => (
+                          <SelectItem key={role.id} value={role.id}>
+                            {role.name.replace(/_/g, ' ')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {editUserErrors.roleId && <p className="text-sm text-destructive">{editUserErrors.roleId.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editIsActive">Account status</Label>
+                <Controller
+                  control={editUserControl}
+                  name="isActive"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value ? 'active' : 'inactive'}
+                      onValueChange={(v: string) => field.onChange(v === 'active')}
+                    >
+                      <SelectTrigger id="editIsActive">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editPassword">Reset password (optional)</Label>
+                <Input id="editPassword" type="password" placeholder="Leave blank to keep current password" {...registerEditUser('password')} />
+                {editUserErrors.password && <p className="text-sm text-destructive">{editUserErrors.password.message}</p>}
+              </div>
+              {editUserFormError && (
+                <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {editUserFormError}
+                </p>
+              )}
+            </SheetBody>
+            <SheetFooter>
+              <Button type="submit" disabled={isEditUserSubmitting || updateUserMutation.isPending}>
+                {updateUserMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Changes
+              </Button>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
 
       {/* Sheet: Add / Edit User Type & Rules */}
       <Sheet open={roleSheetOpen} onOpenChange={(open: boolean) => !open && setRoleSheetOpen(false)}>
