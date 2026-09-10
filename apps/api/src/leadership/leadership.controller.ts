@@ -14,6 +14,7 @@ import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { CreateLeadershipDto } from './dto/create-leadership.dto';
 import { UpdateLeadershipDto } from './dto/update-leadership.dto';
+import { Public } from '../common/decorators/public.decorator';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PERMISSIONS } from '../common/constants/permissions';
@@ -23,6 +24,12 @@ import { PERMISSIONS } from '../common/constants/permissions';
 @Controller('leadership')
 export class LeadershipController {
   constructor(private readonly service: LeadershipService) {}
+
+  @Public()
+  @Get('public')
+  findPublicLeadership() {
+    return this.service.findPublicLeadership();
+  }
 
   @Get('positions')
   @RequirePermissions(PERMISSIONS.LEADERSHIP_VIEW)

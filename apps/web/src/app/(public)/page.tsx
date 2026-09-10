@@ -23,8 +23,8 @@ import {
   fetchPublicSermons,
   fetchPublicEvents,
   fetchPublicNews,
+  fetchPublicMinistries,
 } from '@/lib/api/public';
-import { fetchMinistries } from '@/lib/api/ministries';
 import { fetchPublicGallery } from '@/lib/api/media';
 import { Button } from '@/components/ui/button';
 
@@ -51,7 +51,7 @@ export default function PublicHomePage() {
 
   const { data: ministries = [] } = useQuery({
     queryKey: ['public-ministries'],
-    queryFn: fetchMinistries,
+    queryFn: fetchPublicMinistries,
   });
 
   const { data: galleryData } = useQuery({
@@ -201,54 +201,31 @@ export default function PublicHomePage() {
             </Link>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {topMinistries.length > 0
-              ? topMinistries.map((m) => (
-                  <Link
-                    key={m.id}
-                    href={`/ministries/${m.slug}`}
-                    className="flex items-center gap-4 rounded-xl border border-slate-200/80 bg-white p-4 transition-all hover:shadow-md hover:border-[#FFC72C]/50"
-                  >
-                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-[#14309c] text-white">
-                      <Users className="h-6 w-6 text-[#FFC72C]" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900">{m.name}</h3>
-                      <p className="mt-1 line-clamp-1 text-xs text-slate-500">
-                        {m.description || 'Spiritual growth and fellowship.'}
-                      </p>
-                    </div>
-                  </Link>
-                ))
-              : [
-                  { id: '1', day: '07', month: 'SEP', title: 'Weekly Drill', location: 'Brigade Hall' },
-                  { id: '2', day: '05', month: 'SEP', title: 'Sports Day', location: 'Sports Field' },
-                  { id: '3', day: '05', month: 'SEP', title: 'Sports Day', location: 'Sports Field' },
-                  { id: '4', day: '02', month: 'SEP', title: 'Bible Study', location: 'Church Hall' },
-                  { id: '5', day: '02', month: 'SEP', title: 'Bible Study', location: 'Church Hall' },
-                  { id: '6', day: '01', month: 'SEP', title: 'Weekly Drill', location: 'Brigade Hall' },
-                ].map((act) => (
-                  <Link
-                    key={act.id}
-                    href="/ministries"
-                    className="flex items-center gap-4 rounded-xl border border-slate-200/80 bg-white p-4 transition-all hover:shadow-md"
-                  >
-                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-[#14309c] text-white">
-                      <span className="font-serif text-lg font-bold leading-none">{act.day}</span>
-                      <span className="mt-0.5 text-[9px] font-extrabold uppercase tracking-widest text-[#FFC72C]">
-                        {act.month}
-                      </span>
-                    </div>
-
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900">{act.title}</h3>
-                      <div className="mt-1 flex items-center gap-1 text-xs font-semibold text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 text-[#FFC72C]" /> {act.location}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-          </div>
+          {topMinistries.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {topMinistries.map((m) => (
+                <Link
+                  key={m.id}
+                  href={`/ministries/${m.slug}`}
+                  className="flex items-center gap-4 rounded-xl border border-slate-200/80 bg-white p-4 transition-all hover:shadow-md hover:border-[#FFC72C]/50"
+                >
+                  <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-[#14309c] text-white">
+                    <Users className="h-6 w-6 text-[#FFC72C]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">{m.name}</h3>
+                    <p className="mt-1 line-clamp-1 text-xs text-slate-500">
+                      {m.description || 'Spiritual growth and fellowship.'}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center text-xs text-slate-500">
+              Ministries added from the admin dashboard will appear here.
+            </div>
+          )}
         </div>
       </section>
 
@@ -263,69 +240,45 @@ export default function PublicHomePage() {
             </Link>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.length > 0
-              ? upcomingEvents.map((ev) => (
-                  <Link
-                    key={ev.id}
-                    href={`/events/${ev.slug}`}
-                    className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all hover:shadow-lg"
-                  >
-                    <div className="relative flex h-44 items-center justify-center bg-[#14309c] p-6 text-center">
-                      <Calendar className="h-10 w-10 text-white/20" />
+          {upcomingEvents.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {upcomingEvents.map((ev) => (
+                <Link
+                  key={ev.id}
+                  href={`/events/${ev.slug}`}
+                  className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all hover:shadow-lg"
+                >
+                  <div className="relative flex h-44 items-center justify-center bg-[#14309c] p-6 text-center">
+                    <Calendar className="h-10 w-10 text-white/20" />
 
-                      <div className="absolute top-0 left-0 rounded-br-xl bg-[#14309c] border-r border-b border-white/10 px-3 py-1.5 text-xs font-bold text-[#FFC72C]">
-                        {new Date(ev.startDate).toLocaleDateString(undefined, { day: '2-digit', month: 'short' }).toUpperCase()}
-                      </div>
-
-                      <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20">
-                        <Share2 className="h-4 w-4" />
-                      </div>
+                    <div className="absolute top-0 left-0 rounded-br-xl bg-[#14309c] border-r border-b border-white/10 px-3 py-1.5 text-xs font-bold text-[#FFC72C]">
+                      {new Date(ev.startDate).toLocaleDateString(undefined, { day: '2-digit', month: 'short' }).toUpperCase()}
                     </div>
 
-                    <div className="space-y-3 p-6">
-                      <h3 className="font-serif text-lg font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
-                        {ev.title}
-                      </h3>
-                      <p className="line-clamp-2 text-xs leading-relaxed text-slate-600">
-                        {ev.description || 'Annual camping and training event for all members and visitors.'}
-                      </p>
-                      <div className="flex items-center gap-1.5 pt-1 text-xs font-semibold text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 text-[#FFC72C]" /> {ev.location || 'Brigade Camp Grounds'}
-                      </div>
+                    <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20">
+                      <Share2 className="h-4 w-4" />
                     </div>
-                  </Link>
-                ))
-              : [1, 2].map((i) => (
-                  <Link
-                    key={i}
-                    href="/events"
-                    className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-all hover:shadow-lg"
-                  >
-                    <div className="relative flex h-44 items-center justify-center bg-[#14309c] p-6 text-center">
-                      <Calendar className="h-10 w-10 text-white/20" />
-                      <div className="absolute top-0 left-0 rounded-br-xl bg-[#14309c] border-r border-b border-white/10 px-3 py-1.5 text-xs font-bold text-[#FFC72C]">
-                        01 NOV
-                      </div>
-                      <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
-                        <Share2 className="h-4 w-4" />
-                      </div>
-                    </div>
+                  </div>
 
-                    <div className="space-y-3 p-6">
-                      <h3 className="font-serif text-lg font-bold text-slate-900">
-                        Annual Brigade Camp 2026
-                      </h3>
-                      <p className="text-xs leading-relaxed text-slate-600">
-                        Annual camping and training event for all members.
-                      </p>
-                      <div className="flex items-center gap-1.5 pt-1 text-xs font-semibold text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 text-[#FFC72C]" /> Brigade Camp Grounds
-                      </div>
+                  <div className="space-y-3 p-6">
+                    <h3 className="font-serif text-lg font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+                      {ev.title}
+                    </h3>
+                    <p className="line-clamp-2 text-xs leading-relaxed text-slate-600">
+                      {ev.description || 'Annual camping and training event for all members and visitors.'}
+                    </p>
+                    <div className="flex items-center gap-1.5 pt-1 text-xs font-semibold text-slate-500">
+                      <MapPin className="h-3.5 w-3.5 text-[#FFC72C]" /> {ev.location || 'Brigade Camp Grounds'}
                     </div>
-                  </Link>
-                ))}
-          </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-xs text-slate-500">
+              Events added from the admin dashboard will appear here.
+            </div>
+          )}
         </div>
       </section>
 
@@ -408,9 +361,9 @@ export default function PublicHomePage() {
             </Link>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {latestNews.length > 0 ? (
-              latestNews.map((n) => (
+          {latestNews.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {latestNews.map((n) => (
                 <Link
                   key={n.id}
                   href={`/news/${n.slug}`}
@@ -435,51 +388,13 @@ export default function PublicHomePage() {
                   </h3>
                   <p className="text-xs leading-relaxed text-slate-600">{n.excerpt}</p>
                 </Link>
-              ))
-            ) : (
-              <>
-                <Link
-                  href="/news"
-                  className="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-extrabold uppercase tracking-wider text-[#FFC72C]">
-                      01 SEP 2026
-                    </span>
-                    <div className="text-slate-400">
-                      <Share2 className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <h3 className="font-serif text-lg font-bold text-slate-900">
-                    Welcome to the New Brigade Year!
-                  </h3>
-                  <p className="text-xs leading-relaxed text-slate-600">
-                    We are excited to begin a new year of activities. All members are encouraged to register and participate actively.
-                  </p>
-                </Link>
-
-                <Link
-                  href="/news"
-                  className="space-y-3 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-extrabold uppercase tracking-wider text-[#FFC72C]">
-                      31 AUG 2026
-                    </span>
-                    <div className="text-slate-400">
-                      <Share2 className="h-4 w-4" />
-                    </div>
-                  </div>
-                  <h3 className="font-serif text-lg font-bold text-slate-900">
-                    Welcome to the New Brigade Year!
-                  </h3>
-                  <p className="text-xs leading-relaxed text-slate-600">
-                    We are excited to begin a new year of activities. All members are encouraged to register and participate actively.
-                  </p>
-                </Link>
-              </>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-xs text-slate-500">
+              News and announcements added from the admin dashboard will appear here.
+            </div>
+          )}
         </div>
       </section>
 

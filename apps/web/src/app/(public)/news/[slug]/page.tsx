@@ -5,28 +5,11 @@ import { fetchPublicNewsBySlug, NewsItem } from '@/lib/api/public';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Calendar, Share2 } from 'lucide-react';
 
+export const revalidate = 60;
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-const FALLBACK_NEWS: NewsItem = {
-  id: '1',
-  title: 'Methodist Church Ghana Launches 2026 National Evangelism Drive',
-  slug: 'national-evangelism-drive-2026',
-  excerpt: 'The Presiding Bishop announces a nationwide soul-winning drive under the theme "Go and Make Disciples of All Nations".',
-  content: `The leadership of the Methodist Church Ghana has officially unveiled the 2026 National Evangelism Strategy focused on rural church planting, youth outreach, and digital gospel broadcast.
-
-Addressing Synod representatives at the Connexional Secretariat, the Presiding Bishop stressed that Wesley's legacy of taking the world as his parish remains binding upon every Methodist today.
-
-Key pillars of the 2026 campaign include:
-• Planting 50 new societies across underserved rural circuits.
-• Equipping 10,000 Methodist Youth Fellowship members with digital evangelism tools.
-• Providing clean water wells and basic medical supplies in target outreach communities.
-
-"We are called not to maintain buildings, but to win souls and cultivate holy communities," stated the Presiding Bishop. Circuit stewards and ministers have been urged to coordinate prayer vigils and resource mobilization toward this divine vision.`,
-  publishedAt: '2026-09-01T08:00:00.000Z',
-  featuredImageUrl: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80',
-};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -34,11 +17,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     article = await fetchPublicNewsBySlug(slug);
   } catch (e) {
-    // fallback
+    // article stays null; page itself will 404
   }
 
   if (!article) {
-    article = FALLBACK_NEWS;
+    return { title: 'Article Not Found | Methodist Church Ghana' };
   }
 
   return {
@@ -53,7 +36,7 @@ export default async function NewsDetailPage({ params }: Props) {
   try {
     article = await fetchPublicNewsBySlug(slug);
   } catch (e) {
-    article = FALLBACK_NEWS;
+    article = null;
   }
 
   if (!article) {

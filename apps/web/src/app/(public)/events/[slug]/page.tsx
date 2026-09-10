@@ -6,21 +6,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Calendar, Clock, MapPin, UserCheck } from 'lucide-react';
 
+export const revalidate = 60;
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-const FALLBACK_EVENT: EventItem = {
-  id: '1',
-  title: 'Annual Connexional Synod & Prayer Convention',
-  slug: 'annual-connexional-synod-2026',
-  description: 'Gathering of ministers, lay leaders, and members for prayer, strategic visioning, reports, and spiritual empowerment.',
-  startDate: '2026-10-15T09:00:00.000Z',
-  endDate: '2026-10-18T16:00:00.000Z',
-  location: 'Diocesan Cathedral Hall, Accra',
-  bannerImageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
-  isRegistrationRequired: true,
-};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -28,11 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     event = await fetchPublicEventBySlug(slug);
   } catch (e) {
-    // fallback
+    // event stays null; page itself will 404
   }
 
   if (!event) {
-    event = FALLBACK_EVENT;
+    return { title: 'Event Not Found | Methodist Church Ghana' };
   }
 
   return {
@@ -47,7 +37,7 @@ export default async function EventDetailPage({ params }: Props) {
   try {
     event = await fetchPublicEventBySlug(slug);
   } catch (e) {
-    event = FALLBACK_EVENT;
+    event = null;
   }
 
   if (!event) {

@@ -6,22 +6,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Calendar, User, BookOpen, Headphones, Video, Share2 } from 'lucide-react';
 
+export const revalidate = 60;
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
-
-const FALLBACK_SERMON: SermonItem = {
-  id: '1',
-  title: 'Walking in Divine Grace & Stewardship',
-  slug: 'walking-in-divine-grace',
-  speaker: 'Very Rev. Dr. Emmanuel K. Asante',
-  date: '2026-09-06',
-  scripture: '2 Corinthians 9:8-11',
-  description: 'A deep biblical reflection on how God multiplies grace and entrusts resources to believers for kingdom advancement and community transformation.',
-  videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-  tags: 'Grace, Stewardship, Faith',
-};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -29,11 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     sermon = await fetchPublicSermonBySlug(slug);
   } catch (e) {
-    // fallback
+    // sermon stays null; page itself will 404
   }
 
   if (!sermon) {
-    sermon = FALLBACK_SERMON;
+    return { title: 'Sermon Not Found | Methodist Church Ghana' };
   }
 
   return {
@@ -48,7 +37,7 @@ export default async function SermonDetailPage({ params }: Props) {
   try {
     sermon = await fetchPublicSermonBySlug(slug);
   } catch (e) {
-    sermon = FALLBACK_SERMON;
+    sermon = null;
   }
 
   if (!sermon) {

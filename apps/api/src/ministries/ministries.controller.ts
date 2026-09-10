@@ -13,6 +13,7 @@ import { MinistriesService } from './ministries.service';
 import { CreateMinistryDto } from './dto/create-ministry.dto';
 import { UpdateMinistryDto } from './dto/update-ministry.dto';
 import { AddMinistryMemberDto } from './dto/add-ministry-member.dto';
+import { Public } from '../common/decorators/public.decorator';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PERMISSIONS } from '../common/constants/permissions';
@@ -22,6 +23,18 @@ import { PERMISSIONS } from '../common/constants/permissions';
 @Controller('ministries')
 export class MinistriesController {
   constructor(private readonly service: MinistriesService) {}
+
+  @Public()
+  @Get('public')
+  findPublic() {
+    return this.service.findPublic();
+  }
+
+  @Public()
+  @Get('public/:slug')
+  findPublicBySlug(@Param('slug') slug: string) {
+    return this.service.findPublicBySlug(slug);
+  }
 
   @Get()
   @RequirePermissions(PERMISSIONS.MINISTRY_VIEW)

@@ -5,45 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock, ArrowRight } from 'lucide-react';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Events & Church Calendar | Methodist Church Ghana',
   description: 'Upcoming conferences, synods, revival meetings, youth camps, and special Sunday services across the Methodist Church Ghana.',
 };
-
-const FALLBACK_EVENTS: EventItem[] = [
-  {
-    id: '1',
-    title: 'Annual Connexional Synod & Prayer Convention',
-    slug: 'annual-connexional-synod-2026',
-    description: 'Gathering of ministers, lay leaders, and members for prayer, strategic visioning, reports, and spiritual empowerment.',
-    startDate: '2026-10-15T09:00:00.000Z',
-    endDate: '2026-10-18T16:00:00.000Z',
-    location: 'Diocesan Cathedral Hall, Accra',
-    bannerImageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
-    isRegistrationRequired: true,
-  },
-  {
-    id: '2',
-    title: 'National Youth & Campus Evangelism Summit',
-    slug: 'national-youth-summit-2026',
-    description: 'Three days of fiery worship, career mentoring, leadership training, and campus outreach hosted by the MYF.',
-    startDate: '2026-11-05T10:00:00.000Z',
-    endDate: '2026-11-07T18:00:00.000Z',
-    location: 'Main Sanctuary & Youth Center',
-    bannerImageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop&q=80',
-    isRegistrationRequired: true,
-  },
-  {
-    id: '3',
-    title: 'Harvest Thanksgiving & Praise Festival',
-    slug: 'harvest-thanksgiving-praise-2026',
-    description: 'Join us for a colorful service of thanksgiving to God for His agricultural and financial provisions throughout the year.',
-    startDate: '2026-12-06T08:30:00.000Z',
-    endDate: '2026-12-06T13:00:00.000Z',
-    location: 'Main Church Premises',
-    isRegistrationRequired: false,
-  },
-];
 
 export default async function EventsPage() {
   let events: EventItem[] = [];
@@ -51,10 +18,6 @@ export default async function EventsPage() {
     events = await fetchPublicEvents();
   } catch (err) {
     console.error('Failed to fetch public events:', err);
-  }
-
-  if (!events || events.length === 0) {
-    events = FALLBACK_EVENTS;
   }
 
   return (
@@ -74,6 +37,12 @@ export default async function EventsPage() {
         </div>
 
         {/* Events Grid */}
+        {events.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
+            No upcoming events have been published yet. Check back soon, or visit the admin dashboard to add one.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => {
             const start = new Date(event.startDate);

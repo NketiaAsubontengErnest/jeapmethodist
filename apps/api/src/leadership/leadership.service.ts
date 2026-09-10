@@ -105,6 +105,28 @@ export class LeadershipService {
     return { message: 'Leadership position deleted' };
   }
 
+  findPublicLeadership() {
+    return this.prisma.churchLeadership.findMany({
+      where: { isActive: true, position: { isActive: true } },
+      select: {
+        id: true,
+        name: true,
+        photoUrl: true,
+        bio: true,
+        phone: true,
+        email: true,
+        displayOrder: true,
+        position: {
+          select: { title: true, category: true, displayOrder: true },
+        },
+        member: {
+          select: { firstName: true, lastName: true, profilePhotoUrl: true },
+        },
+      },
+      orderBy: [{ displayOrder: 'asc' }, { position: { displayOrder: 'asc' } }],
+    });
+  }
+
   // Leadership Profiles
   findAllLeadership() {
     return this.prisma.churchLeadership.findMany({

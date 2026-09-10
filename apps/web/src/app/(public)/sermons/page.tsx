@@ -5,51 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Video, Headphones, Calendar, User, ArrowRight, PlayCircle } from 'lucide-react';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Sermon Library & Messages | Methodist Church Ghana',
   description: 'Listen to and watch spirit-filled sermons, Bible teachings, and Sunday messages from Methodist ministers and guest preachers.',
 };
-
-const FALLBACK_SERMONS: SermonItem[] = [
-  {
-    id: '1',
-    title: 'Walking in Divine Grace & Stewardship',
-    slug: 'walking-in-divine-grace',
-    speaker: 'Very Rev. Dr. Emmanuel K. Asante',
-    date: '2026-09-06',
-    scripture: '2 Corinthians 9:8-11',
-    description: 'A deep biblical reflection on how God multiplies grace and entrusts resources to believers for kingdom advancement and community transformation.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&auto=format&fit=crop&q=80',
-    tags: 'Grace, Stewardship, Faith',
-  },
-  {
-    id: '2',
-    title: 'The Power of Unceasing Prayer',
-    slug: 'power-of-unceasing-prayer',
-    speaker: 'Rev. Grace Mensah',
-    date: '2026-08-30',
-    scripture: '1 Thessalonians 5:16-18',
-    description: 'Examining John Wesley’s passion for personal prayer and how secret devotion fuels public spiritual revival in the local church.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1544427920-c49ccfb85579?w=800&auto=format&fit=crop&q=80',
-    tags: 'Prayer, Holiness, Revival',
-  },
-  {
-    id: '3',
-    title: 'Living as Salt and Light in Modern Society',
-    slug: 'salt-and-light-in-society',
-    speaker: 'Rt. Rev. Bishop Joseph K. Edusei',
-    date: '2026-08-23',
-    scripture: 'Matthew 5:13-16',
-    description: 'Challenging Christians to exhibit moral integrity, professional excellence, and Christian love in their workplaces and communities.',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?w=800&auto=format&fit=crop&q=80',
-    tags: 'Evangelism, Integrity, Witness',
-  },
-];
 
 export default async function SermonsPage() {
   let sermons: SermonItem[] = [];
@@ -57,10 +18,6 @@ export default async function SermonsPage() {
     sermons = await fetchPublicSermons();
   } catch (err) {
     console.error('Failed to fetch public sermons:', err);
-  }
-
-  if (!sermons || sermons.length === 0) {
-    sermons = FALLBACK_SERMONS;
   }
 
   const featured = sermons[0];
@@ -157,6 +114,12 @@ export default async function SermonsPage() {
               All Sermons &amp; Archives
             </h2>
           </div>
+
+          {sermons.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
+              No sermons have been published yet. Check back soon, or visit the admin dashboard to add one.
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sermons.map((sermon) => (

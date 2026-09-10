@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import '../src/env';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
@@ -6,24 +7,6 @@ import cookieParser from 'cookie-parser';
 import { json, urlencoded } from 'express';
 import { AppModule } from '../src/app.module';
 import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter';
-
-const NEON_DB_URL =
-  'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
-
-const isPostgresUrl = (url?: string) =>
-  Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
-
-if (!isPostgresUrl(process.env.DATABASE_URL)) {
-  process.env.DATABASE_URL = NEON_DB_URL;
-}
-if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET =
-    'YRhmE7bE_jUWddqWhtAIJER0YCRUfSse9xQ09mevXDDS1xWVguoWiFnXJtFilgLT';
-}
-if (!process.env.JWT_REFRESH_SECRET) {
-  process.env.JWT_REFRESH_SECRET =
-    'KvajkTpgSTQJMV3asuqkNU3ftED2iu7tWYbEq7Luh3YhxJ7aB_GBrmU_16RGfPBQ';
-}
 
 let cachedServer: any;
 

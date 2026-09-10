@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# NEXT_PUBLIC_* values only — no secrets — committed so `next build` always
+# targets the production API regardless of Vercel dashboard configuration.
+!.env.production
 
 # vercel
 .vercel

@@ -25,6 +25,45 @@ export class MinistriesService {
     private readonly auditService: AuditService,
   ) {}
 
+  findPublic() {
+    return this.prisma.ministry.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        meetingSchedule: true,
+        meetingVenue: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async findPublicBySlug(slug: string) {
+    const ministry = await this.prisma.ministry.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        meetingSchedule: true,
+        meetingVenue: true,
+        isActive: true,
+        leaderMember: { select: { firstName: true, lastName: true } },
+        assistantLeaderMember: { select: { firstName: true, lastName: true } },
+        _count: { select: { members: true } },
+      },
+    });
+
+    if (!ministry || !ministry.isActive) {
+      throw new NotFoundException('Ministry not found');
+    }
+
+    return ministry;
+  }
+
   findAll() {
     return this.prisma.ministry.findMany({
       include: {

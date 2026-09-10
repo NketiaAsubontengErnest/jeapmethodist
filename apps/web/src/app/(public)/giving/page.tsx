@@ -1,14 +1,19 @@
-﻿import { Metadata } from 'next';
+﻿'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Smartphone, Building2, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
+import { fetchPublicSettings } from '@/lib/api/public';
 
-export const metadata: Metadata = {
-  title: 'Giving & Stewardship | Methodist Church Ghana',
-  description: 'Support the work of God through Tithes, Offerings, Connexional Assessment, Harvest giving, and Mobile Money (MoMo) contributions.',
-};
+const NOT_YET_CONFIGURED = 'Not yet configured — please contact the church office';
 
 export default function GivingPage() {
+  const { data: settings } = useQuery({
+    queryKey: ['public-settings'],
+    queryFn: fetchPublicSettings,
+  });
+
   return (
     <div className="min-h-screen bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
@@ -63,12 +68,14 @@ export default function GivingPage() {
               <div className="bg-gold-50/60 border border-gold-200 rounded-xl p-6 space-y-4">
                 <div className="space-y-1">
                   <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Official MoMo Number</p>
-                  <p className="text-2xl font-extrabold text-gold-800 tracking-wider">024 000 0000</p>
+                  <p className="text-2xl font-extrabold text-gold-800 tracking-wider">
+                    {settings?.momo_number || NOT_YET_CONFIGURED}
+                  </p>
                 </div>
 
                 <div className="space-y-1 pt-2 border-t border-gold-200/70">
                   <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Account Merchant Name</p>
-                  <p className="text-sm font-bold text-foreground">Methodist Church Ghana</p>
+                  <p className="text-sm font-bold text-foreground">{settings?.church_name || 'Methodist Church Ghana'}</p>
                 </div>
 
                 <div className="space-y-1 pt-2 border-t border-gold-200/70">
@@ -79,16 +86,18 @@ export default function GivingPage() {
                 </div>
               </div>
 
-              <div className="space-y-2 text-xs text-muted-foreground">
-                <p className="font-semibold text-secondary-foreground">How to send via USSD:</p>
-                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                  <li>Dial *170# (MTN) or *110# (Telecel / AT).</li>
-                  <li>Select Transfer Money or Pay Merchant.</li>
-                  <li>Enter Number: <strong>0240000000</strong>.</li>
-                  <li>Enter Amount and reference (e.g., Tithe/Harvest).</li>
-                  <li>Confirm with your MoMo PIN.</li>
-                </ol>
-              </div>
+              {settings?.momo_number && (
+                <div className="space-y-2 text-xs text-muted-foreground">
+                  <p className="font-semibold text-secondary-foreground">How to send via USSD:</p>
+                  <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                    <li>Dial *170# (MTN) or *110# (Telecel / AT).</li>
+                    <li>Select Transfer Money or Pay Merchant.</li>
+                    <li>Enter Number: <strong>{settings.momo_number}</strong>.</li>
+                    <li>Enter Amount and reference (e.g., Tithe/Harvest).</li>
+                    <li>Confirm with your MoMo PIN.</li>
+                  </ol>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -112,25 +121,21 @@ export default function GivingPage() {
               </p>
 
               <div className="bg-cream-200/60 border border-border rounded-xl p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <p className="text-muted-foreground font-medium">Bank Name</p>
-                    <p className="font-bold text-foreground text-sm">GCB Bank PLC / Stanbic Bank</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground font-medium">Branch</p>
-                    <p className="font-bold text-foreground text-sm">Main Branch, Accra</p>
-                  </div>
+                <div>
+                  <p className="text-muted-foreground font-medium text-xs">Bank Name</p>
+                  <p className="font-bold text-foreground text-sm">{settings?.bank_name || NOT_YET_CONFIGURED}</p>
                 </div>
 
                 <div className="space-y-1 pt-2 border-t border-border">
                   <p className="text-xs text-muted-foreground font-medium">Account Name</p>
-                  <p className="font-bold text-foreground">Methodist Church Ghana - Main Account</p>
+                  <p className="font-bold text-foreground">{settings?.church_name || 'Methodist Church Ghana'}</p>
                 </div>
 
                 <div className="space-y-1 pt-2 border-t border-border">
                   <p className="text-xs text-muted-foreground font-medium">Account Number</p>
-                  <p className="text-xl font-extrabold text-primary tracking-wider">1011180009990</p>
+                  <p className="text-xl font-extrabold text-primary tracking-wider">
+                    {settings?.bank_account_number || NOT_YET_CONFIGURED}
+                  </p>
                 </div>
               </div>
 

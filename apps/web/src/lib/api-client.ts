@@ -1,4 +1,10 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://jeapmethodistapi.vercel.app/api/v1';
+if (!process.env.NEXT_PUBLIC_API_URL) {
+  throw new Error(
+    'NEXT_PUBLIC_API_URL is not set. Local dev reads it from apps/web/.env.local; production builds read it from apps/web/.env.production.',
+  );
+}
+
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /** In-memory only — never persisted to localStorage/sessionStorage to limit XSS exposure. */
 let accessToken: string | null = null;

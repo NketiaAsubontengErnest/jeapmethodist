@@ -17,24 +17,28 @@ export interface AppConfig {
   };
 }
 
-export default (): AppConfig => ({
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  port: parseInt(process.env.API_PORT ?? '4000', 10),
-  apiPrefix: process.env.API_PREFIX ?? 'api/v1',
-  corsOrigin: process.env.CORS_ORIGIN ?? 'https://jeapmethodist.vercel.app',
-  publicOrigin: process.env.PUBLIC_API_ORIGIN ?? 'https://jeapmethodistapi.vercel.app',
-  jwt: {
-    accessSecret:
-      process.env.JWT_SECRET ||
-      'YRhmE7bE_jUWddqWhtAIJER0YCRUfSse9xQ09mevXDDS1xWVguoWiFnXJtFilgLT',
-    accessExpiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
-    refreshSecret:
-      process.env.JWT_REFRESH_SECRET ||
-      'KvajkTpgSTQJMV3asuqkNU3ftED2iu7tWYbEq7Luh3YhxJ7aB_GBrmU_16RGfPBQ',
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
-  },
-  defaults: {
-    currency: process.env.DEFAULT_CURRENCY ?? 'GHS',
-    timezone: process.env.DEFAULT_TIMEZONE ?? 'Africa/Accra',
-  },
-});
+export default (): AppConfig => {
+  if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+    throw new Error(
+      'JWT_SECRET and JWT_REFRESH_SECRET must be set in the environment (local .env for dev, Vercel project settings for production).',
+    );
+  }
+
+  return {
+    nodeEnv: process.env.NODE_ENV ?? 'development',
+    port: parseInt(process.env.API_PORT ?? '4000', 10),
+    apiPrefix: process.env.API_PREFIX ?? 'api/v1',
+    corsOrigin: process.env.CORS_ORIGIN ?? 'https://jeapmethodist.vercel.app',
+    publicOrigin: process.env.PUBLIC_API_ORIGIN ?? 'https://jeapmethodistapi.vercel.app',
+    jwt: {
+      accessSecret: process.env.JWT_SECRET,
+      accessExpiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
+      refreshSecret: process.env.JWT_REFRESH_SECRET,
+      refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
+    },
+    defaults: {
+      currency: process.env.DEFAULT_CURRENCY ?? 'GHS',
+      timezone: process.env.DEFAULT_TIMEZONE ?? 'Africa/Accra',
+    },
+  };
+};

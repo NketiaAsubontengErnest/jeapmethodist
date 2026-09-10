@@ -54,6 +54,34 @@ export interface EventItem {
   isRegistrationRequired: boolean;
 }
 
+export interface MinistryPublicItem {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  meetingSchedule?: string;
+  meetingVenue?: string;
+}
+
+export interface MinistryPublicDetail extends MinistryPublicItem {
+  isActive: boolean;
+  leaderMember?: { firstName: string; lastName: string };
+  assistantLeaderMember?: { firstName: string; lastName: string };
+  _count?: { members: number };
+}
+
+export interface LeadershipPublicItem {
+  id: string;
+  name?: string;
+  photoUrl?: string;
+  bio?: string;
+  phone?: string;
+  email?: string;
+  displayOrder: number;
+  position: { title: string; category: string; displayOrder: number };
+  member?: { firstName: string; lastName: string; profilePhotoUrl?: string };
+}
+
 export interface NewsItem {
   id: string;
   title: string;
@@ -66,6 +94,18 @@ export interface NewsItem {
 
 export async function fetchPublicSettings(): Promise<PublicSettings> {
   return apiClient.get<PublicSettings>('/settings/public');
+}
+
+export async function fetchPublicMinistries(): Promise<MinistryPublicItem[]> {
+  return apiClient.get<MinistryPublicItem[]>('/ministries/public');
+}
+
+export async function fetchPublicMinistryBySlug(slug: string): Promise<MinistryPublicDetail> {
+  return apiClient.get<MinistryPublicDetail>(`/ministries/public/${slug}`);
+}
+
+export async function fetchPublicLeadership(): Promise<LeadershipPublicItem[]> {
+  return apiClient.get<LeadershipPublicItem[]>('/leadership/public');
 }
 
 export async function fetchPublicSermons(): Promise<SermonItem[]> {

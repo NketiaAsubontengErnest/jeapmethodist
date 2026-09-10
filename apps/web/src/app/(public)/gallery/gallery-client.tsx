@@ -8,41 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { fetchPublicGallery, type MediaItem } from '@/lib/api/media';
-import { fetchAlbumById, type AlbumItem } from '@/lib/api/albums';
+import { fetchAlbumById } from '@/lib/api/albums';
 import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, Sparkles } from 'lucide-react';
-
-const FALLBACK_ALBUMS: AlbumItem[] = [
-  {
-    id: '1',
-    title: 'Sunday Divine Service & Holy Communion',
-    slug: 'sunday-divine-service',
-    description: 'Highlights from the Lord’s Day worship and sermon.',
-    coverUrl: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=800&auto=format&fit=crop&q=80',
-    createdAt: '2026-09-01T00:00:00Z',
-    updatedAt: '2026-09-01T00:00:00Z',
-    _count: { photos: 12 },
-  },
-  {
-    id: '2',
-    title: 'Church Choir Annual Music Concert',
-    slug: 'choir-concert',
-    description: 'Praise & adoration by the Wesley Cathedral Choir.',
-    coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&auto=format&fit=crop&q=80',
-    createdAt: '2026-08-15T00:00:00Z',
-    updatedAt: '2026-08-15T00:00:00Z',
-    _count: { photos: 24 },
-  },
-  {
-    id: '3',
-    title: 'Boys’ & Girls’ Brigade March Past Parade',
-    slug: 'brigade-parade',
-    description: 'Youth parade and drills across the church grounds.',
-    coverUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop&q=80',
-    createdAt: '2026-07-20T00:00:00Z',
-    updatedAt: '2026-07-20T00:00:00Z',
-    _count: { photos: 18 },
-  },
-];
 
 export default function GalleryClient() {
   const [filterType, setFilterType] = useState<'ALL' | 'ALBUMS' | 'LIVE' | 'VIDEOS'>('ALL');

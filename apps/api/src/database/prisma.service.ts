@@ -6,14 +6,13 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
-const DEFAULT_DB_URL =
-  'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
-
 const isPostgresUrl = (url?: string) =>
-  Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
+  Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')));
 
 if (!isPostgresUrl(process.env.DATABASE_URL)) {
-  process.env.DATABASE_URL = DEFAULT_DB_URL;
+  throw new Error(
+    'DATABASE_URL is missing or invalid. Set it to a valid postgresql:// connection string (e.g. your Neon connection string) in the environment configuration.',
+  );
 }
 
 @Injectable()
