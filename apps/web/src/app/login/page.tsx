@@ -47,7 +47,7 @@ export default function LoginPage() {
       await login(values.email, values.password);
       router.push('/admin/dashboard');
     } catch (error) {
-      setServerError(error instanceof ApiError ? error.message : 'Something went wrong. Please try again.');
+      setServerError(error instanceof Error ? error.message : 'Something went wrong. Please try again.');
     }
   };
 

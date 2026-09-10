@@ -36,10 +36,12 @@ export class AuthController {
   private setRefreshCookie(res: Response, token: string) {
     const refreshExpiresIn =
       this.configService.get<string>('jwt.refreshExpiresIn') ?? '7d';
+    const isProd =
+      this.configService.get<string>('nodeEnv') === 'production' || !!process.env.VERCEL;
     res.cookie(REFRESH_COOKIE_NAME, token, {
       httpOnly: true,
-      secure: this.configService.get<string>('nodeEnv') === 'production',
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       path: '/api/v1/auth',
       maxAge: parseDurationToMs(refreshExpiresIn),
     });
@@ -88,7 +90,13 @@ export class AuthController {
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const token = req.cookies?.[REFRESH_COOKIE_NAME];
     await this.authService.logout(token);
-    res.clearCookie(REFRESH_COOKIE_NAME, { path: '/api/v1/auth' });
+    const isProd =
+      this.configService.get<string>('nodeEnv') === 'production' || !!process.env.VERCEL;
+    res.clearCookie(REFRESH_COOKIE_NAME, {
+      path: '/api/v1/auth',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+    });
     return { message: 'Logged out' };
   }
 
