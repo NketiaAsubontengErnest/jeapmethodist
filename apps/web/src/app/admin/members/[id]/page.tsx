@@ -93,7 +93,11 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
       toast.success('Member details updated successfully!');
       setEditSheetOpen(false);
     },
-    onError: (error) => setEditFormError(error instanceof ApiError ? error.message : 'Failed to update member'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to update member';
+      setEditFormError(message);
+      toast.error('Failed to update member', message);
+    },
   });
 
   const openEditSheet = () => {

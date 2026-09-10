@@ -10,6 +10,7 @@ import { UsersRound, Plus, Users, Search, Loader2, MapPin, Calendar, Pencil, Tra
 import { fetchGroups, createGroup, updateGroup, deleteGroup, GroupListItem } from '@/lib/api/groups';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,6 +48,7 @@ type GroupFormValues = z.infer<typeof groupSchema>;
 
 export default function GroupsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
@@ -70,9 +72,12 @@ export default function GroupsPage() {
       setOpen(false);
       reset();
       setFormError(null);
+      toast.success('Group created!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to create group');
+      const message = err instanceof ApiError ? err.message : 'Failed to create group';
+      setFormError(message);
+      toast.error('Failed to create group', message);
     },
   });
 
@@ -83,9 +88,12 @@ export default function GroupsPage() {
       setEditingGroup(null);
       reset();
       setFormError(null);
+      toast.success('Group updated!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to update group');
+      const message = err instanceof ApiError ? err.message : 'Failed to update group';
+      setFormError(message);
+      toast.error('Failed to update group', message);
     },
   });
 
@@ -94,7 +102,9 @@ export default function GroupsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
       setDeleteId(null);
+      toast.success('Group deleted');
     },
+    onError: (err) => toast.error('Failed to delete group', err instanceof ApiError ? err.message : undefined),
   });
 
   const openEdit = (g: GroupListItem) => {

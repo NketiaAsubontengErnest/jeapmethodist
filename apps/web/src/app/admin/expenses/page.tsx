@@ -15,6 +15,7 @@ import {
 } from '@/lib/api/finance';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,7 @@ function formatGHS(amount: number | string) {
 
 export default function ExpensesPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
@@ -84,13 +86,22 @@ export default function ExpensesPage() {
       queryClient.invalidateQueries({ queryKey: ['finance-transactions'] });
       setOpen(false);
       reset();
+      toast.success('Expense recorded!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to record expense'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to record expense';
+      setError(message);
+      toast.error('Failed to record expense', message);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteTransaction,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['finance-transactions'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['finance-transactions'] });
+      toast.success('Expense deleted');
+    },
+    onError: (e) => toast.error('Failed to delete expense', e instanceof ApiError ? e.message : undefined),
   });
 
   const canCreate = hasPermission('finance.create');

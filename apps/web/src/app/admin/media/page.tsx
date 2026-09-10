@@ -36,6 +36,7 @@ import {
 } from '@/lib/api/albums';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -96,6 +97,7 @@ function MediaThumbnail({ item }: { item: MediaItem }) {
 export default function MediaPage() {
   const { hasPermission } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState<'albums' | 'photos' | 'videos' | 'live'>('albums');
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
@@ -188,14 +190,25 @@ export default function MediaPage() {
         });
       }
     },
-    onSuccess: () => {
+    onSuccess: (media) => {
       queryClient.invalidateQueries({ queryKey: ['media-admin'] });
       queryClient.invalidateQueries({ queryKey: ['albums-admin'] });
       queryClient.invalidateQueries({ queryKey: ['album-detail'] });
       setPostOpen(false);
       resetPostForm();
+      toast.success(
+        media.type === 'LIVE_VIDEO'
+          ? 'Live stream published!'
+          : media.type === 'VIDEO'
+          ? 'Video published!'
+          : 'Photo uploaded!',
+      );
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : (e as Error).message || 'Failed to publish post'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : (e as Error).message || 'Failed to publish post';
+      setError(message);
+      toast.error('Failed to publish', message);
+    },
   });
 
   const updateMediaMutation = useMutation({
@@ -212,8 +225,13 @@ export default function MediaPage() {
       queryClient.invalidateQueries({ queryKey: ['albums-admin'] });
       queryClient.invalidateQueries({ queryKey: ['album-detail'] });
       setEditingMedia(null);
+      toast.success('Media updated!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : (e as Error).message || 'Failed to update media'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : (e as Error).message || 'Failed to update media';
+      setError(message);
+      toast.error('Failed to update media', message);
+    },
   });
 
   const albumMutation = useMutation({
@@ -231,8 +249,13 @@ export default function MediaPage() {
       setAlbumTitle('');
       setAlbumDescription('');
       setAlbumCoverUrl('');
+      toast.success('Album created!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : (e as Error).message || 'Failed to create album'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : (e as Error).message || 'Failed to create album';
+      setError(message);
+      toast.error('Failed to create album', message);
+    },
   });
 
   const deleteMediaMutation = useMutation({
@@ -241,7 +264,9 @@ export default function MediaPage() {
       queryClient.invalidateQueries({ queryKey: ['media-admin'] });
       queryClient.invalidateQueries({ queryKey: ['albums-admin'] });
       queryClient.invalidateQueries({ queryKey: ['album-detail'] });
+      toast.success('Media deleted');
     },
+    onError: (e) => toast.error('Failed to delete media', e instanceof ApiError ? e.message : undefined),
   });
 
   const deleteAlbumMutation = useMutation({
@@ -249,7 +274,9 @@ export default function MediaPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['albums-admin'] });
       setSelectedAlbumId(null);
+      toast.success('Album deleted');
     },
+    onError: (e) => toast.error('Failed to delete album', e instanceof ApiError ? e.message : undefined),
   });
 
   function resetPostForm() {

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { unlink } from 'fs/promises';
+import { randomUUID } from 'crypto';
 import { MediaType, Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { MEDIA_UPLOAD_DIR } from './media.constants';
@@ -57,7 +58,7 @@ export class MediaService {
     return this.prisma.media.create({
       data: {
         filename: dto.title,
-        storedName: `embed_${Date.now()}`,
+        storedName: `embed_${randomUUID()}`,
         url: embedDetails.embedUrl,
         mimeType: 'video/embed',
         size: 0,

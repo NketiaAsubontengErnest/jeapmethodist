@@ -7,6 +7,7 @@ import { Loader2, Save, Upload } from 'lucide-react';
 import { fetchSettings, updateSettings, type SettingsMap } from '@/lib/api/settings';
 import { uploadMedia } from '@/lib/api/media';
 import { ApiError } from '@/lib/api-client';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -105,6 +106,7 @@ const SECTIONS: SectionSpec[] = [
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
@@ -136,8 +138,13 @@ export default function SettingsPage() {
       // Re-lock all link fields after successful save
       setUnlockedFields({});
       setTimeout(() => setSuccess(false), 3000);
+      toast.success('Settings saved!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save settings'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save settings';
+      setError(message);
+      toast.error('Failed to save settings', message);
+    },
   });
 
   const handleFileUpload = async (field: 'logo_url' | 'favicon_url', file: File) => {

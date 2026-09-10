@@ -20,6 +20,7 @@ import { fetchFunds, type Fund } from '@/lib/api/funds';
 import { fetchIncomeCategories, fetchExpenseCategories } from '@/lib/api/finance';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -108,6 +109,7 @@ function getVarianceInfo(row: BudgetVsActualRow): {
 
 export default function BudgetsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const canView = hasPermission('finance.view');
@@ -192,8 +194,13 @@ export default function BudgetsPage() {
     onSuccess: () => {
       invalidateBudgetQueries();
       setOpen(false);
+      toast.success('Budget line created!');
     },
-    onError: (e) => setFormError(e instanceof ApiError ? e.message : 'Failed to save budget line'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save budget line';
+      setFormError(message);
+      toast.error('Failed to save budget line', message);
+    },
   });
 
   const updateMutation = useMutation({
@@ -201,8 +208,13 @@ export default function BudgetsPage() {
     onSuccess: () => {
       invalidateBudgetQueries();
       setOpen(false);
+      toast.success('Budget line updated!');
     },
-    onError: (e) => setFormError(e instanceof ApiError ? e.message : 'Failed to save budget line'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save budget line';
+      setFormError(message);
+      toast.error('Failed to save budget line', message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -210,7 +222,9 @@ export default function BudgetsPage() {
     onSuccess: () => {
       invalidateBudgetQueries();
       setDeleteId(null);
+      toast.success('Budget line deleted');
     },
+    onError: (e) => toast.error('Failed to delete budget line', e instanceof ApiError ? e.message : undefined),
   });
 
   const isSaving = createMutation.isPending || updateMutation.isPending;

@@ -96,7 +96,11 @@ export default function MembersPage() {
       setNewGroupIds([]);
       setNewMinistryIds([]);
     },
-    onError: (error) => setNewFormError(error instanceof ApiError ? error.message : 'Failed to create member'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to create member';
+      setNewFormError(message);
+      toast.error('Failed to register member', message);
+    },
   });
 
   const updateMutation = useMutation({
@@ -112,7 +116,11 @@ export default function MembersPage() {
       toast.success('Member updated successfully!');
       setEditingMember(null);
     },
-    onError: (error) => setEditFormError(error instanceof ApiError ? error.message : 'Failed to update member'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to update member';
+      setEditFormError(message);
+      toast.error('Failed to update member', message);
+    },
   });
 
   const canCreate = hasPermission('member.create');

@@ -168,6 +168,39 @@ body {
   color: var(--foreground);
 }
 
+/* The admin portal always renders in its light brand palette, regardless of
+   the visitor's OS/browser dark-mode preference — unlike the public site,
+   it isn't designed with a dark variant, so letting it inherit the
+   `prefers-color-scheme: dark` overrides above just breaks contrast.
+   These declarations sit outside that media query, so they unconditionally
+   win over the inherited :root values for anything under .admin-shell. */
+.admin-shell {
+  --background: #ffffff;
+  --foreground: #14213d;
+
+  --card: #ffffff;
+  --card-foreground: #14213d;
+
+  --primary: #14309c;
+  --primary-foreground: #ffffff;
+
+  --secondary: #eef3fa;
+  --secondary-foreground: #1b3a63;
+
+  --muted: #f2f5fa;
+  --muted-foreground: #5b6b82;
+
+  --accent: #b8860b;
+  --accent-foreground: #2a1d08;
+
+  --destructive: #a80d27;
+  --destructive-foreground: #fdfaf6;
+
+  --border: #dbe3ee;
+  --input: #dbe3ee;
+  --ring: #14309c;
+}
+
 /* Classic touch: a thin gold rule under section headings when used with this class. */
 .heading-rule::after {
   content: "";

@@ -18,6 +18,7 @@ import {
 import { fetchMembers } from '@/lib/api/members';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,7 @@ function FamilyDetailDialog({
   canManage: boolean;
 }) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const familyQuery = useQuery({ queryKey: ['families', familyId], queryFn: () => fetchFamily(familyId) });
   const membersQuery = useQuery({ queryKey: ['members', 'all-for-family'], queryFn: () => fetchMembers({ pageSize: 100 }) });
   const [error, setError] = useState<string | null>(null);
@@ -83,13 +85,22 @@ function FamilyDetailDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] });
       reset();
+      toast.success('Family member added!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to add member'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to add member';
+      setError(message);
+      toast.error('Failed to add member', message);
+    },
   });
 
   const removeMutation = useMutation({
     mutationFn: (memberId: string) => removeFamilyMember(familyId, memberId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['families'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['families'] });
+      toast.success('Member removed from family');
+    },
+    onError: (e) => toast.error('Failed to remove member', e instanceof ApiError ? e.message : undefined),
   });
 
   const family = familyQuery.data;
@@ -225,6 +236,7 @@ function FamilyDetailDialog({
 
 export default function FamiliesPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
@@ -253,8 +265,13 @@ export default function FamiliesPage() {
       queryClient.invalidateQueries({ queryKey: ['families'] });
       setCreateOpen(false);
       reset();
+      toast.success('Family created!');
     },
-    onError: (e) => setFormError(e instanceof ApiError ? e.message : 'Failed to create family'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to create family';
+      setFormError(message);
+      toast.error('Failed to create family', message);
+    },
   });
 
   const canCreate = hasPermission('member.create');

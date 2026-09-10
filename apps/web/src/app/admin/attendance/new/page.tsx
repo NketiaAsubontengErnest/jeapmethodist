@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { fetchProgrammeTypes, createSession } from '@/lib/api/attendance';
 import { ApiError } from '@/lib/api-client';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,7 @@ type FormValues = z.infer<typeof schema>;
 
 export default function NewAttendanceSessionPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const programmeTypesQuery = useQuery({ queryKey: ['programme-types'], queryFn: fetchProgrammeTypes });
 
@@ -31,8 +33,15 @@ export default function NewAttendanceSessionPage() {
 
   const createMutation = useMutation({
     mutationFn: createSession,
-    onSuccess: (session) => router.push(`/admin/attendance/${session.id}`),
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to create session'),
+    onSuccess: (session) => {
+      toast.success('Attendance session started!');
+      router.push(`/admin/attendance/${session.id}`);
+    },
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to create session';
+      setError(message);
+      toast.error('Failed to create session', message);
+    },
   });
 
   return (

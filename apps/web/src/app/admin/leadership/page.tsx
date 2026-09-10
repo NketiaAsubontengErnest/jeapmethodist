@@ -21,6 +21,7 @@ import {
 import { uploadMedia } from '@/lib/api/media';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -83,6 +84,7 @@ type LeadershipFormValues = z.infer<typeof leadershipSchema>;
 
 export default function LeadershipPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const [leaderOpen, setLeaderOpen] = useState(false);
@@ -146,9 +148,12 @@ export default function LeadershipPage() {
       setPosOpen(false);
       posForm.reset();
       setFormError(null);
+      toast.success('Position created!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to create position');
+      const message = err instanceof ApiError ? err.message : 'Failed to create position';
+      setFormError(message);
+      toast.error('Failed to create position', message);
     },
   });
 
@@ -159,9 +164,12 @@ export default function LeadershipPage() {
       setEditingPos(null);
       editPosForm.reset();
       setFormError(null);
+      toast.success('Position updated!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to update position');
+      const message = err instanceof ApiError ? err.message : 'Failed to update position';
+      setFormError(message);
+      toast.error('Failed to update position', message);
     },
   });
 
@@ -171,9 +179,12 @@ export default function LeadershipPage() {
       queryClient.invalidateQueries({ queryKey: ['positions'] });
       setDeletePosId(null);
       setDeletePosError(null);
+      toast.success('Position deleted');
     },
     onError: (err) => {
-      setDeletePosError(err instanceof ApiError ? err.message : 'Failed to delete position');
+      const message = err instanceof ApiError ? err.message : 'Failed to delete position';
+      setDeletePosError(message);
+      toast.error('Failed to delete position', message);
     },
   });
 
@@ -187,9 +198,12 @@ export default function LeadershipPage() {
       setLeaderPhotoFile(null);
       setLeaderPhotoPreview(null);
       setSelectedMemberLabel(undefined);
+      toast.success('Leadership profile added!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to assign leadership profile');
+      const message = err instanceof ApiError ? err.message : 'Failed to assign leadership profile';
+      setFormError(message);
+      toast.error('Failed to assign leadership profile', message);
     },
   });
 
@@ -201,9 +215,12 @@ export default function LeadershipPage() {
       editLeaderForm.reset();
       setFormError(null);
       setEditSelectedMemberLabel(undefined);
+      toast.success('Leadership profile updated!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to update leadership profile');
+      const message = err instanceof ApiError ? err.message : 'Failed to update leadership profile';
+      setFormError(message);
+      toast.error('Failed to update leadership profile', message);
     },
   });
 
@@ -212,7 +229,9 @@ export default function LeadershipPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leadership'] });
       setDeleteId(null);
+      toast.success('Leadership profile deleted');
     },
+    onError: (err) => toast.error('Failed to delete leadership profile', err instanceof ApiError ? err.message : undefined),
   });
 
   const openEditPosition = (p: ChurchPosition) => {

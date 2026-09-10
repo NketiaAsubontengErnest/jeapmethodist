@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { ArrowLeft } from 'lucide-react';
 import { createNewsArticle } from '@/lib/api/news';
 import { ApiError } from '@/lib/api-client';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,13 +27,21 @@ type FormValues = z.infer<typeof schema>;
 
 export default function NewNewsArticlePage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const { register, handleSubmit, formState } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const createMutation = useMutation({
     mutationFn: createNewsArticle,
-    onSuccess: (article) => router.push(`/admin/news/${article.id}`),
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to create article'),
+    onSuccess: (article) => {
+      toast.success('Article created!');
+      router.push(`/admin/news/${article.id}`);
+    },
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to create article';
+      setError(message);
+      toast.error('Failed to create article', message);
+    },
   });
 
   return (

@@ -20,6 +20,7 @@ import {
 import { fetchMemberCategories, fetchMembershipStatuses } from '@/lib/api/members';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,7 @@ function statusVariant(status: VisitorFollowUpStatus) {
 
 export default function VisitorsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -100,8 +102,13 @@ export default function VisitorsPage() {
       queryClient.invalidateQueries({ queryKey: ['visitors'] });
       setCreateOpen(false);
       createForm.reset();
+      toast.success('Visitor recorded!');
     },
-    onError: (error) => setFormError(error instanceof ApiError ? error.message : 'Failed to record visitor'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to record visitor';
+      setFormError(message);
+      toast.error('Failed to record visitor', message);
+    },
   });
 
   const updateMutation = useMutation({
@@ -110,16 +117,26 @@ export default function VisitorsPage() {
       queryClient.invalidateQueries({ queryKey: ['visitors'] });
       setEditVisitor(null);
       editForm.reset();
+      toast.success('Visitor updated!');
     },
-    onError: (error) => setFormError(error instanceof ApiError ? error.message : 'Failed to update visitor'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to update visitor';
+      setFormError(message);
+      toast.error('Failed to update visitor', message);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteVisitor,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['visitors'] });
+      toast.success('Visitor deleted');
     },
-    onError: (error) => setFormError(error instanceof ApiError ? error.message : 'Failed to delete visitor'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to delete visitor';
+      setFormError(message);
+      toast.error('Failed to delete visitor', message);
+    },
   });
 
   const followUpMutation = useMutation({
@@ -128,8 +145,13 @@ export default function VisitorsPage() {
       queryClient.invalidateQueries({ queryKey: ['visitors'] });
       setFollowUpVisitor(null);
       followUpForm.reset();
+      toast.success('Follow-up recorded!');
     },
-    onError: (error) => setFormError(error instanceof ApiError ? error.message : 'Failed to record follow-up'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to record follow-up';
+      setFormError(message);
+      toast.error('Failed to record follow-up', message);
+    },
   });
 
   const convertMutation = useMutation({
@@ -139,8 +161,13 @@ export default function VisitorsPage() {
       queryClient.invalidateQueries({ queryKey: ['members'] });
       setConvertVisitorTarget(null);
       convertForm.reset();
+      toast.success('Visitor converted to member!');
     },
-    onError: (error) => setFormError(error instanceof ApiError ? error.message : 'Failed to convert visitor'),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : 'Failed to convert visitor';
+      setFormError(message);
+      toast.error('Failed to convert visitor', message);
+    },
   });
 
   const canCreate = hasPermission('visitor.create');

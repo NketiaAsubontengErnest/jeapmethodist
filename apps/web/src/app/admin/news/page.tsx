@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Plus, Search, Trash2, Pencil } from 'lucide-react';
 import { fetchNewsAdmin, deleteNewsArticle } from '@/lib/api/news';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
+import { ApiError } from '@/lib/api-client';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,7 @@ import {
 
 export default function NewsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -40,7 +43,9 @@ export default function NewsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news-admin'] });
       setDeleteId(null);
+      toast.success('Article deleted');
     },
+    onError: (e) => toast.error('Failed to delete article', e instanceof ApiError ? e.message : undefined),
   });
 
   const canCreate = hasPermission('news.create');

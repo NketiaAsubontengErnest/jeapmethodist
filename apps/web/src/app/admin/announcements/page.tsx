@@ -15,6 +15,7 @@ import {
 } from '@/lib/api/announcements';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ type FormValues = z.infer<typeof schema>;
 
 export default function AnnouncementsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -83,8 +85,13 @@ export default function AnnouncementsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements-admin'] });
       setOpen(false);
+      toast.success('Announcement published!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save announcement'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save announcement';
+      setError(message);
+      toast.error('Failed to publish announcement', message);
+    },
   });
 
   const updateMutation = useMutation({
@@ -92,8 +99,13 @@ export default function AnnouncementsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements-admin'] });
       setOpen(false);
+      toast.success('Announcement updated!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save announcement'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save announcement';
+      setError(message);
+      toast.error('Failed to update announcement', message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -101,7 +113,9 @@ export default function AnnouncementsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['announcements-admin'] });
       setDeleteId(null);
+      toast.success('Announcement deleted');
     },
+    onError: (e) => toast.error('Failed to delete announcement', e instanceof ApiError ? e.message : undefined),
   });
 
   useEffect(() => {

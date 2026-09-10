@@ -17,6 +17,7 @@ import { fetchProgrammeTypes } from '@/lib/api/attendance';
 import { createTransaction, fetchIncomeCategories } from '@/lib/api/finance';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,7 @@ function formatGHS(amount: number) {
 
 export default function GivingPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -98,9 +100,14 @@ export default function GivingPage() {
       queryClient.invalidateQueries({ queryKey: ['offering-sessions'] });
       setOpen(false);
       reset();
+      toast.success('Offering session created!');
       router.push(`/admin/giving/${session.id}`);
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to create offering session'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to create offering session';
+      setError(message);
+      toast.error('Failed to create offering session', message);
+    },
   });
 
   const donationMutation = useMutation({
@@ -110,8 +117,13 @@ export default function GivingPage() {
       queryClient.invalidateQueries({ queryKey: ['finance-summary'] });
       setDonationOpen(false);
       donationForm.reset();
+      toast.success('Donation recorded!');
     },
-    onError: (e) => setDonationError(e instanceof ApiError ? e.message : 'Failed to record donation'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to record donation';
+      setDonationError(message);
+      toast.error('Failed to record donation', message);
+    },
   });
 
   const canCreate = hasPermission('finance.create');

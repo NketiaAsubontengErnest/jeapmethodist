@@ -11,6 +11,7 @@ import { fetchOfferingSession, addOfferingLine, removeOfferingLine } from '@/lib
 import { fetchIncomeCategories } from '@/lib/api/finance';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ function formatGHS(amount: number | string) {
 export default function OfferingSessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -56,13 +58,22 @@ export default function OfferingSessionDetailPage({ params }: { params: Promise<
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['offering-sessions'] });
       reset();
+      toast.success('Offering line added!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to add line'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to add line';
+      setError(message);
+      toast.error('Failed to add line', message);
+    },
   });
 
   const removeMutation = useMutation({
     mutationFn: (transactionId: string) => removeOfferingLine(id, transactionId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['offering-sessions'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['offering-sessions'] });
+      toast.success('Offering line removed');
+    },
+    onError: (e) => toast.error('Failed to remove line', e instanceof ApiError ? e.message : undefined),
   });
 
   const canEdit = hasPermission('finance.create');

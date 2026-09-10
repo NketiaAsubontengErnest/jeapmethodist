@@ -28,6 +28,7 @@ import {
 
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -77,6 +78,7 @@ export default function MinistryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const [addOpen, setAddOpen] = useState(false);
@@ -119,9 +121,12 @@ export default function MinistryDetailPage() {
       addForm.reset();
       setFormError(null);
       setAddMemberLabel(undefined);
+      toast.success('Member added to ministry!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to add member');
+      const message = err instanceof ApiError ? err.message : 'Failed to add member';
+      setFormError(message);
+      toast.error('Failed to add member', message);
     },
   });
 
@@ -129,7 +134,9 @@ export default function MinistryDetailPage() {
     mutationFn: (memberId: string) => removeMinistryMember(id, memberId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ministry', id] });
+      toast.success('Member removed from ministry');
     },
+    onError: (err) => toast.error('Failed to remove member', err instanceof ApiError ? err.message : undefined),
   });
 
   const editMutation = useMutation({
@@ -138,9 +145,12 @@ export default function MinistryDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['ministry', id] });
       setEditOpen(false);
       setFormError(null);
+      toast.success('Ministry updated!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to update ministry');
+      const message = err instanceof ApiError ? err.message : 'Failed to update ministry';
+      setFormError(message);
+      toast.error('Failed to update ministry', message);
     },
   });
 

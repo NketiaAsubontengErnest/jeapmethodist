@@ -15,6 +15,7 @@ import {
 } from '@/lib/api/liabilities';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -63,6 +64,7 @@ function todayIso() {
 
 export default function LiabilitiesPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Liability | null>(null);
@@ -111,8 +113,13 @@ export default function LiabilitiesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liabilities'] });
       setOpen(false);
+      toast.success('Liability created!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save liability'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save liability';
+      setError(message);
+      toast.error('Failed to save liability', message);
+    },
   });
 
   const updateMutation = useMutation({
@@ -120,8 +127,13 @@ export default function LiabilitiesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liabilities'] });
       setOpen(false);
+      toast.success('Liability updated!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save liability'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save liability';
+      setError(message);
+      toast.error('Failed to save liability', message);
+    },
   });
 
   const toggleSettledMutation = useMutation({
@@ -129,6 +141,7 @@ export default function LiabilitiesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liabilities'] });
     },
+    onError: (e) => toast.error('Failed to update liability status', e instanceof ApiError ? e.message : undefined),
   });
 
   const deleteMutation = useMutation({
@@ -136,7 +149,9 @@ export default function LiabilitiesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['liabilities'] });
       setDeleteId(null);
+      toast.success('Liability deleted');
     },
+    onError: (e) => toast.error('Failed to delete liability', e instanceof ApiError ? e.message : undefined),
   });
 
   useEffect(() => {

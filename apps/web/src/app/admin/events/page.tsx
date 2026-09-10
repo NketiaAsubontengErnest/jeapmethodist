@@ -10,6 +10,7 @@ import { Loader2, Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import { fetchEvents, createEvent, deleteEvent } from '@/lib/api/events';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,7 @@ type FormValues = z.infer<typeof schema>;
 
 export default function EventsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -68,8 +70,13 @@ export default function EventsPage() {
       queryClient.invalidateQueries({ queryKey: ['events-admin'] });
       setOpen(false);
       reset();
+      toast.success('Event created!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to create event'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to create event';
+      setError(message);
+      toast.error('Failed to create event', message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -77,7 +84,9 @@ export default function EventsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events-admin'] });
       setDeleteId(null);
+      toast.success('Event deleted');
     },
+    onError: (e) => toast.error('Failed to delete event', e instanceof ApiError ? e.message : undefined),
   });
 
   const canCreate = hasPermission('event.create');

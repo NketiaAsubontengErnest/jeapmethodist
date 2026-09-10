@@ -8,6 +8,7 @@ import { fetchSession, addAttendanceRecord, removeAttendanceRecord, type Attenda
 import { fetchMembers, type MemberListItem } from '@/lib/api/members';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ function statusVariant(status: AttendanceStatus) {
 export default function AttendanceSessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<AttendanceStatus>('PRESENT');
@@ -56,12 +58,17 @@ export default function AttendanceSessionPage({ params }: { params: Promise<{ id
       setSearch('');
       setVisitorName('');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to add record'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to add record';
+      setError(message);
+      toast.error('Failed to check in', message);
+    },
   });
 
   const removeMutation = useMutation({
     mutationFn: (recordId: string) => removeAttendanceRecord(id, recordId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['attendance-sessions'] }),
+    onError: (e) => toast.error('Failed to remove record', e instanceof ApiError ? e.message : undefined),
   });
 
   const addMember = (member: MemberListItem) => {

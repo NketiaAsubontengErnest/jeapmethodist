@@ -10,6 +10,7 @@ import { fetchEvent, updateEvent, deleteEvent, type EventInput } from '@/lib/api
 import { fetchMinistries } from '@/lib/api/ministries';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -43,6 +44,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -101,16 +103,23 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       setSuccess(true);
       setError(null);
       setTimeout(() => setSuccess(false), 3000);
+      toast.success('Event saved!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save event'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save event';
+      setError(message);
+      toast.error('Failed to save event', message);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteEvent(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events-admin'] });
+      toast.success('Event deleted');
       router.push('/admin/events');
     },
+    onError: (e) => toast.error('Failed to delete event', e instanceof ApiError ? e.message : undefined),
   });
 
   const canUpdate = hasPermission('event.update');

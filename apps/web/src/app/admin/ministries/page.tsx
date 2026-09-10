@@ -10,6 +10,7 @@ import { HandHeart, Plus, Users, Search, Loader2, MapPin, Calendar, Pencil, Tras
 import { fetchMinistries, createMinistry, updateMinistry, deleteMinistry, type MinistryListItem } from '@/lib/api/ministries';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,6 +40,7 @@ type CreateMinistryValues = z.infer<typeof createMinistrySchema>;
 
 export default function MinistriesPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
@@ -68,9 +70,12 @@ export default function MinistriesPage() {
       setOpen(false);
       reset();
       setFormError(null);
+      toast.success('Ministry created!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to create ministry');
+      const message = err instanceof ApiError ? err.message : 'Failed to create ministry';
+      setFormError(message);
+      toast.error('Failed to create ministry', message);
     },
   });
 
@@ -81,9 +86,12 @@ export default function MinistriesPage() {
       setEditingMinistry(null);
       editForm.reset();
       setFormError(null);
+      toast.success('Ministry updated!');
     },
     onError: (err) => {
-      setFormError(err instanceof ApiError ? err.message : 'Failed to update ministry');
+      const message = err instanceof ApiError ? err.message : 'Failed to update ministry';
+      setFormError(message);
+      toast.error('Failed to update ministry', message);
     },
   });
 
@@ -91,9 +99,10 @@ export default function MinistriesPage() {
     mutationFn: deleteMinistry,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ministries'] });
+      toast.success('Ministry deleted');
     },
     onError: (err) => {
-      alert(err instanceof ApiError ? err.message : 'Failed to delete ministry');
+      toast.error('Failed to delete ministry', err instanceof ApiError ? err.message : undefined);
     },
   });
 

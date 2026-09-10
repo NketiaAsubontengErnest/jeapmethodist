@@ -14,6 +14,7 @@ import {
 } from '@/lib/api/finance';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ function formatCurrency(amount: string | number) {
 
 export default function TithesPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -94,8 +96,13 @@ export default function TithesPage() {
       reset({ payerType: 'MEMBER', date: new Date().toISOString().slice(0, 10) });
       setFormError(null);
       setSelectedMemberLabel(undefined);
+      toast.success('Tithe recorded!');
     },
-    onError: (e) => setFormError(e instanceof ApiError ? e.message : 'Failed to record tithe'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to record tithe';
+      setFormError(message);
+      toast.error('Failed to record tithe', message);
+    },
   });
 
   const total = useMemo(

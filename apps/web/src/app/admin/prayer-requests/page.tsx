@@ -11,6 +11,7 @@ import {
 } from '@/lib/api/prayer-requests';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ function StatusBadge({ status }: { status: PrayerRequestStatus }) {
 
 export default function PrayerRequestsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<PrayerRequest | null>(null);
   const [open, setOpen] = useState(false);
@@ -73,8 +75,13 @@ export default function PrayerRequestsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prayer-requests'] });
       setOpen(false);
+      toast.success('Prayer request updated!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to update status'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to update status';
+      setError(message);
+      toast.error('Failed to update status', message);
+    },
   });
 
   const visibleRequests = useMemo(() => {

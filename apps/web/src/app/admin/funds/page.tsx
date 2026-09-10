@@ -9,6 +9,7 @@ import { Loader2, Plus, Search, Trash2, Pencil, Landmark } from 'lucide-react';
 import { fetchFunds, createFund, updateFund, deleteFund, type Fund, type FundType } from '@/lib/api/funds';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ function formatCurrency(amount: string | number) {
 
 export default function FundsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Fund | null>(null);
@@ -89,8 +91,13 @@ export default function FundsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['funds'] });
       setOpen(false);
+      toast.success('Fund created!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save fund'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save fund';
+      setError(message);
+      toast.error('Failed to save fund', message);
+    },
   });
 
   const updateMutation = useMutation({
@@ -98,8 +105,13 @@ export default function FundsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['funds'] });
       setOpen(false);
+      toast.success('Fund updated!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save fund'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save fund';
+      setError(message);
+      toast.error('Failed to save fund', message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -107,7 +119,9 @@ export default function FundsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['funds'] });
       setDeleteId(null);
+      toast.success('Fund deleted');
     },
+    onError: (e) => toast.error('Failed to delete fund', e instanceof ApiError ? e.message : undefined),
   });
 
   useEffect(() => {

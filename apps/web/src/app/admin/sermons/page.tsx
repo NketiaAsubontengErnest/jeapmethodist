@@ -9,6 +9,7 @@ import { Loader2, Plus, Search, Trash2, Pencil } from 'lucide-react';
 import { fetchSermonsAdmin, createSermon, updateSermon, deleteSermon, type SermonItem } from '@/lib/api/sermons';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { exportToCsv } from '@/lib/export-csv';
 import { ListActions } from '@/components/admin/list-actions';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ type FormValues = z.infer<typeof schema>;
 
 export default function SermonsPage() {
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -95,8 +97,13 @@ export default function SermonsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sermons-admin'] });
       setOpen(false);
+      toast.success(editing ? 'Sermon updated!' : 'Sermon published!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save sermon'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save sermon';
+      setError(message);
+      toast.error('Failed to save sermon', message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -104,7 +111,9 @@ export default function SermonsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sermons-admin'] });
       setDeleteId(null);
+      toast.success('Sermon deleted');
     },
+    onError: (e) => toast.error('Failed to delete sermon', e instanceof ApiError ? e.message : undefined),
   });
 
   const canCreate = hasPermission('sermon.create');

@@ -36,9 +36,23 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
   }, [isLoading, user, router]);
 
+  // The admin portal always renders in its light brand palette — never the
+  // OS/browser dark-mode variant. The `.admin-shell` class in globals.css
+  // covers everything inside this layout, but Radix Dialog/Sheet/Dropdown/
+  // Select/Popover portal their content straight to document.body, outside
+  // that div, so they'd still pick up the dark :root override on their own.
+  // Setting data-theme on <html> instead opts the whole document out via
+  // the existing `:root:not([data-theme="light"])` rule, portals included.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'light');
+    return () => {
+      document.documentElement.removeAttribute('data-theme');
+    };
+  }, []);
+
   if (isLoading || !user) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-secondary">
+      <div className="admin-shell fixed inset-0 flex items-center justify-center bg-secondary">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-label="Loading" />
       </div>
     );
@@ -53,7 +67,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     // scrolling at once. Being fixed removes the outer page as a scroll
     // candidate entirely; only `nav` (sidebar) and `main` below scroll,
     // independently, while the header and sidebar chrome never move.
-    <div className="fixed inset-0 flex overflow-hidden bg-secondary print:static print:block print:h-auto print:overflow-visible">
+    <div className="admin-shell fixed inset-0 flex overflow-hidden bg-secondary print:static print:block print:h-auto print:overflow-visible">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card md:flex print:hidden">
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border px-5">
           {logoSrc ? (

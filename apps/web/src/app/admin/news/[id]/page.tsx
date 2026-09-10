@@ -9,6 +9,7 @@ import { ArrowLeft, Loader2, Save, Trash2 } from 'lucide-react';
 import { fetchNewsArticle, updateNewsArticle, deleteNewsArticle } from '@/lib/api/news';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +28,7 @@ export default function NewsArticleDetailPage({ params }: { params: Promise<{ id
   const { id } = use(params);
   const router = useRouter();
   const { hasPermission } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -61,16 +63,23 @@ export default function NewsArticleDetailPage({ params }: { params: Promise<{ id
       setSuccess(true);
       setError(null);
       setTimeout(() => setSuccess(false), 3000);
+      toast.success('Article saved!');
     },
-    onError: (e) => setError(e instanceof ApiError ? e.message : 'Failed to save article'),
+    onError: (e) => {
+      const message = e instanceof ApiError ? e.message : 'Failed to save article';
+      setError(message);
+      toast.error('Failed to save article', message);
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteNewsArticle(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news-admin'] });
+      toast.success('Article deleted');
       router.push('/admin/news');
     },
+    onError: (e) => toast.error('Failed to delete article', e instanceof ApiError ? e.message : undefined),
   });
 
   const canUpdate = hasPermission('news.update');
