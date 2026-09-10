@@ -115,7 +115,14 @@ export class MediaController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: MEDIA_UPLOAD_DIR,
+        destination: (_req, _file, callback) => {
+          try {
+            if (!existsSync(MEDIA_UPLOAD_DIR)) {
+              mkdirSync(MEDIA_UPLOAD_DIR, { recursive: true });
+            }
+          } catch {}
+          callback(null, MEDIA_UPLOAD_DIR);
+        },
         filename: (_req, file, callback) => {
           callback(null, `${randomUUID()}${extname(file.originalname)}`);
         },
