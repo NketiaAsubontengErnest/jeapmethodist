@@ -600,10 +600,11 @@ export default function UsersPage() {
                   placeholder="e.g. Welfare Officer, Choir Director, Secretary"
                   value={roleName}
                   onChange={(e) => setRoleName(e.target.value)}
-                  disabled={editingRole?.isSystem}
                 />
                 {editingRole?.isSystem && (
-                  <p className="text-[11px] text-muted-foreground">System role names cannot be altered.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    This is a built-in system user type — renaming it will not affect the access rules already granted to it.
+                  </p>
                 )}
               </div>
 
