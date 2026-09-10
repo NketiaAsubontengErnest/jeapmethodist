@@ -1,8 +1,9 @@
 {
   "version": 2,
   "functions": {
-    "api/index.ts": {
+    "api/index.js": {
       "includeFiles": [
+        "dist/**",
         "node_modules/@prisma/client/**",
         "../../node_modules/.prisma/client/**"
       ]

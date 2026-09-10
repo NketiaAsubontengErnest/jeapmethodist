@@ -1,12 +1,12 @@
-import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication, ExpressAdapter } from '@nestjs/platform-express';
-import { AppModule } from '../src/app.module';
-import express from 'express';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
-import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter';
+require('reflect-metadata');
+const { NestFactory } = require('@nestjs/core');
+const { ExpressAdapter } = require('@nestjs/platform-express');
+const express = require('express');
+const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
+const { ValidationPipe } = require('@nestjs/common');
+const { AppModule } = require('../dist/src/app.module');
+const { AllExceptionsFilter } = require('../dist/src/common/filters/http-exception.filter');
 
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL =
@@ -27,7 +27,7 @@ let isAppInitialized = false;
 async function bootstrap() {
   if (isAppInitialized) return server;
 
-  const app = await NestFactory.create<NestExpressApplication>(
+  const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(server),
   );
@@ -58,16 +58,17 @@ async function bootstrap() {
   return server;
 }
 
-export default async function handler(req: any, res: any) {
+module.exports = async function handler(req, res) {
   try {
     await bootstrap();
     server(req, res);
-  } catch (err: any) {
+  } catch (err) {
     console.error('Vercel Serverless Bootstrap Error:', err);
     res.status(500).json({
       statusCode: 500,
       message: err?.message || 'Internal Server Error during serverless bootstrap',
       error: err?.name || 'BootstrapError',
+      stack: process.env.NODE_ENV !== 'production' ? err?.stack : undefined,
     });
   }
-}
+};
