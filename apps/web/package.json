@@ -35,7 +35,9 @@
     "zod": "^3.23.8"
   },
   "optionalDependencies": {
-    "lightningcss-linux-x64-gnu": "^1.29.1"
+    "lightningcss-linux-x64-gnu": "^1.29.1",
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.0.0",
+    "@tailwindcss/oxide-linux-x64-musl": "^4.0.0"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.59.16",
