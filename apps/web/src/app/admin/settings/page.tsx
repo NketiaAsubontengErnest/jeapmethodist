@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatMediaUrl } from '@/lib/utils';
+import { formatMediaUrl, compressImage } from '@/lib/utils';
 
 interface FieldSpec {
   key: keyof SettingsMap;
@@ -145,11 +145,15 @@ export default function SettingsPage() {
       setUploadingField(field);
       setError(null);
 
+      // Compress logo to max 500px, favicon to max 128px before uploading
+      const maxDim = field === 'favicon_url' ? 128 : 500;
+      const fileToUpload = await compressImage(file, maxDim, maxDim, 0.85);
+
       // Instant local browser preview
-      const localPreview = URL.createObjectURL(file);
+      const localPreview = URL.createObjectURL(fileToUpload);
       setValue(field, localPreview);
 
-      const res = await uploadMedia(file, { category: 'identity', title: field });
+      const res = await uploadMedia(fileToUpload, { category: 'identity', title: field });
       setValue(field, res.url);
 
       // Auto-save setting to database
