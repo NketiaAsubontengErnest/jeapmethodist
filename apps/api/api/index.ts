@@ -1,11 +1,4 @@
 import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from '../src/app.module';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
-import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter';
 
 const NEON_DB_URL =
   'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
@@ -27,7 +20,14 @@ let cachedServer: any;
 async function bootstrap() {
   if (cachedServer) return cachedServer;
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const { NestFactory } = await import('@nestjs/core');
+  const { ValidationPipe } = await import('@nestjs/common');
+  const helmet = (await import('helmet')).default;
+  const cookieParser = (await import('cookie-parser')).default;
+  const { AppModule } = await import('../src/app.module');
+  const { AllExceptionsFilter } = await import('../src/common/filters/http-exception.filter');
+
+  const app = await NestFactory.create(AppModule);
 
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('trust proxy', 1);
