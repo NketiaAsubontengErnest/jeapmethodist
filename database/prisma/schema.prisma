@@ -1,0 +1,1068 @@
+// =============================================================================
+// Church Management System — Prisma Schema
+// Built incrementally, phase by phase (see docs/architecture.md).
+// Phase 1: Auth foundation (User, RefreshToken)
+// Phase 2: RBAC + Audit (Role, Permission, RolePermission, AuditLog)
+// Phase 3: Members, Families, Membership Categories/Statuses, Visitors
+// Phase 4: Attendance sessions & records
+// Phase 10: Finance — giving, offerings, expenses
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 2: Roles & Permissions (granular RBAC — see section 12 of the spec)
+// -----------------------------------------------------------------------------
+
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  /// System roles (Super Admin, Minister, Secretary, Treasurer, Media Officer)
+  /// cannot be deleted, only edited, to keep the seeded operational roles intact.
+  isSystem    Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  users       User[]
+  permissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String  @id @default(uuid())
+  /// Dot-notation permission code, e.g. "member.view", "finance.report"
+  code        String  @unique
+  /// Module this permission belongs to, e.g. "member", "finance"
+  module      String
+  description String?
+
+  roles RolePermission[]
+
+  createdAt DateTime @default(now())
+
+  @@index([module])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 1: Users & Authentication
+// -----------------------------------------------------------------------------
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  isActive     Boolean @default(true)
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  lastLoginAt         DateTime?
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
+  passwordResetTokenHash String?
+  passwordResetExpiresAt DateTime?
+
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  assignedVisitors              Visitor[]              @relation("VisitorAssignedTo")
+  visitorFollowUps              VisitorFollowUp[]      @relation("VisitorFollowUpBy")
+  attendanceSessionsRecorded    AttendanceSession[]
+  offeringSessionsRecorded      OfferingSession[]      @relation("OfferingSessionRecordedBy")
+  financialTransactionsRecorded FinancialTransaction[] @relation("FinancialTransactionRecordedBy")
+  financialTransactionsApproved FinancialTransaction[] @relation("FinancialTransactionApprovedBy")
+  financialTransactionsReconciled FinancialTransaction[] @relation("FinancialTransactionReconciledBy")
+  uploadedMedia                 Media[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([roleId])
+  @@map("users")
+}
+
+model RefreshToken {
+  id          String    @id @default(uuid())
+  /// SHA-256 hash of the refresh token — the raw token is never stored.
+  tokenHash   String    @unique
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  replacedBy  String?
+  createdByIp String?
+  userAgent   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 2: Audit Log
+// -----------------------------------------------------------------------------
+
+model AuditLog {
+  id     String  @id @default(uuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  /// Human-readable action, e.g. "member.updated", "auth.login_failed"
+  action String
+  /// Module the action belongs to, e.g. "members", "auth", "finance"
+  module String
+
+  entityType String?
+  entityId   String?
+
+  ipAddress String?
+  userAgent String?
+
+  previousValue Json?
+  newValue      Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([module])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 3: Members, Families, Membership Categories/Statuses, Visitors
+// -----------------------------------------------------------------------------
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+  SEPARATED
+}
+
+/// Configurable by administrators (see section 5 of the build spec) — deliberately
+/// NOT a hard-coded enum, since the exact classifications are a church decision.
+model MemberCategory {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  description  String?
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  members Member[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("member_categories")
+}
+
+/// Configurable membership status (Active, Inactive, Transferred, Deceased, ...) —
+/// distinct from MemberCategory (Full Member, Youth, ...). Also configurable.
+model MembershipStatus {
+  id             String  @id @default(uuid())
+  name           String  @unique
+  description    String?
+  displayOrder   Int     @default(0)
+  isActive       Boolean @default(true)
+  /// Whether members with this status still count as "active" for reporting.
+  countsAsActive Boolean @default(true)
+
+  members Member[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("membership_statuses")
+}
+
+model Member {
+  id               String @id @default(uuid())
+  membershipNumber String @unique
+
+  firstName   String
+  middleName  String?
+  lastName    String
+  gender      Gender
+  dateOfBirth DateTime?
+
+  phone          String?
+  whatsappNumber String?
+  email          String?
+
+  residentialAddress String?
+  digitalAddress     String?
+  ghanaRegion        String?
+  ghanaDistrict      String?
+
+  occupation    String?
+  maritalStatus MaritalStatus?
+  marriageDate  DateTime?
+
+  emergencyContactName         String?
+  emergencyContactPhone        String?
+  emergencyContactRelationship String?
+
+  dateJoinedChurch DateTime?
+
+  baptized         Boolean   @default(false)
+  baptismDate      DateTime?
+  confirmed        Boolean   @default(false)
+  confirmationDate DateTime?
+
+  membershipStatusId String
+  membershipStatus   MembershipStatus @relation(fields: [membershipStatusId], references: [id])
+
+  memberCategoryId String
+  memberCategory   MemberCategory @relation(fields: [memberCategoryId], references: [id])
+
+  localSociety    String?
+  skills          String?
+  notes           String?
+  profilePhotoUrl String?
+
+  isActive Boolean @default(true)
+
+  familyMemberships    FamilyMember[]
+  convertedFromVisitor Visitor?
+  attendanceRecords    AttendanceRecord[]
+  donationsAsDonor     FinancialTransaction[]
+
+  ministryMemberships    MinistryMember[]
+  ledMinistries          Ministry[]       @relation("MinistryLeader")
+  assistantLedMinistries Ministry[]       @relation("MinistryAssistantLeader")
+
+  groupMemberships   GroupMember[]
+  ledGroups          ChurchGroup[] @relation("GroupLeader")
+  assistantLedGroups ChurchGroup[] @relation("GroupAssistantLeader")
+
+  churchLeadership ChurchLeadership[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([membershipStatusId])
+  @@index([memberCategoryId])
+  @@index([lastName, firstName])
+  @@map("members")
+}
+
+enum FamilyRole {
+  HEAD
+  SPOUSE
+  CHILD
+  DEPENDANT
+  OTHER
+}
+
+model MemberFamily {
+  id            String  @id @default(uuid())
+  name          String
+  familyPhone   String?
+  familyAddress String?
+  notes         String?
+
+  members FamilyMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("member_families")
+}
+
+model FamilyMember {
+  id       String       @id @default(uuid())
+  familyId String
+  family   MemberFamily @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  memberId String
+  member   Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  role     FamilyRole
+
+  createdAt DateTime @default(now())
+
+  @@unique([familyId, memberId])
+  @@index([memberId])
+  @@map("family_members")
+}
+
+enum AgeCategory {
+  CHILD
+  TEEN
+  YOUNG_ADULT
+  ADULT
+  SENIOR
+}
+
+enum VisitorFollowUpStatus {
+  NEW
+  CONTACTED
+  FOLLOW_UP_SCHEDULED
+  INTERESTED
+  JOINED
+  NOT_INTERESTED
+  COULD_NOT_REACH
+}
+
+model Visitor {
+  id String @id @default(uuid())
+
+  firstName      String
+  lastName       String
+  phone          String?
+  whatsappNumber String?
+  email          String?
+  gender         Gender?
+  ageCategory    AgeCategory?
+
+  howHeard          String?
+  dateVisited       DateTime
+  programmeAttended String?
+  address           String?
+
+  interestedInJoining Boolean @default(false)
+
+  followUpStatus   VisitorFollowUpStatus @default(NEW)
+  assignedToUserId String?
+  assignedToUser   User?                 @relation("VisitorAssignedTo", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+
+  notes String?
+
+  /// Set once this visitor is converted into a full Member record.
+  convertedMemberId String? @unique
+  convertedMember   Member? @relation(fields: [convertedMemberId], references: [id], onDelete: SetNull)
+
+  followUps         VisitorFollowUp[]
+  attendanceRecords AttendanceRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([followUpStatus])
+  @@index([assignedToUserId])
+  @@map("visitors")
+}
+
+model VisitorFollowUp {
+  id        String  @id @default(uuid())
+  visitorId String
+  visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?   @relation("VisitorFollowUpBy", fields: [userId], references: [id], onDelete: SetNull)
+
+  status VisitorFollowUpStatus
+  notes  String?
+
+  contactedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([visitorId])
+  @@map("visitor_follow_ups")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 4: Attendance
+// -----------------------------------------------------------------------------
+
+/// Configurable programme/session type (Sunday Worship, Bible Study, ...) — see
+/// section 7 of the build spec. Same configurable-lookup pattern as
+/// MemberCategory/MembershipStatus: administrators can add custom programmes.
+model ProgrammeType {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  description  String?
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  sessions         AttendanceSession[]
+  offeringSessions OfferingSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("programme_types")
+}
+
+model AttendanceSession {
+  id String @id @default(uuid())
+
+  programmeTypeId String
+  programmeType   ProgrammeType @relation(fields: [programmeTypeId], references: [id])
+
+  /// Optional label for this specific occurrence, e.g. "Christmas Carol Service"
+  /// when programmeType is "Special Programmes".
+  name String?
+
+  sessionDate DateTime
+  location    String?
+  notes       String?
+
+  recordedByUserId String?
+  recordedByUser   User?   @relation(fields: [recordedByUserId], references: [id], onDelete: SetNull)
+
+  records AttendanceRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([programmeTypeId])
+  @@index([sessionDate])
+  @@map("attendance_sessions")
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+  VISITOR
+}
+
+model AttendanceRecord {
+  id        String            @id @default(uuid())
+  sessionId String
+  session   AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  /// Set for PRESENT/ABSENT/EXCUSED records tied to a registered member.
+  memberId String?
+  member   Member? @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  /// Optionally set for VISITOR records that match a known Visitor record.
+  visitorId   String?
+  visitor     Visitor? @relation(fields: [visitorId], references: [id], onDelete: SetNull)
+  /// Freeform name for a VISITOR record not linked to a Visitor profile
+  /// (quick headcount entry at the welcome desk).
+  visitorName String?
+
+  status AttendanceStatus
+  notes  String?
+
+  recordedAt DateTime @default(now())
+
+  @@unique([sessionId, memberId])
+  @@index([sessionId])
+  @@index([memberId])
+  @@index([status])
+  @@map("attendance_records")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 5: Ministries, Groups, Church Leadership
+// -----------------------------------------------------------------------------
+
+model Ministry {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+
+  meetingSchedule String?
+  meetingVenue    String?
+  contactPhone    String?
+  contactEmail    String?
+
+  leaderMemberId String?
+  leaderMember   Member? @relation("MinistryLeader", fields: [leaderMemberId], references: [id], onDelete: SetNull)
+
+  assistantLeaderMemberId String?
+  assistantLeaderMember   Member? @relation("MinistryAssistantLeader", fields: [assistantLeaderMemberId], references: [id], onDelete: SetNull)
+
+  isActive Boolean @default(true)
+
+  members MinistryMember[]
+  events  Event[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ministries")
+}
+
+model MinistryMember {
+  id         String   @id @default(uuid())
+  ministryId String
+  ministry   Ministry @relation(fields: [ministryId], references: [id], onDelete: Cascade)
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  roleInMinistry String   @default("Member")
+  joinedAt       DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ministryId, memberId])
+  @@index([memberId])
+  @@map("ministry_members")
+}
+
+model ChurchGroup {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+
+  meetingSchedule String?
+  meetingVenue    String?
+  contactPhone    String?
+  contactEmail    String?
+
+  leaderMemberId String?
+  leaderMember   Member? @relation("GroupLeader", fields: [leaderMemberId], references: [id], onDelete: SetNull)
+
+  assistantLeaderMemberId String?
+  assistantLeaderMember   Member? @relation("GroupAssistantLeader", fields: [assistantLeaderMemberId], references: [id], onDelete: SetNull)
+
+  isActive Boolean @default(true)
+
+  members GroupMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("church_groups")
+}
+
+model GroupMember {
+  id       String      @id @default(uuid())
+  groupId  String
+  group    ChurchGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  memberId String
+  member   Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  roleInGroup String   @default("Member")
+  joinedAt    DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([groupId, memberId])
+  @@index([memberId])
+  @@map("group_members")
+}
+
+model ChurchPosition {
+  id           String  @id @default(uuid())
+  title        String  @unique
+  category     String  @default("Lay Leadership")
+  description  String?
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  leadershipProfiles ChurchLeadership[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("church_positions")
+}
+
+model ChurchLeadership {
+  id         String         @id @default(uuid())
+  positionId String
+  position   ChurchPosition @relation(fields: [positionId], references: [id], onDelete: Cascade)
+
+  memberId String?
+  member   Member? @relation(fields: [memberId], references: [id], onDelete: SetNull)
+
+  name         String?
+  photoUrl     String?
+  bio          String?
+  phone        String?
+  email        String?
+  displayOrder Int     @default(0)
+
+  startDate DateTime?
+  endDate   DateTime?
+  isActive  Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([positionId])
+  @@index([memberId])
+  @@map("church_leadership")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 10: Finance
+//
+// The spec's entity list names Donation, Offering, OfferingSession, Expense,
+// ExpenseCategory, FinancialAccount and FinancialTransaction separately. In
+// practice a Donation and an Offering-session line are both just an income
+// transaction — modeling them as distinct tables risks the two drifting out
+// of sync (a donation report that doesn't match the transaction ledger).
+// Instead there is ONE ledger table, FinancialTransaction, covering both
+// income and expenses; OfferingSession is a lightweight grouping header over
+// the income transactions collected during one service (see section 15),
+// and a named/individual gift is simply a transaction with donor fields set.
+// This keeps reporting (income/expense/monthly/annual/category summaries)
+// a single query over one table instead of a union of several.
+// -----------------------------------------------------------------------------
+
+enum FinancialAccountType {
+  BANK
+  MOBILE_MONEY
+  CASH
+  OTHER
+}
+
+model FinancialAccount {
+  id            String               @id @default(uuid())
+  name          String               @unique
+  accountType   FinancialAccountType
+  /// Last 4 digits or similar partial reference only — never store full account numbers.
+  accountNumber String?
+  isActive      Boolean              @default(true)
+
+  transactions FinancialTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("financial_accounts")
+}
+
+/// Configurable income categories (Sunday offering, Tithe, Thanksgiving, ...)
+/// — see section 14. Same configurable-lookup pattern used throughout.
+model IncomeCategory {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  description  String?
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  transactions FinancialTransaction[]
+  budgets      Budget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("income_categories")
+}
+
+/// Configurable expense categories (Utilities, Maintenance, ...) — section 14.
+model ExpenseCategory {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  description  String?
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  transactions FinancialTransaction[]
+  budgets      Budget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("expense_categories")
+}
+
+/// Groups the income transactions collected during one church service —
+/// "Sunday Worship, 2026-09-06 -> General offering, Tithe, Missions, ..."
+/// (section 15). Deliberately holds only totals per category, never
+/// individual donor amounts, to satisfy "avoid exposing individual donor
+/// amounts to ordinary users."
+model OfferingSession {
+  id String @id @default(uuid())
+
+  programmeTypeId String
+  programmeType   ProgrammeType @relation(fields: [programmeTypeId], references: [id])
+
+  sessionDate DateTime
+  notes       String?
+
+  recordedByUserId String?
+  recordedByUser   User?   @relation("OfferingSessionRecordedBy", fields: [recordedByUserId], references: [id], onDelete: SetNull)
+
+  transactions FinancialTransaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([programmeTypeId])
+  @@index([sessionDate])
+  @@map("offering_sessions")
+}
+
+enum FinancialTransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model FinancialTransaction {
+  id   String                   @id @default(uuid())
+  type FinancialTransactionType
+
+  date        DateTime
+  amount      Decimal  @db.Decimal(12, 2)
+  description String?
+  /// Receipt/cheque/MoMo reference number, free text.
+  reference   String?
+
+  incomeCategoryId String?
+  incomeCategory   IncomeCategory? @relation(fields: [incomeCategoryId], references: [id])
+
+  expenseCategoryId String?
+  expenseCategory   ExpenseCategory? @relation(fields: [expenseCategoryId], references: [id])
+
+  financialAccountId String?
+  financialAccount   FinancialAccount? @relation(fields: [financialAccountId], references: [id])
+
+  offeringSessionId String?
+  offeringSession   OfferingSession? @relation(fields: [offeringSessionId], references: [id], onDelete: SetNull)
+
+  /// Set only for a named/individual gift (not an aggregate offering-session line).
+  donorName     String?
+  donorMemberId String?
+  donorMember   Member? @relation(fields: [donorMemberId], references: [id], onDelete: SetNull)
+  isAnonymous   Boolean @default(false)
+
+  /// URL into the future Media/storage module (Phase 7) — not a local file path.
+  attachmentUrl String?
+
+  approvalStatus   ApprovalStatus @default(APPROVED)
+  approvedByUserId String?
+  approvedByUser   User?          @relation("FinancialTransactionApprovedBy", fields: [approvedByUserId], references: [id], onDelete: SetNull)
+  approvedAt       DateTime?
+
+  recordedByUserId String?
+  recordedByUser   User?   @relation("FinancialTransactionRecordedBy", fields: [recordedByUserId], references: [id], onDelete: SetNull)
+
+  notes String?
+
+  /// Which fund this transaction belongs to (General, Building, Missions, ...).
+  /// Optional so existing/legacy transactions keep working unassigned.
+  fundId String?
+  fund   Fund?   @relation(fields: [fundId], references: [id], onDelete: SetNull)
+
+  /// Bank reconciliation — has this line been matched against the bank/MoMo statement?
+  isReconciled     Boolean   @default(false)
+  reconciledAt     DateTime?
+  reconciledByUserId String?
+  reconciledByUser   User?   @relation("FinancialTransactionReconciledBy", fields: [reconciledByUserId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([date])
+  @@index([incomeCategoryId])
+  @@index([expenseCategoryId])
+  @@index([offeringSessionId])
+  @@index([approvalStatus])
+  @@index([fundId])
+  @@index([isReconciled])
+  @@map("financial_transactions")
+}
+
+enum FundType {
+  GENERAL
+  RESTRICTED
+}
+
+/// Fund accounting — separates restricted money (Building Fund, Missions Fund, ...)
+/// from the General Fund so restricted gifts can be proven unspent on other purposes.
+model Fund {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  type        FundType @default(GENERAL)
+  description String?
+  isActive    Boolean  @default(true)
+
+  transactions FinancialTransaction[]
+  budgets      Budget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("funds")
+}
+
+/// A simple outstanding-liabilities ledger (amounts owed by the church) —
+/// deliberately not full double-entry bookkeeping, just enough to produce a
+/// meaningful Balance Sheet for a single-church deployment: Assets (financial
+/// account balances, computed from transactions) minus Liabilities (this
+/// model) equals the church's net Fund Balance.
+model Liability {
+  id          String    @id @default(uuid())
+  name        String
+  category    String?
+  amount      Decimal   @db.Decimal(12, 2)
+  incurredDate DateTime @default(now())
+  dueDate     DateTime?
+  isSettled   Boolean   @default(false)
+  settledDate DateTime?
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isSettled])
+  @@map("liabilities")
+}
+
+/// Annual budget per fund/category, compared against actual transactions
+/// for budget-vs-actual reporting.
+model Budget {
+  id     String @id @default(uuid())
+  year   Int
+
+  fundId String?
+  fund   Fund?   @relation(fields: [fundId], references: [id], onDelete: SetNull)
+
+  incomeCategoryId String?
+  incomeCategory   IncomeCategory? @relation(fields: [incomeCategoryId], references: [id], onDelete: SetNull)
+
+  expenseCategoryId String?
+  expenseCategory   ExpenseCategory? @relation(fields: [expenseCategoryId], references: [id], onDelete: SetNull)
+
+  amount Decimal @db.Decimal(12, 2)
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([year])
+  @@map("budgets")
+}
+
+// -----------------------------------------------------------------------------
+// PHASE 8: Public Website, CMS, Sermons, Events, News & Media
+// -----------------------------------------------------------------------------
+
+model ChurchSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("church_settings")
+}
+
+model Sermon {
+  id           String   @id @default(uuid())
+  title        String
+  slug         String   @unique
+  speaker      String
+  date         DateTime
+  scripture    String?
+  description  String?
+  videoUrl     String?
+  audioUrl     String?
+  pdfUrl       String?
+  thumbnailUrl String?
+  tags         String?
+
+  isPublished Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([date])
+  @@map("sermons")
+}
+
+model NewsArticle {
+  id               String    @id @default(uuid())
+  title            String
+  slug             String    @unique
+  excerpt          String?
+  content          String
+  featuredImageUrl String?
+  publishedAt      DateTime? @default(now())
+
+  isPublished Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([publishedAt])
+  @@map("news_articles")
+}
+
+model Event {
+  id             String    @id @default(uuid())
+  title          String
+  slug           String    @unique
+  description    String?
+  startDate      DateTime
+  endDate        DateTime?
+  startTime      String?
+  endTime        String?
+  location       String?
+  organizer      String?
+  bannerImageUrl String?
+
+  ministryId String?
+  ministry   Ministry? @relation(fields: [ministryId], references: [id], onDelete: SetNull)
+
+  isRegistrationRequired Boolean @default(false)
+  registrationLimit      Int?
+  contactPhone           String?
+  contactEmail           String?
+
+  isPublished Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([startDate])
+  @@index([ministryId])
+  @@map("events")
+}
+
+enum PrayerRequestStatus {
+  NEW
+  CONTACTED
+  PRAYED_FOR
+  ARCHIVED
+}
+
+model PrayerRequest {
+  id          String              @id @default(uuid())
+  name        String?
+  email       String?
+  phone       String?
+  request     String
+  isAnonymous Boolean             @default(false)
+  status      PrayerRequestStatus @default(NEW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("prayer_requests")
+}
+
+model ContactMessage {
+  id      String  @id @default(uuid())
+  name    String
+  email   String
+  phone   String?
+  subject String?
+  message String
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact_messages")
+}
+
+enum AnnouncementPriority {
+  NORMAL
+  URGENT
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+  LIVE_VIDEO
+}
+
+model Album {
+  id          String  @id @default(uuid())
+  title       String
+  slug        String  @unique
+  description String?
+  coverUrl    String?
+
+  photos Media[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("albums")
+}
+
+model Media {
+  id          String    @id @default(uuid())
+  filename    String
+  storedName  String    @unique
+  url         String
+  mimeType    String
+  size        Int
+  category    String?
+  type        MediaType @default(PHOTO)
+  title       String?
+  description String?
+  externalUrl String?
+  platform    String?
+  embedId     String?
+
+  albumId String?
+  album   Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)
+
+  uploadedById String?
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([type])
+  @@index([albumId])
+  @@map("media")
+}
+
+model Announcement {
+  id          String               @id @default(uuid())
+  title       String
+  message     String
+  priority    AnnouncementPriority @default(NORMAL)
+  isPublished Boolean              @default(true)
+  expiresAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isPublished])
+  @@map("announcements")
+}

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables — never commit real secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Build output
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Uploaded user content (local media storage)
+apps/api/uploads/
+
+# Prisma
+database/prisma/*.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing / coverage
+coverage/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Misc
+*.tsbuildinfo
+next-env.d.ts

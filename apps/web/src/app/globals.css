@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/*
+ * Methodist Church Ghana — design tokens.
+ *
+ * Palette drawn from the official Methodist Church Ghana crest: royal blue
+ * (the seal's field) as the primary brand color, with heritage gold (the
+ * seal's trim/lettering) as the supporting accent. Visual direction stays
+ * classic and professional: white/cream carries the body of every page
+ * (content sections, cards, forms), while the navbar and page heroes are
+ * deliberately solid blue brand surfaces — mirroring the crest itself —
+ * with gold used throughout as the accent on top of both. See
+ * docs/architecture.md.
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #14213d;
+
+  --card: #ffffff;
+  --card-foreground: #14213d;
+
+  /* Royal blue — matched directly to the crest's vivid field color. */
+  --primary: #14309c;
+  --primary-foreground: #ffffff;
+
+  /* Pale blue-white, not a tinted gray — keeps "secondary" surfaces still
+     reading as white-family rather than introducing a second hue. */
+  --secondary: #eef3fa;
+  --secondary-foreground: #1b3a63;
+
+  --muted: #f2f5fa;
+  --muted-foreground: #5b6b82;
+
+  /* Heritage gold — the crest's trim and lettering. Used for small
+     highlights, rules, icons, quote marks — never as a large fill (fails
+     contrast at that scale). */
+  --accent: #b8860b;
+  --accent-foreground: #2a1d08;
+
+  --destructive: #a80d27;
+  --destructive-foreground: #fdfaf6;
+
+  --border: #dbe3ee;
+  --input: #dbe3ee;
+  --ring: #14309c;
+
+  --radius: 0.5rem;
+
+  /* Full scales for direct utility use (bg-blue-700, text-gold-600, ...).
+     blue-700 (#14309c) is matched directly to the crest's field color. */
+  --color-blue-50: #eef1fc;
+  --color-blue-100: #d3daf7;
+  --color-blue-200: #a8b8ef;
+  --color-blue-300: #7690e5;
+  --color-blue-400: #4868d8;
+  --color-blue-500: #2748c5;
+  --color-blue-600: #1c37ae;
+  --color-blue-700: #14309c;
+  --color-blue-800: #0f2478;
+  --color-blue-900: #0a1a58;
+  --color-blue-950: #06113b;
+
+  --color-gold-50: #fbf6e7;
+  --color-gold-100: #f4e6b9;
+  --color-gold-200: #ecd389;
+  --color-gold-300: #ddba5f;
+  --color-gold-400: #cca23f;
+  --color-gold-500: #b8860b;
+  --color-gold-600: #966d09;
+  --color-gold-700: #745407;
+  --color-gold-800: #523b05;
+  --color-gold-900: #302303;
+
+  /* Cross red — the crest's cross-and-flame mark. A third brand color, used
+     deliberately (the brand mark itself, urgent/featured badges) rather
+     than scattered everywhere — blue still carries the large surfaces. */
+  --color-red-50: #fdeceb;
+  --color-red-100: #f9cac6;
+  --color-red-200: #f2a29b;
+  --color-red-300: #e8776d;
+  --color-red-400: #dc4f42;
+  --color-red-500: #c8102e;
+  --color-red-600: #a80d27;
+  --color-red-700: #870a1f;
+  --color-red-800: #650816;
+  --color-red-900: #45050f;
+
+  --color-cream-50: #fbfcfe;
+  --color-cream-100: #f5f8fc;
+  --color-cream-200: #eef3fa;
+  --color-cream-300: #e4ebf5;
+  --color-cream-400: #cfdbea;
+
+  --color-charcoal-50: #f2f4f7;
+  --color-charcoal-100: #dde3ea;
+  --color-charcoal-200: #b6c0cc;
+  --color-charcoal-300: #8996a6;
+  --color-charcoal-400: #5b6b82;
+  --color-charcoal-500: #3f4d63;
+  --color-charcoal-600: #2c3850;
+  --color-charcoal-700: #1b2740;
+  --color-charcoal-800: #121b30;
+  --color-charcoal-900: #0a1220;
+
+  /* Brand Palette from Reference Design */
+  --navy-deep: #14309c;
+  --navy-dark: #0f2478;
+  --gold-vibrant: #ffc72c;
+  --crimson-dark: #2b0b0a;
+  --crimson-mid: #5c1615;
+  --crimson-light: #8b2519;
+  --cream-soft: #faf8f5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-heading);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0a1220;
+    --foreground: #eef3fa;
+
+    --card: #121b30;
+    --card-foreground: #eef3fa;
+
+    --primary: #7690e5;
+    --primary-foreground: #0a1220;
+
+    --secondary: #1b2740;
+    --secondary-foreground: #eef3fa;
+
+    --muted: #1b2740;
+    --muted-foreground: #b6c0cc;
+
+    --accent: #ddba5f;
+    --accent-foreground: #0a1220;
+
+    --border: #2c3850;
+    --input: #2c3850;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Classic touch: a thin gold rule under section headings when used with this class. */
+.heading-rule::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 3px;
+  margin-top: 0.75rem;
+  background: var(--accent);
+}
+
+/* Off-canvas Sheet panel (no tailwindcss-animate plugin installed, so these
+   are plain CSS keyframes referenced via Tailwind's arbitrary `animation`
+   property on the Radix data-state attribute). */
+@keyframes sheet-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes sheet-slide-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes sheet-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sheet-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
