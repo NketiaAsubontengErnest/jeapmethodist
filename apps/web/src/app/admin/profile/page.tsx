@@ -119,7 +119,7 @@ export default function ProfilePage() {
 
       <div className="grid gap-8 md:grid-cols-2">
         {/* Card 1: Account Information (Read-only Name & Email) */}
-        <Card className="shadow-lg border-slate-200 dark:border-slate-800">
+        <Card className="shadow-lg border-slate-200 admin-dark:border-slate-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-serif">
               <User className="h-5 w-5 text-amber-500" /> Account Information
@@ -181,13 +181,13 @@ export default function ProfilePage() {
                 <Input id="phone" placeholder="+233 24 123 4567" {...registerProfile('phone')} />
               </div>
 
-              <div className="rounded-xl border border-amber-500/20 bg-amber-50/50 p-3 text-xs text-amber-900 dark:bg-amber-950/20 dark:text-amber-300 flex items-center gap-2">
+              <div className="rounded-xl border border-amber-500/20 bg-amber-50/50 p-3 text-xs text-amber-900 admin-dark:bg-amber-950/20 admin-dark:text-amber-300 flex items-center gap-2">
                 <Lock className="h-4 w-4 text-amber-600 shrink-0" />
                 <span>Name and email changes must be requested through your System Administrator.</span>
               </div>
 
               {profileSuccess && (
-                <div className="flex items-center gap-2 rounded-lg bg-emerald-50 text-emerald-700 p-3 text-xs font-semibold dark:bg-emerald-950/40 dark:text-emerald-400">
+                <div className="flex items-center gap-2 rounded-lg bg-emerald-50 text-emerald-700 p-3 text-xs font-semibold admin-dark:bg-emerald-950/40 admin-dark:text-emerald-400">
                   <CheckCircle2 className="h-4 w-4 shrink-0" />
                   Contact details updated successfully!
                 </div>
@@ -210,7 +210,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Card 2: Security & Password */}
-        <Card className="shadow-lg border-slate-200 dark:border-slate-800">
+        <Card className="shadow-lg border-slate-200 admin-dark:border-slate-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-serif">
               <KeyRound className="h-5 w-5 text-amber-500" /> Security &amp; Password
@@ -262,7 +262,7 @@ export default function ProfilePage() {
               </div>
 
               {passwordSuccess && (
-                <div className="flex items-center gap-2 rounded-lg bg-emerald-50 text-emerald-700 p-3 text-xs font-semibold dark:bg-emerald-950/40 dark:text-emerald-400">
+                <div className="flex items-center gap-2 rounded-lg bg-emerald-50 text-emerald-700 p-3 text-xs font-semibold admin-dark:bg-emerald-950/40 admin-dark:text-emerald-400">
                   <CheckCircle2 className="h-4 w-4 shrink-0" />
                   Your password has been changed successfully!
                 </div>
@@ -272,7 +272,7 @@ export default function ProfilePage() {
                 type="submit"
                 disabled={passwordMutation.isPending || isSubmittingPassword}
                 variant="outline"
-                className="w-full border-[#14309c] text-[#14309c] hover:bg-[#14309c] hover:text-white font-bold dark:border-white dark:text-white"
+                className="w-full border-[#14309c] text-[#14309c] hover:bg-[#14309c] hover:text-white font-bold admin-dark:border-white admin-dark:text-white"
               >
                 {passwordMutation.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -18,15 +18,13 @@ interface PublicFooterProps {
 
 export function PublicFooter({
   churchName = 'Methodist Church Ghana',
-  societyName = 'Trinity Society',
-  slogan = 'Sure and Steadfast!',
-  heroSubtitle = 'A vibrant, spirit-filled family worshipping Christ, building lives, and transforming communities in Ghana.',
-  address = 'Methodist Church Ghana, Cathedral Avenue, Accra / Circuit Headquarters',
-  phone = '+233 30 200 0000 / +233 24 000 0000',
-  email = 'info@methodistchurch.org.gh',
-  secretariatHours = 'Monday – Friday: 8:00 AM – 5:00 PM',
-  sundayServiceTimes = 'First Service: 7:00 AM | Second Service: 9:30 AM',
-  midweekServiceTimes = 'Wednesday Bible Study: 6:00 PM',
+  societyName,
+  slogan,
+  heroSubtitle,
+  address,
+  phone,
+  email,
+  secretariatHours,
   logoUrl,
 }: PublicFooterProps) {
   const logoSrc = formatMediaUrl(logoUrl);
@@ -40,19 +38,25 @@ export function PublicFooter({
             <div className="flex items-center gap-3">
               {logoSrc && (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={logoSrc} alt={societyName} className="h-9 w-9 rounded-full border border-[#FFC72C]/80 bg-white object-contain p-0.5" />
+                <img src={logoSrc} alt={societyName || churchName} className="h-9 w-9 rounded-full border border-[#FFC72C]/80 bg-white object-contain p-0.5" />
               )}
               <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#FFC72C]">
                 {churchName}
               </span>
             </div>
-            <h3 className="font-serif text-xl font-bold leading-tight text-white">{societyName}</h3>
-            <p className="text-xs leading-relaxed text-slate-400">
-              {heroSubtitle}
-            </p>
-            <p className="text-xs font-semibold italic text-[#FFC72C] pt-1">
-              &quot;{slogan.replace(/^["']|["']$/g, '')}&quot;
-            </p>
+            {societyName && (
+              <h3 className="font-serif text-xl font-bold leading-tight text-white">{societyName}</h3>
+            )}
+            {heroSubtitle && (
+              <p className="text-xs leading-relaxed text-slate-400">
+                {heroSubtitle}
+              </p>
+            )}
+            {slogan && (
+              <p className="text-xs font-semibold italic text-[#FFC72C] pt-1">
+                &quot;{slogan.replace(/^["']|["']$/g, '')}&quot;
+              </p>
+            )}
           </div>
 
           {/* Column 2: Explore */}
@@ -71,22 +75,30 @@ export function PublicFooter({
           <div className="space-y-3">
             <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-[#FFC72C]">CONTACT</h4>
             <div className="space-y-1.5 text-xs text-slate-300">
-              <p className="flex items-start gap-1.5">
-                <MapPin className="h-3.5 w-3.5 text-[#FFC72C] shrink-0 mt-0.5" />
-                <span className="line-clamp-2">{address}</span>
-              </p>
-              <p className="flex items-center gap-1.5">
-                <Phone className="h-3.5 w-3.5 text-[#FFC72C] shrink-0" />
-                <span>{phone}</span>
-              </p>
-              <p className="flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5 text-[#FFC72C] shrink-0" />
-                <span>{email}</span>
-              </p>
-              <p className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-[#FFC72C] shrink-0" />
-                <span>{secretariatHours}</span>
-              </p>
+              {address && (
+                <p className="flex items-start gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-[#FFC72C] shrink-0 mt-0.5" />
+                  <span className="line-clamp-2">{address}</span>
+                </p>
+              )}
+              {phone && (
+                <p className="flex items-center gap-1.5">
+                  <Phone className="h-3.5 w-3.5 text-[#FFC72C] shrink-0" />
+                  <span>{phone}</span>
+                </p>
+              )}
+              {email && (
+                <p className="flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5 text-[#FFC72C] shrink-0" />
+                  <span>{email}</span>
+                </p>
+              )}
+              {secretariatHours && (
+                <p className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-[#FFC72C] shrink-0" />
+                  <span>{secretariatHours}</span>
+                </p>
+              )}
             </div>
             <Link href="/contact" className="inline-flex items-center text-xs font-bold text-[#FFC72C] hover:underline pt-1">
               Full Contact Page &rarr;

@@ -164,7 +164,7 @@ export default function LoginPage() {
                   placeholder="Enter your email"
                   autoComplete="email"
                   aria-invalid={!!errors.email}
-                  className="pl-10 h-11 rounded-xl border-slate-200 bg-white text-sm focus-visible:ring-[#14309c] shadow-sm"
+                  className="pl-10 h-11 rounded-xl border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 ring-offset-white focus-visible:ring-[#14309c] shadow-sm"
                   {...register('email')}
                 />
               </div>
@@ -184,7 +184,7 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   aria-invalid={!!errors.password}
-                  className="pl-10 h-11 rounded-xl border-slate-200 bg-white text-sm focus-visible:ring-[#14309c] shadow-sm"
+                  className="pl-10 h-11 rounded-xl border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 ring-offset-white focus-visible:ring-[#14309c] shadow-sm"
                   {...register('password')}
                 />
               </div>

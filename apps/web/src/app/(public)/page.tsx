@@ -75,22 +75,29 @@ export default function PublicHomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid items-center gap-12 lg:grid-cols-12">
             <div className="space-y-6 lg:col-span-7">
-              <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-                {settings?.church_name ? `${settings.church_name} • ${settings?.society_name || 'TRINITY SOCIETY'}` : 'METHODIST CHURCH GHANA • TRINITY SOCIETY'}
-              </span>
+              {(settings?.church_name || settings?.society_name) && (
+                <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
+                  {[settings?.church_name, settings?.society_name].filter(Boolean).join(' • ').toUpperCase()}
+                </span>
+              )}
 
-              <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-                {settings?.hero_title || settings?.society_name || 'Trinity Society'}
-              </h1>
+              {(settings?.hero_title || settings?.society_name) && (
+                <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  {settings?.hero_title || settings?.society_name}
+                </h1>
+              )}
 
-              <p className="text-base font-medium italic text-[#FFC72C]">
-                &quot;{(settings?.slogan || 'Sure and Steadfast!').replace(/^["']|["']$/g, '')}&quot;
-              </p>
+              {settings?.slogan && (
+                <p className="text-base font-medium italic text-[#FFC72C]">
+                  &quot;{settings.slogan.replace(/^["']|["']$/g, '')}&quot;
+                </p>
+              )}
 
-              <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                {settings?.hero_subtitle ||
-                  'A vibrant, spirit-filled family worshipping Christ, building lives, and transforming communities in Ghana.'}
-              </p>
+              {settings?.hero_subtitle && (
+                <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                  {settings.hero_subtitle}
+                </p>
+              )}
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Button

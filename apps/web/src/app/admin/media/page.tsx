@@ -405,7 +405,7 @@ export default function MediaPage() {
           ) : albumsQuery.data && albumsQuery.data.items.length === 0 ? (
             <Card className="border-dashed">
               <CardContent className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-                <div className="rounded-full bg-amber-50 p-4 text-amber-600 dark:bg-amber-950">
+                <div className="rounded-full bg-amber-50 p-4 text-amber-600 admin-dark:bg-amber-950">
                   <FolderPlus className="h-8 w-8" />
                 </div>
                 <div>

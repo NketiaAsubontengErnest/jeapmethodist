@@ -128,7 +128,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-l-4 border-l-[#14309c] shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 admin-dark:text-slate-400">
               Active Membership
             </CardTitle>
             <div className="rounded-xl bg-[#14309c] p-2.5 text-amber-400 shadow-inner">
@@ -136,18 +136,18 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-extrabold text-amber-600 dark:text-amber-400">
+            <div className="text-4xl font-extrabold text-amber-600 admin-dark:text-amber-400">
               {overview?.totalMembers ?? 0}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              <span className="font-semibold text-[#14309c] dark:text-slate-200">{overview?.activeMembers ?? 0} active</span> members registered
+              <span className="font-semibold text-[#14309c] admin-dark:text-slate-200">{overview?.activeMembers ?? 0} active</span> members registered
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-emerald-600 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 admin-dark:text-slate-400">
               Monthly Income
             </CardTitle>
             <div className="rounded-xl bg-emerald-950 p-2.5 text-emerald-400 shadow-inner">
@@ -155,7 +155,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-extrabold text-emerald-700 dark:text-emerald-400">
+            <div className="text-4xl font-extrabold text-emerald-700 admin-dark:text-emerald-400">
               {formatGHS(overview?.monthlyIncome ?? 0)}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Tithes, offerings &amp; donations this month</p>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
         <Card className="border-l-4 border-l-amber-600 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 admin-dark:text-slate-400">
               Monthly Expenses
             </CardTitle>
             <div className="rounded-xl bg-amber-950 p-2.5 text-amber-400 shadow-inner">
@@ -172,7 +172,7 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-extrabold text-amber-700 dark:text-amber-400">
+            <div className="text-4xl font-extrabold text-amber-700 admin-dark:text-amber-400">
               {formatGHS(overview?.monthlyExpense ?? 0)}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">Operational expenditures this month</p>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
 
         <Card className="border-l-4 border-l-purple-700 shadow-md hover:shadow-lg transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+            <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-600 admin-dark:text-slate-400">
               Media &amp; Photo Albums
             </CardTitle>
             <div className="rounded-xl bg-purple-950 p-2.5 text-purple-300 shadow-inner">
@@ -189,21 +189,21 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-extrabold text-purple-700 dark:text-purple-400">
+            <div className="text-4xl font-extrabold text-purple-700 admin-dark:text-purple-400">
               {overview?.totalMedia ?? 0}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              <span className="font-semibold text-slate-900 dark:text-slate-200">{overview?.totalAlbums ?? 0} photo albums</span> &amp; video items
+              <span className="font-semibold text-slate-900 admin-dark:text-slate-200">{overview?.totalAlbums ?? 0} photo albums</span> &amp; video items
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* 12-Month Financial Performance Graph */}
-      <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+      <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
         <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
           <div>
-            <CardTitle className="flex items-center gap-2 font-serif text-lg font-bold text-[#14309c] dark:text-white">
+            <CardTitle className="flex items-center gap-2 font-serif text-lg font-bold text-[#14309c] admin-dark:text-white">
               <BarChart3 className="h-5 w-5 text-amber-500" />
               12-Month Financial Performance (Income vs. Expenses)
             </CardTitle>
@@ -219,7 +219,7 @@ export default function DashboardPage() {
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={charts?.monthlyFinancialTrend ?? []}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 admin-dark:stroke-slate-800" />
                 <XAxis dataKey="period" fontSize={12} stroke="#64748b" />
                 <YAxis fontSize={12} tickFormatter={(v: number) => formatGHS(v)} width={80} stroke="#64748b" />
                 <Tooltip formatter={(value: number) => formatGHS(value)} />
@@ -235,10 +235,10 @@ export default function DashboardPage() {
       {/* Pie Charts Section */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Pie Chart 1: Member Gender Demographics */}
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="border-b pb-4">
-            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
-              <PieIcon className="h-4 w-4 text-[#14309c] dark:text-amber-400" />
+            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
+              <PieIcon className="h-4 w-4 text-[#14309c] admin-dark:text-amber-400" />
               Member Gender Breakdown
             </CardTitle>
             <CardDescription>Demographic ratio</CardDescription>
@@ -276,9 +276,9 @@ export default function DashboardPage() {
         </Card>
 
         {/* Pie Chart 2: Income by Category */}
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="border-b pb-4">
-            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
               <PieIcon className="h-4 w-4 text-amber-500" />
               Income Categories Distribution
             </CardTitle>
@@ -315,9 +315,9 @@ export default function DashboardPage() {
         </Card>
 
         {/* Pie Chart 3: Media Content Breakdown */}
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="border-b pb-4">
-            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
               <PieIcon className="h-4 w-4 text-purple-600" />
               Media Content Distribution
             </CardTitle>
@@ -356,9 +356,9 @@ export default function DashboardPage() {
 
       {/* Visitor Status & Quick Actions Row */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="border-b pb-4">
-            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
               <UserCheck className="h-5 w-5 text-amber-500" />
               Visitor Follow-Up Funnel
             </CardTitle>
@@ -369,7 +369,7 @@ export default function DashboardPage() {
               <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={charts.visitorStatus}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" />
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 admin-dark:stroke-slate-800" />
                     <XAxis dataKey="name" fontSize={11} stroke="#64748b" />
                     <YAxis fontSize={11} stroke="#64748b" />
                     <Tooltip />
@@ -384,9 +384,9 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Management Action Shortcuts */}
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="border-b pb-4">
-            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+            <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
               <Layers className="h-5 w-5 text-amber-500" />
               Quick Action Shortcuts
             </CardTitle>
@@ -394,9 +394,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2 pt-6">
             <Link href="/admin/media">
-              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg dark:bg-slate-900 dark:border-slate-800">
+              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg admin-dark:bg-slate-900 admin-dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <div className="rounded-xl bg-purple-100 p-2.5 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
+                  <div className="rounded-xl bg-purple-100 p-2.5 text-purple-700 admin-dark:bg-purple-950 admin-dark:text-purple-300">
                     <Image className="h-5 w-5" />
                   </div>
                   <Badge className="bg-[#14309c] text-amber-400 font-bold text-[10px]">Media &amp; Albums</Badge>
@@ -409,9 +409,9 @@ export default function DashboardPage() {
             </Link>
 
             <Link href="/admin/giving">
-              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg dark:bg-slate-900 dark:border-slate-800">
+              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg admin-dark:bg-slate-900 admin-dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <div className="rounded-xl bg-emerald-100 p-2.5 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  <div className="rounded-xl bg-emerald-100 p-2.5 text-emerald-700 admin-dark:bg-emerald-950 admin-dark:text-emerald-300">
                     <DollarSign className="h-5 w-5" />
                   </div>
                   <Badge className="bg-[#14309c] text-emerald-400 font-bold text-[10px]">Finance</Badge>
@@ -424,9 +424,9 @@ export default function DashboardPage() {
             </Link>
 
             <Link href="/admin/attendance">
-              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg dark:bg-slate-900 dark:border-slate-800">
+              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg admin-dark:bg-slate-900 admin-dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <div className="rounded-xl bg-blue-100 p-2.5 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                  <div className="rounded-xl bg-blue-100 p-2.5 text-blue-700 admin-dark:bg-blue-950 admin-dark:text-blue-300">
                     <CalendarCheck className="h-5 w-5" />
                   </div>
                   <Badge className="bg-[#14309c] text-blue-400 font-bold text-[10px]">Attendance</Badge>
@@ -439,9 +439,9 @@ export default function DashboardPage() {
             </Link>
 
             <Link href="/admin/events">
-              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg dark:bg-slate-900 dark:border-slate-800">
+              <div className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-[#14309c] hover:shadow-lg admin-dark:bg-slate-900 admin-dark:border-slate-800">
                 <div className="flex items-center justify-between">
-                  <div className="rounded-xl bg-amber-100 p-2.5 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                  <div className="rounded-xl bg-amber-100 p-2.5 text-amber-700 admin-dark:bg-amber-950 admin-dark:text-amber-300">
                     <BarChart3 className="h-5 w-5" />
                   </div>
                   <Badge className="bg-[#14309c] text-amber-400 font-bold text-[10px]">Events</Badge>
@@ -459,10 +459,10 @@ export default function DashboardPage() {
       {/* New Additional Information Row: Upcoming Events & System Activity Log */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Upcoming Events Widget */}
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
             <div>
-              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                 <Sparkles className="h-5 w-5 text-amber-500" />
                 Upcoming Church Events &amp; Programmes
               </CardTitle>
@@ -488,7 +488,7 @@ export default function DashboardPage() {
                       {ev.location && <span>&bull; {ev.location}</span>}
                     </p>
                   </div>
-                  <Badge variant="outline" className="shrink-0 text-[10px] font-mono border-amber-500/50 text-amber-600 dark:text-amber-400">
+                  <Badge variant="outline" className="shrink-0 text-[10px] font-mono border-amber-500/50 text-amber-600 admin-dark:text-amber-400">
                     Upcoming
                   </Badge>
                 </div>
@@ -500,10 +500,10 @@ export default function DashboardPage() {
         </Card>
 
         {/* Recent Sermons Widget */}
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
             <div>
-              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                 <Video className="h-5 w-5 text-purple-600" />
                 Recent Sermon Recordings
               </CardTitle>
@@ -543,10 +543,10 @@ export default function DashboardPage() {
 
       {/* Birthdays Widget Row */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
             <div>
-              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                 <Cake className="h-5 w-5 text-amber-500" />
                 Birthdays This Week
               </CardTitle>
@@ -566,7 +566,7 @@ export default function DashboardPage() {
                   className="flex items-center justify-between rounded-xl border p-3 bg-card hover:bg-muted/40 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-amber-500/40 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-amber-500/40 bg-amber-50 text-amber-700 admin-dark:bg-amber-950 admin-dark:text-amber-300">
                       {m.profilePhotoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={m.profilePhotoUrl} alt="" className="h-full w-full object-cover" />
@@ -586,7 +586,7 @@ export default function DashboardPage() {
                   </div>
                   <Badge
                     variant="outline"
-                    className="shrink-0 text-[10px] font-mono border-amber-500/50 text-amber-600 dark:text-amber-400"
+                    className="shrink-0 text-[10px] font-mono border-amber-500/50 text-amber-600 admin-dark:text-amber-400"
                   >
                     {m.daysUntil === 0 ? 'Today' : m.daysUntil === 1 ? 'Tomorrow' : `In ${m.daysUntil}d`}
                   </Badge>
@@ -598,10 +598,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+        <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
             <div>
-              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                 <Cake className="h-5 w-5 text-purple-600" />
                 Birthdays This Month
               </CardTitle>
@@ -622,7 +622,7 @@ export default function DashboardPage() {
                     className={`flex items-center justify-between rounded-lg border p-2.5 bg-card transition-colors ${m.isPast ? 'opacity-50' : 'hover:bg-muted/40'}`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#14309c]/10 text-xs font-bold text-[#14309c] dark:bg-[#14309c]/30 dark:text-blue-300">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#14309c]/10 text-xs font-bold text-[#14309c] admin-dark:bg-[#14309c]/30 admin-dark:text-blue-300">
                         {m.day}
                       </span>
                       <span className="truncate text-sm font-medium text-foreground">

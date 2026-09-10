@@ -201,7 +201,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
         {/* Enrolled Groups */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 space-y-0">
-            <Users className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <Users className="h-4 w-4 text-amber-600 admin-dark:text-amber-400" />
             <CardTitle className="text-base">Church Groups ({member.groupMemberships.length})</CardTitle>
           </CardHeader>
           <CardContent>
@@ -213,7 +213,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                   <Badge
                     key={gm.id}
                     variant="outline"
-                    className="px-3 py-1 text-xs gap-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border-amber-300"
+                    className="px-3 py-1 text-xs gap-1.5 bg-amber-50 admin-dark:bg-amber-950/40 text-amber-800 admin-dark:text-amber-200 border-amber-300"
                   >
                     <Users className="h-3 w-3" />
                     {gm.group.name}
@@ -227,7 +227,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
         {/* Enrolled Ministries */}
         <Card>
           <CardHeader className="flex flex-row items-center gap-2 space-y-0">
-            <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Building2 className="h-4 w-4 text-blue-600 admin-dark:text-blue-400" />
             <CardTitle className="text-base">Church Ministries ({member.ministryMemberships.length})</CardTitle>
           </CardHeader>
           <CardContent>
@@ -239,7 +239,7 @@ export default function MemberDetailPage({ params }: { params: Promise<{ id: str
                   <Badge
                     key={mm.id}
                     variant="outline"
-                    className="px-3 py-1 text-xs gap-1.5 bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-200 border-blue-300"
+                    className="px-3 py-1 text-xs gap-1.5 bg-blue-50 admin-dark:bg-blue-950/40 text-blue-800 admin-dark:text-blue-200 border-blue-300"
                   >
                     <Building2 className="h-3 w-3" />
                     {mm.ministry.name}

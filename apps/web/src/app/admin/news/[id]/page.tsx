@@ -156,7 +156,7 @@ export default function NewsArticleDetailPage({ params }: { params: Promise<{ id
                   <Save className="h-4 w-4" />
                   {updateMutation.isPending ? 'Saving…' : 'Save changes'}
                 </Button>
-                {success && <p className="text-sm text-green-700 dark:text-green-400">Saved.</p>}
+                {success && <p className="text-sm text-green-700 admin-dark:text-green-400">Saved.</p>}
               </div>
             )}
           </form>

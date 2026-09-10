@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* A second, independent dark variant used only by admin/** components —
+   keyed off the manual data-theme attribute (see admin/layout.tsx's
+   toggle) rather than prefers-color-scheme, so it never fires from the
+   visitor's OS setting the way the public site's `dark:` still does.
+   `&:where(...)` keeps this at zero specificity, matching Tailwind's own
+   dark: output, so admin-dark: utilities override base utilities the same
+   way dark: ones do (source order, not specificity). */
+@custom-variant admin-dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /*
  * Methodist Church Ghana — design tokens.
  *
@@ -168,37 +177,40 @@ body {
   color: var(--foreground);
 }
 
-/* The admin portal always renders in its light brand palette, regardless of
-   the visitor's OS/browser dark-mode preference — unlike the public site,
-   it isn't designed with a dark variant, so letting it inherit the
-   `prefers-color-scheme: dark` overrides above just breaks contrast.
-   These declarations sit outside that media query, so they unconditionally
-   win over the inherited :root values for anything under .admin-shell. */
-.admin-shell {
-  --background: #ffffff;
-  --foreground: #14213d;
+/* The admin portal's theme is switched manually (see the header toggle in
+   admin/layout.tsx), independent of the visitor's OS/browser preference —
+   unlike the public site, which follows prefers-color-scheme above. While
+   mounted, the admin layout sets data-theme="light" (default) or "dark" on
+   <html> and removes it entirely on unmount, so public pages are completely
+   unaffected and keep following the media query exactly as before.
+   Targeting :root (not a wrapper class) so this also reaches Radix
+   Dialog/Sheet/Dropdown/Select/Popover content, which portals to
+   document.body outside the admin layout's own DOM subtree. */
+:root[data-theme="dark"] {
+  --background: #0a1220;
+  --foreground: #eef3fa;
 
-  --card: #ffffff;
-  --card-foreground: #14213d;
+  --card: #121b30;
+  --card-foreground: #eef3fa;
 
-  --primary: #14309c;
-  --primary-foreground: #ffffff;
+  --primary: #7690e5;
+  --primary-foreground: #0a1220;
 
-  --secondary: #eef3fa;
-  --secondary-foreground: #1b3a63;
+  --secondary: #1b2740;
+  --secondary-foreground: #eef3fa;
 
-  --muted: #f2f5fa;
-  --muted-foreground: #5b6b82;
+  --muted: #1b2740;
+  --muted-foreground: #b6c0cc;
 
-  --accent: #b8860b;
-  --accent-foreground: #2a1d08;
+  --accent: #ddba5f;
+  --accent-foreground: #0a1220;
 
   --destructive: #a80d27;
   --destructive-foreground: #fdfaf6;
 
-  --border: #dbe3ee;
-  --input: #dbe3ee;
-  --ring: #14309c;
+  --border: #2c3850;
+  --input: #2c3850;
+  --ring: #7690e5;
 }
 
 /* Classic touch: a thin gold rule under section headings when used with this class. */

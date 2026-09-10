@@ -263,7 +263,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               <Save className="h-4 w-4" />
               {updateMutation.isPending ? 'Saving…' : 'Save changes'}
             </Button>
-            {success && <p className="text-sm text-green-700 dark:text-green-400">Saved.</p>}
+            {success && <p className="text-sm text-green-700 admin-dark:text-green-400">Saved.</p>}
             {error && <p className="text-sm text-destructive">{error}</p>}
           </div>
         )}

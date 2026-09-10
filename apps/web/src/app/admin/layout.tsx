@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Cross, LogOut, Loader2, User, ChevronDown } from 'lucide-react';
+import { Cross, LogOut, Loader2, User, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { NAV_ITEMS } from '@/lib/nav-items';
@@ -18,10 +18,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+// Must match the key the blocking bootstrap script in app/layout.tsx reads
+// before first paint, and only ever holds 'light' or 'dark'.
+const ADMIN_THEME_KEY = 'admin-theme';
+
+// SSR-safe: useLayoutEffect on the client (fires before paint, so toggling
+// or arriving here via client-side navigation never flashes the wrong
+// theme), useEffect (a no-op-on-server-safe fallback) during SSR.
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, isLoading, logout, hasPermission } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   const { data: settings } = useQuery({
     queryKey: ['public-settings'],
@@ -36,23 +46,42 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
   }, [isLoading, user, router]);
 
-  // The admin portal always renders in its light brand palette — never the
-  // OS/browser dark-mode variant. The `.admin-shell` class in globals.css
-  // covers everything inside this layout, but Radix Dialog/Sheet/Dropdown/
-  // Select/Popover portal their content straight to document.body, outside
-  // that div, so they'd still pick up the dark :root override on their own.
-  // Setting data-theme on <html> instead opts the whole document out via
-  // the existing `:root:not([data-theme="light"])` rule, portals included.
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'light');
+  // The admin portal's theme is switched manually via the header toggle,
+  // never the OS/browser dark-mode preference — unlike the public site.
+  // Reads any theme this browser previously chose (defaulting to light —
+  // a different browser has no entry, so it's light there too) and applies
+  // it to <html> for as long as this layout is mounted; removed entirely on
+  // unmount so public pages are untouched and keep following the system
+  // preference exactly as before.
+  useIsomorphicLayoutEffect(() => {
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(ADMIN_THEME_KEY);
+    } catch {
+      // Storage may be unavailable (private browsing, disabled) — light stays default.
+    }
+    const initial = stored === 'dark' ? 'dark' : 'light';
+    setTheme(initial);
+    document.documentElement.setAttribute('data-theme', initial);
     return () => {
       document.documentElement.removeAttribute('data-theme');
     };
   }, []);
 
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.documentElement.setAttribute('data-theme', next);
+    try {
+      localStorage.setItem(ADMIN_THEME_KEY, next);
+    } catch {
+      // Non-fatal — the toggle still works for the rest of this session.
+    }
+  };
+
   if (isLoading || !user) {
     return (
-      <div className="admin-shell fixed inset-0 flex items-center justify-center bg-secondary">
+      <div className="fixed inset-0 flex items-center justify-center bg-secondary">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-label="Loading" />
       </div>
     );
@@ -67,7 +96,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     // scrolling at once. Being fixed removes the outer page as a scroll
     // candidate entirely; only `nav` (sidebar) and `main` below scroll,
     // independently, while the header and sidebar chrome never move.
-    <div className="admin-shell fixed inset-0 flex overflow-hidden bg-secondary print:static print:block print:h-auto print:overflow-visible">
+    <div className="fixed inset-0 flex overflow-hidden bg-secondary print:static print:block print:h-auto print:overflow-visible">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card md:flex print:hidden">
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border px-5">
           {logoSrc ? (
@@ -157,8 +186,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </p>
           </div>
 
-          {/* User Dropdown Menu at Top Right */}
-          <DropdownMenu>
+          <div className="flex items-center gap-2">
+            {/* Light / Dark Mode Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted transition-colors cursor-pointer outline-none"
+            >
+              {theme === 'dark' ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+            </button>
+
+            {/* User Dropdown Menu at Top Right */}
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
@@ -194,13 +235,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => logout().then(() => router.replace('/login'))}
-                className="text-rose-600 focus:bg-rose-50 focus:text-rose-700 dark:focus:bg-rose-950 dark:focus:text-rose-400 font-semibold"
+                className="text-rose-600 focus:bg-rose-50 focus:text-rose-700 admin-dark:focus:bg-rose-950 admin-dark:focus:text-rose-400 font-semibold"
               >
                 <LogOut className="h-4 w-4" />
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </header>
         {/* Independent scroll region — the main content scrolls on its own, separately from the sidebar */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 print:h-auto print:overflow-visible print:p-0">{children}</main>

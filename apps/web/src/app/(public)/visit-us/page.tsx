@@ -13,13 +13,13 @@ export default function VisitUsPage() {
     queryFn: fetchPublicSettings,
   });
 
-  const churchTitle = settings?.church_name
-    ? `${settings.church_name} — ${settings?.society_name || 'Trinity Society'}`
-    : 'Methodist Church Ghana';
+  const churchTitle = settings?.church_name && settings?.society_name
+    ? `${settings.church_name} — ${settings.society_name}`
+    : settings?.church_name || settings?.society_name;
 
-  const service1 = settings?.sunday_service_1 || 'First Service (Vernacular / Fante) at 7:00 AM';
-  const service2 = settings?.sunday_service_2 || 'Second Service (English) at 9:30 AM';
-  const midweek = settings?.midweek_service || 'Mid-week Bible study Wednesdays at 6:00 PM';
+  const serviceSchedule = [settings?.sunday_service_1, settings?.sunday_service_2, settings?.midweek_service]
+    .filter(Boolean)
+    .join(', ') || settings?.sunday_service_times;
 
   return (
     <div className="min-h-screen bg-white py-12">
@@ -33,7 +33,10 @@ export default function VisitUsPage() {
             Plan Your First Visit
           </h1>
           <p className="text-lg text-muted-foreground">
-            We are thrilled to welcome you to {churchTitle}. Here is a friendly guide on what to expect when you join us for Sunday divine service.
+            {churchTitle
+              ? `We are thrilled to welcome you to ${churchTitle}. `
+              : 'We are thrilled to welcome you. '}
+            Here is a friendly guide on what to expect when you join us for Sunday divine service.
           </p>
         </div>
 
@@ -86,7 +89,7 @@ export default function VisitUsPage() {
             <div className="space-y-2">
               <h3 className="font-serif font-bold text-foreground text-base">What are your service times?</h3>
               <p className="text-muted-foreground leading-relaxed">
-                We hold divine services: {service1}, and {service2}. {midweek}.
+                {serviceSchedule || 'Service times will be posted here once configured.'}
               </p>
             </div>
 

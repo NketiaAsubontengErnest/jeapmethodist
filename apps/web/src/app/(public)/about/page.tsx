@@ -14,24 +14,28 @@ export default function AboutPage() {
     queryFn: fetchPublicSettings,
   });
 
-  const societyTitle = settings?.society_name || 'Trinity Society';
-  const fullChurchName = settings?.church_name
+  const societyTitle = settings?.society_name;
+  const fullChurchName = settings?.church_name && societyTitle
     ? `${settings.church_name} — ${societyTitle}`
-    : `The Methodist Church Ghana — ${societyTitle}`;
+    : settings?.church_name || societyTitle;
 
   return (
     <div className="space-y-16 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-white text-foreground">
       {/* Page Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <Badge variant="outline" className="rounded-full border-blue-200 bg-blue-50 font-bold text-primary">
-          About {societyTitle}
-        </Badge>
+        {societyTitle && (
+          <Badge variant="outline" className="rounded-full border-blue-200 bg-blue-50 font-bold text-primary">
+            About {societyTitle}
+          </Badge>
+        )}
         <h1 className="font-serif text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
           {settings?.slogan ? `"${settings.slogan.replace(/^["']|["']$/g, '')}"` : 'Worshipping God, Serving Humanity'}
         </h1>
-        <p className="text-muted-foreground text-lg leading-relaxed">
-          {fullChurchName} is dedicated to proclaiming the Gospel of Jesus Christ, building vibrant believers, and demonstrating God&apos;s love in our society.
-        </p>
+        {fullChurchName && (
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            {fullChurchName} is dedicated to proclaiming the Gospel of Jesus Christ, building vibrant believers, and demonstrating God&apos;s love in our society.
+          </p>
+        )}
       </div>
 
       {/* Mission & Vision Cards */}

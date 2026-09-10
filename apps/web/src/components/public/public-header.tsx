@@ -28,9 +28,9 @@ interface PublicHeaderProps {
 
 export function PublicHeader({
   churchName = 'Methodist Church Ghana',
-  societyName = 'Trinity Society',
-  phone = '+233 30 200 0000 / +233 24 000 0000',
-  sundayServiceTimes = 'Sunday Worship: 7:00 AM & 9:30 AM',
+  societyName,
+  phone,
+  sundayServiceTimes,
   logoUrl,
 }: PublicHeaderProps) {
   const pathname = usePathname();
@@ -43,10 +43,14 @@ export function PublicHeader({
       <div className="bg-[#0f2478] px-4 py-1.5 text-xs font-medium text-slate-300 sm:px-6">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="hidden items-center gap-1 sm:inline-flex">
-              <Phone className="h-3 w-3 text-[#FFC72C]" /> {phone}
-            </span>
-            <span className="font-semibold text-[#FFC72C]">{sundayServiceTimes}</span>
+            {phone && (
+              <span className="hidden items-center gap-1 sm:inline-flex">
+                <Phone className="h-3 w-3 text-[#FFC72C]" /> {phone}
+              </span>
+            )}
+            {sundayServiceTimes && (
+              <span className="font-semibold text-[#FFC72C]">{sundayServiceTimes}</span>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <Link href="/visit-us" className="font-semibold text-slate-200 hover:text-[#FFC72C] transition-colors">

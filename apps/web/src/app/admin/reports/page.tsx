@@ -65,7 +65,7 @@ export default function ReportsPage() {
       {/* Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-serif text-3xl font-extrabold tracking-tight text-[#14309c] dark:text-white">
+          <h1 className="font-serif text-3xl font-extrabold tracking-tight text-[#14309c] admin-dark:text-white">
             Reports &amp; Analytics
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -74,7 +74,7 @@ export default function ReportsPage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[150px] border-slate-300 dark:border-slate-800">
+            <SelectTrigger className="w-[150px] border-slate-300 admin-dark:border-slate-800">
               <SelectValue placeholder="Time range" />
             </SelectTrigger>
             <SelectContent>
@@ -86,7 +86,7 @@ export default function ReportsPage() {
           </Select>
 
           {canExport && (
-            <Button variant="outline" className="border-[#14309c] text-[#14309c] hover:bg-[#14309c] hover:text-white dark:border-slate-700 dark:text-slate-200" onClick={() => downloadTransactionsCsv()}>
+            <Button variant="outline" className="border-[#14309c] text-[#14309c] hover:bg-[#14309c] hover:text-white admin-dark:border-slate-700 admin-dark:text-slate-200" onClick={() => downloadTransactionsCsv()}>
               <Download className="mr-1.5 h-4 w-4" /> Export CSV Report
             </Button>
           )}
@@ -121,7 +121,7 @@ export default function ReportsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-extrabold text-emerald-700 dark:text-emerald-400">
+                  <p className="text-3xl font-extrabold text-emerald-700 admin-dark:text-emerald-400">
                     {formatGHS(summary.totalIncome)}
                   </p>
                 </CardContent>
@@ -133,7 +133,7 @@ export default function ReportsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-extrabold text-red-700 dark:text-red-400">{formatGHS(summary.totalExpense)}</p>
+                  <p className="text-3xl font-extrabold text-red-700 admin-dark:text-red-400">{formatGHS(summary.totalExpense)}</p>
                 </CardContent>
               </Card>
               <Card className="border-l-4 border-l-[#14309c] shadow-md">
@@ -143,16 +143,16 @@ export default function ReportsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-3xl font-extrabold text-amber-600 dark:text-amber-400">{formatGHS(summary.netBalance)}</p>
+                  <p className="text-3xl font-extrabold text-amber-600 admin-dark:text-amber-400">{formatGHS(summary.netBalance)}</p>
                 </CardContent>
               </Card>
             </div>
           )}
 
           {summary && summary.monthlyTrend.length > 0 && (
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader>
-                <CardTitle className="font-serif text-lg font-bold text-[#14309c] dark:text-white">
+                <CardTitle className="font-serif text-lg font-bold text-[#14309c] admin-dark:text-white">
                   Monthly Income vs. Expenses Comparison
                 </CardTitle>
                 <CardDescription>Visual financial trajectory over time</CardDescription>
@@ -161,7 +161,7 @@ export default function ReportsPage() {
                 <div className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={summary.monthlyTrend}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" />
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 admin-dark:stroke-slate-800" />
                       <XAxis dataKey="period" fontSize={12} stroke="#64748b" />
                       <YAxis fontSize={12} tickFormatter={(v: number) => formatGHS(v)} width={80} stroke="#64748b" />
                       <Tooltip formatter={(value: number) => formatGHS(value)} />
@@ -177,9 +177,9 @@ export default function ReportsPage() {
 
           {/* Finance Category Pie Charts */}
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader className="border-b pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                   <PieIcon className="h-4 w-4 text-emerald-600" />
                   Income Distribution by Category (Pie Chart)
                 </CardTitle>
@@ -215,9 +215,9 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader className="border-b pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                   <PieIcon className="h-4 w-4 text-red-600" />
                   Expense Distribution by Category (Pie Chart)
                 </CardTitle>
@@ -254,9 +254,9 @@ export default function ReportsPage() {
             </Card>
           </div>
 
-          <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+          <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
             <CardHeader className="border-b pb-4">
-              <CardTitle className="font-serif text-base font-bold text-[#14309c] dark:text-white">
+              <CardTitle className="font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                 Annual Financial Ledger Summary
               </CardTitle>
             </CardHeader>
@@ -271,17 +271,17 @@ export default function ReportsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-[#14309c]/5 hover:bg-[#14309c]/5">
-                      <TableHead className="font-bold text-[#14309c] dark:text-slate-200">Year</TableHead>
-                      <TableHead className="text-right font-bold text-[#14309c] dark:text-slate-200">Income</TableHead>
-                      <TableHead className="text-right font-bold text-[#14309c] dark:text-slate-200">Expenses</TableHead>
-                      <TableHead className="text-right font-bold text-[#14309c] dark:text-slate-200">Net Balance</TableHead>
+                      <TableHead className="font-bold text-[#14309c] admin-dark:text-slate-200">Year</TableHead>
+                      <TableHead className="text-right font-bold text-[#14309c] admin-dark:text-slate-200">Income</TableHead>
+                      <TableHead className="text-right font-bold text-[#14309c] admin-dark:text-slate-200">Expenses</TableHead>
+                      <TableHead className="text-right font-bold text-[#14309c] admin-dark:text-slate-200">Net Balance</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {annualQuery.data?.map((row) => (
                       <TableRow key={row.year}>
-                        <TableCell className="font-bold text-[#14309c] dark:text-slate-200">{row.year}</TableCell>
-                        <TableCell className="text-right font-semibold text-emerald-700 dark:text-emerald-400">
+                        <TableCell className="font-bold text-[#14309c] admin-dark:text-slate-200">{row.year}</TableCell>
+                        <TableCell className="text-right font-semibold text-emerald-700 admin-dark:text-emerald-400">
                           {formatGHS(row.income)}
                         </TableCell>
                         <TableCell className="text-right font-semibold text-red-600">{formatGHS(row.expense)}</TableCell>
@@ -305,7 +305,7 @@ export default function ReportsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-extrabold text-[#14309c] dark:text-blue-400">{analytics?.attendance.totalRecords ?? 0}</p>
+                <p className="text-4xl font-extrabold text-[#14309c] admin-dark:text-blue-400">{analytics?.attendance.totalRecords ?? 0}</p>
                 <p className="mt-1 text-xs text-muted-foreground">Members &amp; visitors recorded in selected period</p>
               </CardContent>
             </Card>
@@ -317,15 +317,15 @@ export default function ReportsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-4xl font-extrabold text-purple-700 dark:text-purple-400">{analytics?.attendance.totalSessions ?? 0}</p>
+                <p className="text-4xl font-extrabold text-purple-700 admin-dark:text-purple-400">{analytics?.attendance.totalSessions ?? 0}</p>
                 <p className="mt-1 text-xs text-muted-foreground">Sunday services, midweek &amp; special programmes</p>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+          <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
             <CardHeader className="border-b pb-4">
-              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+              <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                 <PieIcon className="h-4 w-4 text-amber-500" />
                 Attendance by Programme Type (Pie Chart)
               </CardTitle>
@@ -365,10 +365,10 @@ export default function ReportsPage() {
         {/* Tab 3: Demographics */}
         <TabsContent value="demographics" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader className="border-b pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
-                  <PieIcon className="h-4 w-4 text-[#14309c] dark:text-amber-400" />
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
+                  <PieIcon className="h-4 w-4 text-[#14309c] admin-dark:text-amber-400" />
                   Membership Category Distribution (Pie Chart)
                 </CardTitle>
               </CardHeader>
@@ -401,9 +401,9 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader className="border-b pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                   <PieIcon className="h-4 w-4 text-emerald-600" />
                   Membership Status Breakdown (Pie Chart)
                 </CardTitle>
@@ -442,9 +442,9 @@ export default function ReportsPage() {
         {/* Tab 4: Media & Visitors */}
         <TabsContent value="media-visitors" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader className="border-b pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                   <PieIcon className="h-4 w-4 text-purple-600" />
                   Media Content Type Distribution (Pie Chart)
                 </CardTitle>
@@ -479,9 +479,9 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
 
-            <Card className="shadow-md border border-slate-200 dark:border-slate-800">
+            <Card className="shadow-md border border-slate-200 admin-dark:border-slate-800">
               <CardHeader className="border-b pb-4">
-                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] dark:text-white">
+                <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
                   <BarChart3 className="h-4 w-4 text-amber-500" />
                   Visitor Integration Funnel
                 </CardTitle>
@@ -492,7 +492,7 @@ export default function ReportsPage() {
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={analytics.visitors.byStatus}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" />
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 admin-dark:stroke-slate-800" />
                         <XAxis dataKey="name" fontSize={11} stroke="#64748b" />
                         <YAxis fontSize={11} stroke="#64748b" />
                         <Tooltip />

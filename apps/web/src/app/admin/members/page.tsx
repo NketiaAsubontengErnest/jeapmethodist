@@ -693,13 +693,13 @@ export default function MembersPage() {
                           ) : (
                             <>
                               {groupsCount > 0 && (
-                                <Badge variant="outline" className="text-[11px] gap-1 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200">
+                                <Badge variant="outline" className="text-[11px] gap-1 bg-amber-50 admin-dark:bg-amber-950/40 text-amber-700 admin-dark:text-amber-300 border-amber-200">
                                   <Users className="h-3 w-3" />
                                   {groupsCount} {groupsCount === 1 ? 'Group' : 'Groups'}
                                 </Badge>
                               )}
                               {ministriesCount > 0 && (
-                                <Badge variant="outline" className="text-[11px] gap-1 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200">
+                                <Badge variant="outline" className="text-[11px] gap-1 bg-blue-50 admin-dark:bg-blue-950/40 text-blue-700 admin-dark:text-blue-300 border-blue-200">
                                   <Building2 className="h-3 w-3" />
                                   {ministriesCount} {ministriesCount === 1 ? 'Ministry' : 'Ministries'}
                                 </Badge>

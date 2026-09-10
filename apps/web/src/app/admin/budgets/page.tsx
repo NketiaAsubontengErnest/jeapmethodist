@@ -559,7 +559,7 @@ export default function BudgetsPage() {
                   <div className="h-80 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" />
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 admin-dark:stroke-slate-800" />
                         <XAxis dataKey="name" fontSize={11} stroke="#64748b" interval={0} angle={-20} textAnchor="end" height={70} />
                         <YAxis fontSize={12} tickFormatter={(v: number) => formatCurrency(v)} width={90} stroke="#64748b" />
                         <Tooltip formatter={(value: number) => formatCurrency(value)} />

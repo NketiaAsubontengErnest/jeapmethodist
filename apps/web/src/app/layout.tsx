@@ -41,6 +41,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${ebGaramond.variable} ${lato.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        {/* Runs before first paint, ahead of React hydration, so a hard
+            refresh/direct link into /admin never flashes the wrong theme.
+            admin/layout.tsx's toggle re-applies this on client-side
+            navigation (the case this script can't cover, since it only
+            runs once per full document load). Public routes are untouched:
+            the pathname check makes this a no-op everywhere else, leaving
+            them on the prefers-color-scheme behavior in globals.css. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(window.location.pathname.indexOf('/admin')===0){var t=localStorage.getItem('admin-theme')==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`,
+          }}
+        />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
