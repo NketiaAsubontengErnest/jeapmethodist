@@ -207,35 +207,48 @@ export default function GalleryClient() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {[...liveVideos, ...recordedVideos].map((video) => (
-                    <Card
-                      key={video.id}
-                      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-card cursor-pointer"
-                      onClick={() => setActiveMedia(video)}
-                    >
-                      <div className="relative aspect-16/9 overflow-hidden bg-slate-950 flex items-center justify-center">
-                        <div className="rounded-full bg-amber-500 p-4 text-slate-950 shadow-2xl transition-transform group-hover:scale-110">
-                          <Play className="h-8 w-8 fill-current ml-0.5" />
-                        </div>
-                        <Badge className="absolute top-3 left-3 bg-[#14309c] text-amber-400 font-mono text-[10px] font-bold uppercase">
-                          {video.type === 'LIVE_VIDEO' ? 'LIVE STREAM' : 'VIDEO'}
-                        </Badge>
-                        {video.platform && (
-                          <Badge variant="outline" className="absolute top-3 right-3 bg-black/70 text-white border-white/20 text-[10px]">
-                            {video.platform}
+                  {[...liveVideos, ...recordedVideos].map((video) => {
+                    const ytThumb =
+                      video.embedId && (video.platform === 'YOUTUBE' || !video.platform)
+                        ? `https://img.youtube.com/vi/${video.embedId}/hqdefault.jpg`
+                        : null;
+
+                    return (
+                      <Card
+                        key={video.id}
+                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-card cursor-pointer"
+                        onClick={() => setActiveMedia(video)}
+                      >
+                        <div className="relative aspect-16/9 overflow-hidden bg-slate-950 flex items-center justify-center">
+                          {ytThumb ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={ytThumb} alt={video.title || video.filename} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                          ) : null}
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="rounded-full bg-amber-500 p-4 text-slate-950 shadow-2xl transition-transform group-hover:scale-110">
+                              <Play className="h-8 w-8 fill-current ml-0.5" />
+                            </div>
+                          </div>
+                          <Badge className="absolute top-3 left-3 bg-[#14309c] text-amber-400 font-mono text-[10px] font-bold uppercase">
+                            {video.type === 'LIVE_VIDEO' ? 'LIVE STREAM' : 'VIDEO'}
                           </Badge>
-                        )}
-                      </div>
-                      <div className="p-4 space-y-1.5">
-                        <h3 className="font-serif text-base font-bold text-foreground line-clamp-1">
-                          {video.title || video.filename}
-                        </h3>
-                        {video.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2">{video.description}</p>
-                        )}
-                      </div>
-                    </Card>
-                  ))}
+                          {video.platform && (
+                            <Badge variant="outline" className="absolute top-3 right-3 bg-black/70 text-white border-white/20 text-[10px]">
+                              {video.platform}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="p-4 space-y-1.5">
+                          <h3 className="font-serif text-base font-bold text-foreground line-clamp-1">
+                            {video.title || video.filename}
+                          </h3>
+                          {video.description && (
+                            <p className="text-xs text-muted-foreground line-clamp-2">{video.description}</p>
+                          )}
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </div>

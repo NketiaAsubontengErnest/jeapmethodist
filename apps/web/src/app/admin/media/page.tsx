@@ -72,6 +72,28 @@ function formatSize(bytes: number) {
 
 function MediaThumbnail({ item }: { item: MediaItem }) {
   if (item.type === 'LIVE_VIDEO' || item.type === 'VIDEO') {
+    const ytThumb =
+      item.embedId && (item.platform === 'YOUTUBE' || !item.platform)
+        ? `https://img.youtube.com/vi/${item.embedId}/hqdefault.jpg`
+        : null;
+
+    if (ytThumb) {
+      return (
+        <div className="relative h-full w-full overflow-hidden bg-slate-950">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ytThumb} alt={item.title || item.filename} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <div className="rounded-full bg-rose-600 p-2.5 text-white shadow-lg">
+              <Tv className="h-5 w-5" />
+            </div>
+          </div>
+          <Badge className="absolute bottom-2 left-2 bg-rose-600 font-mono text-[10px] text-white">
+            {item.type === 'LIVE_VIDEO' ? 'LIVE STREAM' : 'VIDEO'}
+          </Badge>
+        </div>
+      );
+    }
+
     return (
       <div className="relative flex h-full w-full items-center justify-center bg-slate-950 text-white">
         <Tv className="h-10 w-10 text-rose-500 animate-pulse" />
@@ -194,6 +216,20 @@ export default function MediaPage() {
       queryClient.invalidateQueries({ queryKey: ['media-admin'] });
       queryClient.invalidateQueries({ queryKey: ['albums-admin'] });
       queryClient.invalidateQueries({ queryKey: ['album-detail'] });
+      queryClient.invalidateQueries({ queryKey: ['public-gallery'] });
+
+      // Automatically switch to the active view tab so the user sees the newly posted video/photo immediately!
+      if (media.type === 'VIDEO') {
+        setActiveTab('videos');
+        setSelectedAlbumId(null);
+      } else if (media.type === 'LIVE_VIDEO') {
+        setActiveTab('live');
+        setSelectedAlbumId(null);
+      } else if (media.type === 'PHOTO' && (!postAlbumId || postAlbumId === 'none')) {
+        setActiveTab('photos');
+        setSelectedAlbumId(null);
+      }
+
       setPostOpen(false);
       resetPostForm();
       toast.success(
