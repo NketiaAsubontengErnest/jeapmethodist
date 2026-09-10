@@ -37,7 +37,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       ) {
         message = (body as { message: string | string[] }).message;
       }
-    } else if (!isProduction && exception instanceof Error) {
+    } else if (exception instanceof Error) {
       message = exception.message;
     }
 

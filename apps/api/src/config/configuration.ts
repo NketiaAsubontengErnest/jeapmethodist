@@ -21,8 +21,8 @@ export default (): AppConfig => ({
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parseInt(process.env.API_PORT ?? '4000', 10),
   apiPrefix: process.env.API_PREFIX ?? 'api/v1',
-  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
-  publicOrigin: process.env.PUBLIC_API_ORIGIN ?? `http://localhost:${process.env.API_PORT ?? '4000'}`,
+  corsOrigin: process.env.CORS_ORIGIN ?? 'https://jeapmethodist.vercel.app',
+  publicOrigin: process.env.PUBLIC_API_ORIGIN ?? 'https://jeapmethodistapi.vercel.app',
   jwt: {
     accessSecret:
       process.env.JWT_SECRET ||

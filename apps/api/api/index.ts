@@ -9,7 +9,7 @@ import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter
 
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL =
-    'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require';
+    'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
 }
 if (!process.env.JWT_SECRET) {
   process.env.JWT_SECRET =

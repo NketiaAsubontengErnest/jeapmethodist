@@ -7,7 +7,7 @@ import {
 import { PrismaClient } from '@prisma/client';
 
 const DEFAULT_DB_URL =
-  'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require';
+  'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
 
 @Injectable()
 export class PrismaService
