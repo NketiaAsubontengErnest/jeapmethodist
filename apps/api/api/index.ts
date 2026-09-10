@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication, ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
@@ -58,6 +59,15 @@ async function bootstrap() {
 }
 
 export default async function handler(req: any, res: any) {
-  await bootstrap();
-  server(req, res);
+  try {
+    await bootstrap();
+    server(req, res);
+  } catch (err: any) {
+    console.error('Vercel Serverless Bootstrap Error:', err);
+    res.status(500).json({
+      statusCode: 500,
+      message: err?.message || 'Internal Server Error during serverless bootstrap',
+      error: err?.name || 'BootstrapError',
+    });
+  }
 }
