@@ -1,4 +1,10 @@
 import 'reflect-metadata';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { AppModule } from '../src/app.module';
+import { AllExceptionsFilter } from '../src/common/filters/http-exception.filter';
 
 const NEON_DB_URL =
   'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
@@ -22,13 +28,6 @@ let cachedServer: any;
 
 async function bootstrap() {
   if (cachedServer) return cachedServer;
-
-  const { NestFactory } = await import('@nestjs/core');
-  const { ValidationPipe } = await import('@nestjs/common');
-  const helmet = (await import('helmet')).default;
-  const cookieParser = (await import('cookie-parser')).default;
-  const { AppModule } = await import('../src/app.module');
-  const { AllExceptionsFilter } = await import('../src/common/filters/http-exception.filter');
 
   const app = await NestFactory.create(AppModule);
 

@@ -9,6 +9,13 @@ import { PrismaClient } from '@prisma/client';
 const DEFAULT_DB_URL =
   'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
 
+const isPostgresUrl = (url?: string) =>
+  Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
+
+if (!isPostgresUrl(process.env.DATABASE_URL)) {
+  process.env.DATABASE_URL = DEFAULT_DB_URL;
+}
+
 @Injectable()
 export class PrismaService
   extends PrismaClient
@@ -17,13 +24,6 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const isPostgresUrl = (url?: string) =>
-      Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
-
-    if (!isPostgresUrl(process.env.DATABASE_URL)) {
-      process.env.DATABASE_URL = DEFAULT_DB_URL;
-    }
-
     super({
       datasources: {
         db: {
@@ -43,6 +43,8 @@ export class PrismaService
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
+    if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+      await this.$disconnect();
+    }
   }
 }
