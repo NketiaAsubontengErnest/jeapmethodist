@@ -24,9 +24,13 @@ export default (): AppConfig => ({
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
   publicOrigin: process.env.PUBLIC_API_ORIGIN ?? `http://localhost:${process.env.API_PORT ?? '4000'}`,
   jwt: {
-    accessSecret: process.env.JWT_SECRET ?? '',
+    accessSecret:
+      process.env.JWT_SECRET ||
+      'YRhmE7bE_jUWddqWhtAIJER0YCRUfSse9xQ09mevXDDS1xWVguoWiFnXJtFilgLT',
     accessExpiresIn: process.env.JWT_EXPIRES_IN ?? '15m',
-    refreshSecret: process.env.JWT_REFRESH_SECRET ?? '',
+    refreshSecret:
+      process.env.JWT_REFRESH_SECRET ||
+      'KvajkTpgSTQJMV3asuqkNU3ftED2iu7tWYbEq7Luh3YhxJ7aB_GBrmU_16RGfPBQ',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
   },
   defaults: {
