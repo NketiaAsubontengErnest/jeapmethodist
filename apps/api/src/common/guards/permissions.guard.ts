@@ -14,6 +14,10 @@ export class PermissionsGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    if (request.method === 'OPTIONS') {
+      return true;
+    }
     const required = this.reflector.getAllAndOverride<PermissionCode[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()],
@@ -23,7 +27,6 @@ export class PermissionsGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
     const user: AuthenticatedUser | undefined = request.user;
 
     if (!user) {

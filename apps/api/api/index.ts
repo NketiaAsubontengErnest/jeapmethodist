@@ -37,14 +37,40 @@ async function bootstrap() {
 
   const apiPrefix = process.env.API_PREFIX || 'api/v1';
   const rawCorsOrigin = process.env.CORS_ORIGIN;
-  const corsOrigin = rawCorsOrigin && rawCorsOrigin !== '*'
+  const configuredOrigins = rawCorsOrigin && rawCorsOrigin !== '*'
     ? rawCorsOrigin.split(',').map((o) => o.trim())
-    : true;
+    : [];
+
+  const defaultOrigins = [
+    'https://jeapmethodist.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:4000',
+  ];
+
+  const allowedOrigins = Array.from(new Set([...defaultOrigins, ...configuredOrigins]));
 
   app.setGlobalPrefix(apiPrefix);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cookieParser());
-  app.enableCors({ origin: corsOrigin, credentials: true });
+  app.enableCors({
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+      if (
+        rawCorsOrigin === '*' ||
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app')
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
