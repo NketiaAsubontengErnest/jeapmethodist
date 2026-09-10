@@ -20,14 +20,14 @@ export class PrismaService
     const isPostgresUrl = (url?: string) =>
       Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
 
-    const dbUrl = isPostgresUrl(process.env.DATABASE_URL)
-      ? process.env.DATABASE_URL!
-      : DEFAULT_DB_URL;
+    if (!isPostgresUrl(process.env.DATABASE_URL)) {
+      process.env.DATABASE_URL = DEFAULT_DB_URL;
+    }
 
     super({
       datasources: {
         db: {
-          url: dbUrl,
+          url: process.env.DATABASE_URL,
         },
       },
     });
