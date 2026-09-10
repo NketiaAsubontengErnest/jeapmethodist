@@ -182,12 +182,3 @@ that never leaks stack traces, and an audit log for sensitive actions.
 
 - [`docs/architecture.md`](docs/architecture.md) — system architecture & build roadmap
 - [`docs/roles-and-permissions.md`](docs/roles-and-permissions.md) — the RBAC model
-
-## Troubleshooting
-
-- **"Port 5432 already in use" / migrations fail with access denied** — this
-  machine likely has a native PostgreSQL install also listening on 5432. The bundled
-  `docker-compose.yml` already avoids this by publishing on 5433; make sure your
-  `.env` matches.
-- **`EADDRINUSE` on 3000/3001/4000** — a previous dev server is still running in the
-  background. Stop it (or find the owning process) before restarting.
