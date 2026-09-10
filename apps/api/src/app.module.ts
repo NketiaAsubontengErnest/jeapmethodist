@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { SafeThrottlerGuard } from './common/guards/safe-throttler.guard';
 import configuration from './config/configuration';
 import { PrismaModule } from './database/prisma.module';
 import { HealthModule } from './health/health.module';
@@ -84,7 +85,7 @@ import { PermissionsGuard } from './common/guards/permissions.guard';
     BudgetsModule,
   ],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: SafeThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
   ],

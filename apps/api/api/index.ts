@@ -1,8 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication, ExpressAdapter } from '@nestjs/platform-express';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
-import express from 'express';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
@@ -23,16 +22,15 @@ if (!process.env.JWT_REFRESH_SECRET) {
     'KvajkTpgSTQJMV3asuqkNU3ftED2iu7tWYbEq7Luh3YhxJ7aB_GBrmU_16RGfPBQ';
 }
 
-const server = express();
-let isAppInitialized = false;
+let cachedServer: any;
 
 async function bootstrap() {
-  if (isAppInitialized) return server;
+  if (cachedServer) return cachedServer;
 
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-    new ExpressAdapter(server),
-  );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
 
   const apiPrefix = process.env.API_PREFIX || 'api/v1';
   const rawCorsOrigin = process.env.CORS_ORIGIN;
@@ -56,14 +54,14 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.init();
-  isAppInitialized = true;
-  return server;
+  cachedServer = expressApp;
+  return cachedServer;
 }
 
 export default async function handler(req: any, res: any) {
   try {
-    await bootstrap();
-    server(req, res);
+    const server = await bootstrap();
+    return server(req, res);
   } catch (err: any) {
     console.error('Vercel Serverless Bootstrap Error:', err);
     res.status(500).json({
