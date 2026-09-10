@@ -37,8 +37,12 @@ import {
   MEDIA_UPLOAD_DIR,
 } from './media.constants';
 
-if (!existsSync(MEDIA_UPLOAD_DIR)) {
-  mkdirSync(MEDIA_UPLOAD_DIR, { recursive: true });
+try {
+  if (!existsSync(MEDIA_UPLOAD_DIR)) {
+    mkdirSync(MEDIA_UPLOAD_DIR, { recursive: true });
+  }
+} catch {
+  // Ignore filesystem errors on serverless environments
 }
 
 @ApiTags('media')

@@ -1,7 +1,9 @@
-import { join } from 'path';
+import { tmpdir } from 'os';
 
-/** Local-disk media storage — fine for a single self-hosted church deployment; revisit if this ever needs to scale beyond one server. */
-export const MEDIA_UPLOAD_DIR = join(process.cwd(), 'uploads', 'media');
+/** Local-disk media storage — uses /tmp on Vercel Serverless or process.cwd() locally. */
+export const MEDIA_UPLOAD_DIR = process.env.VERCEL
+  ? join(tmpdir(), 'uploads', 'media')
+  : join(process.cwd(), 'uploads', 'media');
 
 export const MEDIA_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
