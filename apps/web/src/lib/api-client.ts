@@ -1,4 +1,4 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://jeapmethodistapi.vercel.app/api/v1';
 
 /** In-memory only — never persisted to localStorage/sessionStorage to limit XSS exposure. */
 let accessToken: string | null = null;

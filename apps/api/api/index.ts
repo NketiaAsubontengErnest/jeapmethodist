@@ -19,7 +19,10 @@ async function bootstrap() {
   );
 
   const apiPrefix = process.env.API_PREFIX || 'api/v1';
-  const corsOrigin = process.env.CORS_ORIGIN || '*';
+  const rawCorsOrigin = process.env.CORS_ORIGIN;
+  const corsOrigin = rawCorsOrigin && rawCorsOrigin !== '*'
+    ? rawCorsOrigin.split(',').map((o) => o.trim())
+    : true;
 
   app.setGlobalPrefix(apiPrefix);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));

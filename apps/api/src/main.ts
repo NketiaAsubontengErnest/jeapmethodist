@@ -20,14 +20,13 @@ async function bootstrap() {
 
   const nodeEnv = configService.get<string>('nodeEnv') ?? 'development';
   const apiPrefix = configService.get<string>('apiPrefix') ?? 'api/v1';
-  const corsOrigin =
-    configService.get<string>('corsOrigin') ?? 'http://localhost:3000';
+  const rawCorsOrigin = configService.get<string>('corsOrigin');
+  const corsOrigin = rawCorsOrigin && rawCorsOrigin !== '*'
+    ? rawCorsOrigin.split(',').map((o) => o.trim())
+    : true;
   const port = configService.get<number>('port') ?? 4000;
 
   app.setGlobalPrefix(apiPrefix);
-  // Static uploads must be embeddable from the frontend's origin (a different
-  // port in dev) — without this, helmet's default same-origin resource policy
-  // silently blocks <img> tags from loading them.
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cookieParser());
   app.enableCors({ origin: corsOrigin, credentials: true });
