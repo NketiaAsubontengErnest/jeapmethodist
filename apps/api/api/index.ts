@@ -3,7 +3,10 @@ import 'reflect-metadata';
 const NEON_DB_URL =
   'postgresql://neondb_owner:npg_s2WxlqNdyV7k@ep-morning-moon-ax9bp8gw-pooler.c-4.us-east-2.aws.neon.tech/jeap-church-db?sslmode=require&connect_timeout=15&pgbouncer=true';
 
-if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('localhost')) {
+const isPostgresUrl = (url?: string) =>
+  Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
+
+if (!isPostgresUrl(process.env.DATABASE_URL)) {
   process.env.DATABASE_URL = NEON_DB_URL;
 }
 if (!process.env.JWT_SECRET) {

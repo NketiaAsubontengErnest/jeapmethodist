@@ -17,10 +17,12 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const dbUrl =
-      process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost')
-        ? process.env.DATABASE_URL
-        : DEFAULT_DB_URL;
+    const isPostgresUrl = (url?: string) =>
+      Boolean(url && (url.startsWith('postgresql://') || url.startsWith('postgres://')) && !url.includes('localhost'));
+
+    const dbUrl = isPostgresUrl(process.env.DATABASE_URL)
+      ? process.env.DATABASE_URL!
+      : DEFAULT_DB_URL;
 
     super({
       datasources: {
