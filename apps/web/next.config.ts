@@ -22,8 +22,10 @@ const csp = [
   `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
   `font-src 'self' https://fonts.gstatic.com`,
   // images.unsplash.com is only used for placeholder/demo content on the
-  // public pages — safe to drop once real photos replace it.
-  `img-src 'self' data: blob: https://images.unsplash.com ${apiOrigin}`,
+  // public pages; img.youtube.com & i.ytimg.com are used for video thumbnails.
+  `img-src 'self' data: blob: https://images.unsplash.com https://img.youtube.com https://i.ytimg.com ${apiOrigin}`,
+  `media-src 'self' blob: data: ${apiOrigin}`,
+  `frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com https://www.facebook.com https://facebook.com`,
   `connect-src 'self' ${apiOrigin}`,
   `object-src 'none'`,
   `base-uri 'self'`,
