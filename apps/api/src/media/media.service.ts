@@ -112,15 +112,12 @@ export class MediaService implements OnModuleInit {
         : { type }
       : {};
 
-    const excludeSystemIdentity: Prisma.MediaWhereInput = {
-      AND: [
-        { OR: [{ category: null }, { category: { not: 'identity' } }] },
-        { OR: [{ title: null }, { title: { notIn: ['logo_url', 'favicon_url'] } }] },
-      ],
-    };
-
     const where: Prisma.MediaWhereInput = {
-      ...(category ? { category } : excludeSystemIdentity),
+      ...(category
+        ? { category }
+        : {
+            OR: [{ category: null }, { category: { not: 'identity' } }],
+          }),
       ...typeFilter,
       ...(albumId ? { albumId } : {}),
     };
@@ -163,17 +160,10 @@ export class MediaService implements OnModuleInit {
         : { type }
       : {};
 
-    const excludeSystemIdentity: Prisma.MediaWhereInput = {
-      AND: [
-        { OR: [{ category: null }, { category: { not: 'identity' } }] },
-        { OR: [{ title: null }, { title: { notIn: ['logo_url', 'favicon_url'] } }] },
-      ],
-    };
-
     const where: Prisma.MediaWhereInput = {
       ...typeFilter,
       ...(albumId ? { albumId } : {}),
-      ...excludeSystemIdentity,
+      OR: [{ category: null }, { category: { not: 'identity' } }],
     };
 
     const [items, albums] = await Promise.all([
