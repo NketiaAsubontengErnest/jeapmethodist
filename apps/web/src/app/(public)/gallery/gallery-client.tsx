@@ -35,7 +35,7 @@ function getEmbedUrl(item: MediaItem): string {
   const clean = url.trim();
 
   if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || clean.includes('youtube'))) {
-    return `https://www.youtube.com/embed/${item.embedId}`;
+    return `https://www.youtube-nocookie.com/embed/${item.embedId}`;
   }
 
   const match =
@@ -43,7 +43,7 @@ function getEmbedUrl(item: MediaItem): string {
     clean.match(/^([\w-]{11})$/);
 
   if (match?.[1]) {
-    return `https://www.youtube.com/embed/${match[1]}`;
+    return `https://www.youtube-nocookie.com/embed/${match[1]}`;
   }
 
   if (clean.includes('facebook.com') || clean.includes('fb.watch')) {
@@ -388,8 +388,9 @@ export default function GalleryClient() {
                   src={getEmbedUrl(activeMedia)}
                   title={activeMedia.title || 'Video Player'}
                   className="h-full w-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
+                  referrerPolicy="strict-origin-when-cross-origin"
                 />
               </div>
             ) : (
