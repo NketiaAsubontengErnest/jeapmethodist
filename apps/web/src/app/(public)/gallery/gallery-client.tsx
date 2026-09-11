@@ -220,7 +220,7 @@ export default function GalleryClient() {
                     return (
                       <Card
                         key={video.id}
-                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:bg-card cursor-pointer"
+                        className="group overflow-hidden rounded-2xl border border-blue-900/40 bg-[#0d1b4e] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer text-white"
                         onClick={() => setActiveMedia(video)}
                       >
                         <div className="relative aspect-16/9 overflow-hidden bg-slate-950 flex items-center justify-center">
@@ -233,7 +233,7 @@ export default function GalleryClient() {
                               <Play className="h-8 w-8 fill-current ml-0.5" />
                             </div>
                           </div>
-                          <Badge className="absolute top-3 left-3 bg-[#14309c] text-amber-400 font-mono text-[10px] font-bold uppercase">
+                          <Badge className="absolute top-3 left-3 bg-[#14309c] text-amber-400 font-mono text-[10px] font-bold uppercase border border-amber-500/30">
                             {video.type === 'LIVE_VIDEO' ? 'LIVE STREAM' : 'VIDEO'}
                           </Badge>
                           {video.platform && (
@@ -242,12 +242,12 @@ export default function GalleryClient() {
                             </Badge>
                           )}
                         </div>
-                        <div className="p-4 space-y-1.5">
-                          <h3 className="font-serif text-base font-bold text-foreground line-clamp-1">
+                        <div className="p-4 space-y-1.5 bg-[#0d1b4e]">
+                          <h3 className="font-serif text-base font-bold text-white line-clamp-1">
                             {video.title || video.filename}
                           </h3>
                           {video.description && (
-                            <p className="text-xs text-muted-foreground line-clamp-2">{video.description}</p>
+                            <p className="text-xs text-slate-300 line-clamp-2">{video.description}</p>
                           )}
                         </div>
                       </Card>
@@ -261,8 +261,8 @@ export default function GalleryClient() {
           {/* Section 3: General Photo Gallery Grid */}
           {(filterType === 'ALL') && photos.length > 0 && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b pb-2">
-                <h2 className="font-serif text-2xl font-extrabold text-[#14309c] dark:text-white flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-blue-900/30 pb-2">
+                <h2 className="font-serif text-2xl font-extrabold text-white flex items-center gap-2">
                   <ImageIcon className="h-5 w-5 text-amber-500" /> Recent Photos
                 </h2>
               </div>
@@ -270,7 +270,7 @@ export default function GalleryClient() {
                 {photos.map((item) => (
                   <Card
                     key={item.id}
-                    className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer dark:bg-card"
+                    className="group overflow-hidden rounded-2xl border border-blue-900/40 bg-[#0d1b4e] text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                     onClick={() => setActiveMedia(item)}
                   >
                     <div className="relative aspect-4/3 overflow-hidden bg-muted">
@@ -281,14 +281,14 @@ export default function GalleryClient() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    <div className="p-4 space-y-1.5">
-                      <Badge className="w-fit bg-[#14309c] text-amber-400 font-bold text-xs">
+                    <div className="p-4 space-y-1.5 bg-[#0d1b4e]">
+                      <Badge className="w-fit bg-[#14309c] text-amber-400 font-bold text-xs border border-amber-500/30">
                         {item.category || 'Church Life'}
                       </Badge>
-                      <h3 className="font-serif text-base font-bold text-foreground leading-snug line-clamp-2">
+                      <h3 className="font-serif text-base font-bold text-white leading-snug line-clamp-2">
                         {item.title || item.filename}
                       </h3>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-300">
                         {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
                       </p>
                     </div>
@@ -316,22 +316,27 @@ export default function GalleryClient() {
       {/* Video & Live Stream Viewer Dialog */}
       {activeMedia && (
         <Dialog open={Boolean(activeMedia)} onOpenChange={() => setActiveMedia(null)}>
-          <DialogContent className="sm:max-w-3xl">
+          <DialogContent className="sm:max-w-3xl bg-[#0a1232] border border-blue-800 text-white">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Badge className="bg-[#14309c] text-amber-400 font-bold">
-                  {activeMedia.type.replace('_', ' ')}
+              <DialogTitle className="flex items-center gap-2 text-white font-serif">
+                <Badge className="bg-amber-500 text-slate-950 font-bold">
+                  {(activeMedia.mimeType === 'video/embed' ? 'VIDEO' : activeMedia.type).replace('_', ' ')}
                 </Badge>
                 {activeMedia.title || activeMedia.filename}
               </DialogTitle>
-              {activeMedia.description && <DialogDescription>{activeMedia.description}</DialogDescription>}
+              {activeMedia.description && <DialogDescription className="text-slate-300">{activeMedia.description}</DialogDescription>}
             </DialogHeader>
 
-            {activeMedia.type === 'LIVE_VIDEO' || activeMedia.type === 'VIDEO' ? (
-              <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-black shadow-2xl">
+            {activeMedia.type === 'LIVE_VIDEO' ||
+            activeMedia.type === 'VIDEO' ||
+            activeMedia.mimeType === 'video/embed' ||
+            Boolean(activeMedia.embedId) ||
+            activeMedia.url?.includes('youtube.com') ||
+            activeMedia.url?.includes('facebook.com') ? (
+              <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-black shadow-2xl border border-blue-900/60">
                 <iframe
                   src={activeMedia.url}
-                  title={activeMedia.title || 'Live Stream Player'}
+                  title={activeMedia.title || 'Video Player'}
                   className="h-full w-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

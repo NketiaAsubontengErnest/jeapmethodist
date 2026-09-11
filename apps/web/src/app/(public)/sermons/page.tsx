@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { fetchPublicSermons, SermonItem } from '@/lib/api/public';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,7 +23,7 @@ export default async function SermonsPage() {
   const featured = sermons[0];
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen bg-[#0a0f2c] py-12 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
