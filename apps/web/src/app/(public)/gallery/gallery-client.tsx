@@ -63,7 +63,7 @@ function isMediaVideo(item: MediaItem): boolean {
     Boolean(item.externalUrl) ||
     Boolean(getThumbnailUrl(item)) ||
     Boolean(item.url && (item.url.includes('youtu') || item.url.includes('youtube') || item.url.includes('facebook') || item.url.includes('embed'))) ||
-    Boolean(item.storedName && item.storedName.startsWith('embed_'))
+    Boolean((item as any).storedName && (item as any).storedName.startsWith('embed_'))
   );
 }
 
@@ -114,20 +114,20 @@ export default function GalleryClient() {
         </div>
       </div>
 
-      {/* Filter Tabs — Styled matching Screenshot */}
+      {/* Filter Tabs */}
       <div className="flex justify-center">
         <Tabs value={filterType} onValueChange={(v: string) => setFilterType(v as typeof filterType)}>
           <TabsList className="grid grid-cols-4 sm:w-auto bg-[#14309c] text-slate-300 p-1.5 rounded-xl shadow-lg">
-            <TabsTrigger value="ALL" className="text-xs sm:text-sm data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 font-bold">
+            <TabsTrigger value="ALL" className="text-xs sm:text-sm data-[state=active]:bg-[#FFC72C] data-[state=active]:text-[#14309c] font-bold">
               All Content
             </TabsTrigger>
-            <TabsTrigger value="ALBUMS" className="text-xs sm:text-sm flex items-center gap-1.5 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 font-bold">
+            <TabsTrigger value="ALBUMS" className="text-xs sm:text-sm flex items-center gap-1.5 data-[state=active]:bg-[#FFC72C] data-[state=active]:text-[#14309c] font-bold">
               <Folder className="h-3.5 w-3.5" /> Photo Albums ({albums.length})
             </TabsTrigger>
-            <TabsTrigger value="LIVE" className="text-xs sm:text-sm flex items-center gap-1.5 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 font-bold">
+            <TabsTrigger value="LIVE" className="text-xs sm:text-sm flex items-center gap-1.5 data-[state=active]:bg-[#FFC72C] data-[state=active]:text-[#14309c] font-bold">
               <Radio className="h-3.5 w-3.5 animate-pulse" /> Live Streams
             </TabsTrigger>
-            <TabsTrigger value="VIDEOS" className="text-xs sm:text-sm flex items-center gap-1.5 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 font-bold">
+            <TabsTrigger value="VIDEOS" className="text-xs sm:text-sm flex items-center gap-1.5 data-[state=active]:bg-[#FFC72C] data-[state=active]:text-[#14309c] font-bold">
               <Tv className="h-3.5 w-3.5" /> Videos
             </TabsTrigger>
           </TabsList>
@@ -136,15 +136,15 @@ export default function GalleryClient() {
 
       {/* Selected Album Lightbox View */}
       {selectedAlbumId && albumDetailQuery.data && (
-        <div className="space-y-6 rounded-3xl border border-[#14309c]/20 bg-[#14309c]/5 p-6 dark:bg-slate-900">
+        <div className="space-y-6 rounded-3xl border border-[#14309c]/20 bg-[#14309c]/5 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#14309c]/10 pb-4">
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" className="border-[#14309c] text-[#14309c] hover:bg-[#14309c] hover:text-white font-bold" onClick={() => setSelectedAlbumId(null)}>
                 <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to Albums
               </Button>
               <div>
-                <h2 className="font-serif text-2xl font-bold text-[#14309c] dark:text-white">{albumDetailQuery.data.title}</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="font-serif text-2xl font-bold text-[#14309c]">{albumDetailQuery.data.title}</h2>
+                <p className="text-xs text-slate-600">
                   {albumDetailQuery.data.description || 'Photo collection'} •{' '}
                   <span className="font-bold text-amber-600">
                     {albumDetailQuery.data.photos?.length || 0} pictures in album
@@ -158,7 +158,7 @@ export default function GalleryClient() {
           </div>
 
           {albumDetailQuery.data.photos?.length === 0 ? (
-            <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+            <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-slate-500">
               This album is currently empty.
             </div>
           ) : (
@@ -166,10 +166,10 @@ export default function GalleryClient() {
               {albumDetailQuery.data.photos?.map((photo) => (
                 <Card
                   key={photo.id}
-                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer dark:bg-card"
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer"
                   onClick={() => setActiveMedia(photo as unknown as MediaItem)}
                 >
-                  <div className="aspect-4/3 overflow-hidden bg-muted">
+                  <div className="aspect-4/3 overflow-hidden bg-slate-100">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photo.url}
@@ -179,7 +179,7 @@ export default function GalleryClient() {
                   </div>
                   {photo.title && (
                     <div className="p-3">
-                      <p className="text-xs font-bold text-foreground line-clamp-1">{photo.title}</p>
+                      <p className="text-xs font-bold text-slate-900 line-clamp-1">{photo.title}</p>
                     </div>
                   )}
                 </Card>
@@ -191,7 +191,7 @@ export default function GalleryClient() {
 
       {/* Main Content Grid */}
       {isLoading ? (
-        <div className="flex min-h-[300px] items-center justify-center text-muted-foreground">
+        <div className="flex min-h-[300px] items-center justify-center text-slate-500">
           <Loader2 className="mr-2 h-6 w-6 animate-spin text-amber-500" /> Loading church media gallery…
         </div>
       ) : (
@@ -199,15 +199,15 @@ export default function GalleryClient() {
           {/* Section 1: Photo Albums Section */}
           {(filterType === 'ALL' || filterType === 'ALBUMS') && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b pb-2">
-                <h2 className="font-serif text-2xl font-extrabold text-[#14309c] dark:text-white flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <h2 className="font-serif text-2xl font-extrabold text-[#14309c] flex items-center gap-2">
                   <Folder className="h-5 w-5 text-amber-500" /> Photo Albums
                 </h2>
-                <span className="text-xs font-semibold text-muted-foreground">Click an album card to open all photos</span>
+                <span className="text-xs font-semibold text-slate-500">Click an album card to open all photos</span>
               </div>
 
               {albums.length === 0 ? (
-                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-slate-500">
                   No photo albums published yet. Photo albums created from the admin dashboard will appear here.
                 </div>
               ) : (
@@ -217,7 +217,7 @@ export default function GalleryClient() {
                     return (
                       <Card
                         key={album.id}
-                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer dark:bg-card"
+                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
                         onClick={() => setSelectedAlbumId(album.id)}
                       >
                         <div className="relative aspect-16/10 overflow-hidden bg-slate-950">
@@ -237,8 +237,8 @@ export default function GalleryClient() {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-white dark:bg-card">
-                          <span className="text-xs text-muted-foreground font-medium">
+                        <div className="flex items-center justify-between p-4 bg-white">
+                          <span className="text-xs text-slate-500 font-medium">
                             Photo Collection
                           </span>
                           <Button variant="ghost" size="sm" className="h-8 text-xs text-amber-600 font-bold hover:text-amber-700">
@@ -256,15 +256,15 @@ export default function GalleryClient() {
           {/* Section 2: Live Streams & Videos Section */}
           {(filterType === 'ALL' || filterType === 'LIVE' || filterType === 'VIDEOS') && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b pb-2">
-                <h2 className="font-serif text-2xl font-extrabold text-[#14309c] dark:text-white flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <h2 className="font-serif text-2xl font-extrabold text-[#14309c] flex items-center gap-2">
                   <Radio className="h-5 w-5 text-rose-500 animate-pulse" /> Live Worship &amp; Videos
                 </h2>
-                <span className="text-xs font-semibold text-muted-foreground">Watch live YouTube &amp; Facebook broadcasts</span>
+                <span className="text-xs font-semibold text-slate-500">Watch live YouTube &amp; Facebook broadcasts</span>
               </div>
 
               {liveVideos.length === 0 && recordedVideos.length === 0 ? (
-                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-slate-500">
                   No video streams currently posted. Live worship links will appear here when posted.
                 </div>
               ) : (
@@ -275,7 +275,7 @@ export default function GalleryClient() {
                     return (
                       <Card
                         key={video.id}
-                        className="group overflow-hidden rounded-2xl border border-blue-900/40 bg-[#0d1b4e] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer text-white"
+                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-pointer text-slate-900"
                         onClick={() => setActiveMedia(video)}
                       >
                         <div className="relative aspect-16/9 overflow-hidden bg-slate-950 flex items-center justify-center">
@@ -297,12 +297,12 @@ export default function GalleryClient() {
                             </Badge>
                           )}
                         </div>
-                        <div className="p-4 space-y-1.5 bg-[#0d1b4e]">
-                          <h3 className="font-serif text-base font-bold text-white line-clamp-1">
+                        <div className="p-4 space-y-1.5 bg-white">
+                          <h3 className="font-serif text-base font-bold text-slate-900 line-clamp-1">
                             {video.title || video.filename}
                           </h3>
                           {video.description && (
-                            <p className="text-xs text-slate-300 line-clamp-2">{video.description}</p>
+                            <p className="text-xs text-slate-600 line-clamp-2">{video.description}</p>
                           )}
                         </div>
                       </Card>
@@ -316,8 +316,8 @@ export default function GalleryClient() {
           {/* Section 3: General Photo Gallery Grid */}
           {(filterType === 'ALL') && photos.length > 0 && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-blue-900/30 pb-2">
-                <h2 className="font-serif text-2xl font-extrabold text-white flex items-center gap-2">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <h2 className="font-serif text-2xl font-extrabold text-[#14309c] flex items-center gap-2">
                   <ImageIcon className="h-5 w-5 text-amber-500" /> Recent Photos
                 </h2>
               </div>
@@ -325,10 +325,10 @@ export default function GalleryClient() {
                 {photos.map((item) => (
                   <Card
                     key={item.id}
-                    className="group overflow-hidden rounded-2xl border border-blue-900/40 bg-[#0d1b4e] text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+                    className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
                     onClick={() => setActiveMedia(item)}
                   >
-                    <div className="relative aspect-4/3 overflow-hidden bg-muted">
+                    <div className="relative aspect-4/3 overflow-hidden bg-slate-100">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.url}
@@ -336,14 +336,14 @@ export default function GalleryClient() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    <div className="p-4 space-y-1.5 bg-[#0d1b4e]">
+                    <div className="p-4 space-y-1.5 bg-white">
                       <Badge className="w-fit bg-[#14309c] text-amber-400 font-bold text-xs border border-amber-500/30">
                         {item.category || 'Church Life'}
                       </Badge>
-                      <h3 className="font-serif text-base font-bold text-white leading-snug line-clamp-2">
+                      <h3 className="font-serif text-base font-bold text-slate-900 leading-snug line-clamp-2">
                         {item.title || item.filename}
                       </h3>
-                      <p className="text-xs text-slate-300">
+                      <p className="text-xs text-slate-500">
                         {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
                       </p>
                     </div>
@@ -353,14 +353,14 @@ export default function GalleryClient() {
             </div>
           )}
 
-          {/* Callout Banner — Dark Gradient & Vibrant Gold Button */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#14309c] via-amber-950 to-red-950 p-8 text-white shadow-2xl flex flex-wrap items-center justify-between gap-6 border border-[#1e293b]">
+          {/* Callout Banner */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#14309c] to-[#1c37ae] p-8 text-white shadow-2xl flex flex-wrap items-center justify-between gap-6 border border-blue-800">
             <div className="space-y-1">
               <h3 className="font-serif text-2xl font-bold">Visit us this week</h3>
-              <p className="text-sm text-slate-300">We would love to meet you and your family. Join our Sunday Divine Worship service.</p>
+              <p className="text-sm text-slate-200">We would love to meet you and your family. Join our Sunday Divine Worship service.</p>
             </div>
             <a href="/visit-us">
-              <Button className="bg-amber-500 text-slate-950 font-extrabold hover:bg-amber-400 transition-all shadow-xl px-6 py-2">
+              <Button className="bg-[#FFC72C] text-[#14309c] font-extrabold hover:bg-amber-400 transition-all shadow-xl px-6 py-2">
                 Get in Touch
               </Button>
             </a>
@@ -371,19 +371,19 @@ export default function GalleryClient() {
       {/* Video & Live Stream Viewer Dialog */}
       {activeMedia && (
         <Dialog open={Boolean(activeMedia)} onOpenChange={() => setActiveMedia(null)}>
-          <DialogContent className="sm:max-w-3xl bg-[#0a1232] border border-blue-800 text-white">
+          <DialogContent className="sm:max-w-3xl bg-[#14309c] border border-blue-800 text-white p-6 shadow-2xl rounded-2xl">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-white font-serif">
-                <Badge className="bg-amber-500 text-slate-950 font-bold">
+              <DialogTitle className="flex items-center gap-2 text-white font-serif text-xl">
+                <Badge className="bg-[#FFC72C] text-[#14309c] font-bold">
                   {(activeMedia.mimeType === 'video/embed' ? 'VIDEO' : activeMedia.type).replace('_', ' ')}
                 </Badge>
                 {activeMedia.title || activeMedia.filename}
               </DialogTitle>
-              {activeMedia.description && <DialogDescription className="text-slate-300">{activeMedia.description}</DialogDescription>}
+              {activeMedia.description && <DialogDescription className="text-slate-200 text-sm mt-1">{activeMedia.description}</DialogDescription>}
             </DialogHeader>
 
             {isMediaVideo(activeMedia) ? (
-              <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-black shadow-2xl border border-blue-900/60">
+              <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-black shadow-2xl border border-blue-900/60 mt-3">
                 <iframe
                   src={getEmbedUrl(activeMedia)}
                   title={activeMedia.title || 'Video Player'}
@@ -393,7 +393,7 @@ export default function GalleryClient() {
                 />
               </div>
             ) : (
-              <div className="max-h-[70vh] overflow-hidden rounded-xl bg-black">
+              <div className="max-h-[70vh] overflow-hidden rounded-xl bg-black mt-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={activeMedia.url}
