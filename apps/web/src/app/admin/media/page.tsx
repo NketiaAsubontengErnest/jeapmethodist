@@ -127,7 +127,7 @@ export default function MediaPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<'albums' | 'photos' | 'videos' | 'live'>('albums');
+  const [activeTab, setActiveTab] = useState<'albums' | 'photos' | 'videos' | 'live'>('videos');
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
 
   // Upload/Post Modal State
@@ -396,17 +396,17 @@ export default function MediaPage() {
         className="space-y-6"
       >
         <TabsList className="grid w-full grid-cols-4 lg:w-auto">
-          <TabsTrigger value="albums" className="flex items-center gap-2">
-            <ImageIcon className="h-4 w-4 text-amber-500" /> Photo Albums ({albumsQuery.data?.total ?? 0})
-          </TabsTrigger>
-          <TabsTrigger value="photos" className="flex items-center gap-2">
-            <ImageIcon className="h-4 w-4 text-blue-500" /> All Photos
-          </TabsTrigger>
           <TabsTrigger value="videos" className="flex items-center gap-2">
             <Video className="h-4 w-4 text-purple-500" /> Videos
           </TabsTrigger>
           <TabsTrigger value="live" className="flex items-center gap-2">
             <Radio className="h-4 w-4 text-rose-500 animate-pulse" /> Live Streams
+          </TabsTrigger>
+          <TabsTrigger value="photos" className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4 text-blue-500" /> All Photos
+          </TabsTrigger>
+          <TabsTrigger value="albums" className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4 text-amber-500" /> Photo Albums ({albumsQuery.data?.total ?? 0})
           </TabsTrigger>
         </TabsList>
 
@@ -511,7 +511,7 @@ export default function MediaPage() {
         </TabsContent>
 
         {/* Tab 2 & 3 & 4 & Album-Detail Grid */}
-        <TabsContent value={selectedAlbumId ? 'album-view' : activeTab} className="space-y-6">
+        <TabsContent value={selectedAlbumId ? 'album-view' : (activeTab === 'albums' ? 'albums-media-none' : activeTab)} className="space-y-6">
           {selectedAlbumId && selectedAlbumQuery.data ? (
             /* Album Photos Display */
             <div className="space-y-4">
