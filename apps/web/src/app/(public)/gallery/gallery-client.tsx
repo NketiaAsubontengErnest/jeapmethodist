@@ -33,8 +33,12 @@ export default function GalleryClient() {
   const albums = data?.albums || [];
 
   const liveVideos = items.filter((i) => i.type === 'LIVE_VIDEO');
-  const recordedVideos = items.filter((i) => i.type === 'VIDEO');
-  const photos = items.filter((i) => i.type === 'PHOTO');
+  const recordedVideos = items.filter(
+    (i) => i.type === 'VIDEO' || (i.type as string) !== 'LIVE_VIDEO' && (i.mimeType === 'video/embed' || Boolean(i.embedId))
+  );
+  const photos = items.filter(
+    (i) => i.type === 'PHOTO' && i.mimeType !== 'video/embed' && !i.embedId
+  );
 
   return (
     <div className="space-y-12">

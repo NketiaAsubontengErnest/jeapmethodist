@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { unlink } from 'fs/promises';
@@ -10,11 +10,27 @@ import { CreateVideoPostDto } from './dto/create-video-post.dto';
 import { parseVideoUrl } from './media-utils';
 
 @Injectable()
-export class MediaService {
+export class MediaService implements OnModuleInit {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
   ) {}
+
+  async onModuleInit() {
+    try {
+      await this.prisma.media.updateMany({
+        where: {
+          mimeType: 'video/embed',
+          type: MediaType.PHOTO,
+        },
+        data: {
+          type: MediaType.VIDEO,
+        },
+      });
+    } catch {
+      // Ignore initial boot errors
+    }
+  }
 
   create(params: {
     filename: string;
@@ -54,6 +70,8 @@ export class MediaService {
 
   async createVideoPost(dto: CreateVideoPostDto, uploadedById: string) {
     const embedDetails = parseVideoUrl(dto.videoUrlOrId);
+    const videoType =
+      dto.type === MediaType.LIVE_VIDEO ? MediaType.LIVE_VIDEO : MediaType.VIDEO;
 
     return this.prisma.media.create({
       data: {
@@ -62,7 +80,7 @@ export class MediaService {
         url: embedDetails.embedUrl,
         mimeType: 'video/embed',
         size: 0,
-        type: dto.type,
+        type: videoType,
         title: dto.title,
         description: dto.description,
         category: dto.category,
@@ -85,6 +103,15 @@ export class MediaService {
     albumId?: string;
   }) {
     const { page, pageSize, category, type, albumId } = params;
+
+    const typeFilter: Prisma.MediaWhereInput = type
+      ? type === MediaType.VIDEO
+        ? { OR: [{ type: MediaType.VIDEO }, { mimeType: 'video/embed' }] }
+        : type === MediaType.PHOTO
+        ? { type: MediaType.PHOTO, NOT: { mimeType: 'video/embed' } }
+        : { type }
+      : {};
+
     const where: Prisma.MediaWhereInput = {
       ...(category
         ? { category }
@@ -94,7 +121,7 @@ export class MediaService {
               { title: { in: ['logo_url', 'favicon_url'] } },
             ],
           }),
-      ...(type ? { type } : {}),
+      ...typeFilter,
       ...(albumId ? { albumId } : {}),
     };
 
@@ -127,8 +154,17 @@ export class MediaService {
     limit?: number;
   }) {
     const { type, albumId, limit = 50 } = params;
+
+    const typeFilter: Prisma.MediaWhereInput = type
+      ? type === MediaType.VIDEO
+        ? { OR: [{ type: MediaType.VIDEO }, { mimeType: 'video/embed' }] }
+        : type === MediaType.PHOTO
+        ? { type: MediaType.PHOTO, NOT: { mimeType: 'video/embed' } }
+        : { type }
+      : {};
+
     const where: Prisma.MediaWhereInput = {
-      ...(type ? { type } : {}),
+      ...typeFilter,
       ...(albumId ? { albumId } : {}),
       NOT: [
         { category: 'identity' },

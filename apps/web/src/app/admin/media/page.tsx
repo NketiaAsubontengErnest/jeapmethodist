@@ -71,7 +71,13 @@ function formatSize(bytes: number) {
 }
 
 function MediaThumbnail({ item }: { item: MediaItem }) {
-  if (item.type === 'LIVE_VIDEO' || item.type === 'VIDEO') {
+  const isVideo =
+    item.type === 'LIVE_VIDEO' ||
+    item.type === 'VIDEO' ||
+    item.mimeType === 'video/embed' ||
+    Boolean(item.embedId);
+
+  if (isVideo) {
     const ytThumb =
       item.embedId && (item.platform === 'YOUTUBE' || !item.platform)
         ? `https://img.youtube.com/vi/${item.embedId}/hqdefault.jpg`
@@ -103,7 +109,7 @@ function MediaThumbnail({ item }: { item: MediaItem }) {
       </div>
     );
   }
-  if (item.mimeType?.startsWith('image/') || item.url) {
+  if (item.mimeType?.startsWith('image/') || (item.url && !item.url.includes('youtube.com/embed'))) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img src={item.url} alt={item.filename} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
@@ -219,11 +225,18 @@ export default function MediaPage() {
       queryClient.invalidateQueries({ queryKey: ['public-gallery'] });
 
       // Automatically switch to the active view tab so the user sees the newly posted video/photo immediately!
-      if (media.type === 'VIDEO') {
-        setActiveTab('videos');
-        setSelectedAlbumId(null);
-      } else if (media.type === 'LIVE_VIDEO') {
-        setActiveTab('live');
+      const isVideo =
+        media.type === 'VIDEO' ||
+        media.type === 'LIVE_VIDEO' ||
+        media.mimeType === 'video/embed' ||
+        Boolean(media.embedId);
+
+      if (isVideo) {
+        if (media.type === 'LIVE_VIDEO') {
+          setActiveTab('live');
+        } else {
+          setActiveTab('videos');
+        }
         setSelectedAlbumId(null);
       } else if (media.type === 'PHOTO' && (!postAlbumId || postAlbumId === 'none')) {
         setActiveTab('photos');
@@ -580,13 +593,18 @@ export default function MediaPage() {
                       <div
                         className="relative aspect-16/10 cursor-pointer overflow-hidden bg-muted"
                         onClick={() => {
-                          if (item.type === 'LIVE_VIDEO' || item.type === 'VIDEO') {
+                          const isVideo =
+                            item.type === 'LIVE_VIDEO' ||
+                            item.type === 'VIDEO' ||
+                            item.mimeType === 'video/embed' ||
+                            Boolean(item.embedId);
+                          if (isVideo) {
                             setPreviewMedia(item);
                           }
                         }}
                       >
                         <MediaThumbnail item={item} />
-                        {(item.type === 'LIVE_VIDEO' || item.type === 'VIDEO') && (
+                        {(item.type === 'LIVE_VIDEO' || item.type === 'VIDEO' || item.mimeType === 'video/embed' || Boolean(item.embedId)) && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-90 transition-opacity group-hover:bg-black/60">
                             <div className="rounded-full bg-rose-600 p-3 text-white shadow-lg">
                               <Tv className="h-6 w-6" />
@@ -597,7 +615,7 @@ export default function MediaPage() {
                       <div className="space-y-1.5 p-3">
                         <div className="flex items-center justify-between">
                           <Badge variant="outline" className="text-[10px] uppercase">
-                            {item.type.replace('_', ' ')}
+                            {(item.mimeType === 'video/embed' ? 'VIDEO' : item.type).replace('_', ' ')}
                           </Badge>
                           {item.album && (
                             <Badge variant="secondary" className="text-[10px]">
