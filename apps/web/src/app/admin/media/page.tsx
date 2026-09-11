@@ -219,36 +219,37 @@ export default function MediaPage() {
       }
     },
     onSuccess: (media) => {
+      setPostOpen(false);
+      resetPostForm();
+
       queryClient.invalidateQueries({ queryKey: ['media-admin'] });
       queryClient.invalidateQueries({ queryKey: ['albums-admin'] });
       queryClient.invalidateQueries({ queryKey: ['album-detail'] });
       queryClient.invalidateQueries({ queryKey: ['public-gallery'] });
 
-      // Automatically switch to the active view tab so the user sees the newly posted video/photo immediately!
+      const mediaType = media?.type || 'VIDEO';
       const isVideo =
-        media.type === 'VIDEO' ||
-        media.type === 'LIVE_VIDEO' ||
-        media.mimeType === 'video/embed' ||
-        Boolean(media.embedId);
+        mediaType === 'VIDEO' ||
+        mediaType === 'LIVE_VIDEO' ||
+        media?.mimeType === 'video/embed' ||
+        Boolean(media?.embedId);
 
       if (isVideo) {
-        if (media.type === 'LIVE_VIDEO') {
+        if (mediaType === 'LIVE_VIDEO') {
           setActiveTab('live');
         } else {
           setActiveTab('videos');
         }
         setSelectedAlbumId(null);
-      } else if (media.type === 'PHOTO' && (!postAlbumId || postAlbumId === 'none')) {
+      } else if (mediaType === 'PHOTO' && (!postAlbumId || postAlbumId === 'none')) {
         setActiveTab('photos');
         setSelectedAlbumId(null);
       }
 
-      setPostOpen(false);
-      resetPostForm();
       toast.success(
-        media.type === 'LIVE_VIDEO'
+        mediaType === 'LIVE_VIDEO'
           ? 'Live stream published!'
-          : media.type === 'VIDEO'
+          : mediaType === 'VIDEO'
           ? 'Video published!'
           : 'Photo uploaded!',
       );

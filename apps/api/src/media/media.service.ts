@@ -107,6 +107,8 @@ export class MediaService implements OnModuleInit {
     const typeFilter: Prisma.MediaWhereInput = type
       ? type === MediaType.VIDEO
         ? { OR: [{ type: MediaType.VIDEO }, { mimeType: 'video/embed' }] }
+        : type === MediaType.LIVE_VIDEO
+        ? { OR: [{ type: MediaType.LIVE_VIDEO }, { mimeType: 'video/embed' }] }
         : type === MediaType.PHOTO
         ? { type: MediaType.PHOTO, NOT: { mimeType: 'video/embed' } }
         : { type }
@@ -155,6 +157,8 @@ export class MediaService implements OnModuleInit {
     const typeFilter: Prisma.MediaWhereInput = type
       ? type === MediaType.VIDEO
         ? { OR: [{ type: MediaType.VIDEO }, { mimeType: 'video/embed' }] }
+        : type === MediaType.LIVE_VIDEO
+        ? { OR: [{ type: MediaType.LIVE_VIDEO }, { mimeType: 'video/embed' }] }
         : type === MediaType.PHOTO
         ? { type: MediaType.PHOTO, NOT: { mimeType: 'video/embed' } }
         : { type }
