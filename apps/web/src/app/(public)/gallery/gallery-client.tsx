@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { fetchPublicGallery, type MediaItem } from '@/lib/api/media';
 import { fetchAlbumById } from '@/lib/api/albums';
-import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, Sparkles } from 'lucide-react';
+import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, Sparkles, ExternalLink } from 'lucide-react';
 
 function getThumbnailUrl(item: MediaItem): string | null {
   const url = item.externalUrl || item.url || '';
@@ -30,12 +30,18 @@ function getThumbnailUrl(item: MediaItem): string | null {
   return null;
 }
 
+function getDirectWatchUrl(item: MediaItem): string {
+  if (item.externalUrl) return item.externalUrl;
+  if (item.embedId) return `https://www.youtube.com/watch?v=${item.embedId}`;
+  return item.url;
+}
+
 function getEmbedUrl(item: MediaItem): string {
   const url = item.externalUrl || item.url || '';
   const clean = url.trim();
 
   if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || clean.includes('youtube'))) {
-    return `https://www.youtube-nocookie.com/embed/${item.embedId}`;
+    return `https://www.youtube.com/embed/${item.embedId}`;
   }
 
   const match =
@@ -43,7 +49,7 @@ function getEmbedUrl(item: MediaItem): string {
     clean.match(/^([\w-]{11})$/);
 
   if (match?.[1]) {
-    return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+    return `https://www.youtube.com/embed/${match[1]}`;
   }
 
   if (clean.includes('facebook.com') || clean.includes('fb.watch')) {
@@ -372,14 +378,27 @@ export default function GalleryClient() {
       {activeMedia && (
         <Dialog open={Boolean(activeMedia)} onOpenChange={() => setActiveMedia(null)}>
           <DialogContent className="sm:max-w-3xl bg-[#14309c] border border-blue-800 text-white p-6 shadow-2xl rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-white font-serif text-xl">
-                <Badge className="bg-[#FFC72C] text-[#14309c] font-bold">
-                  {(activeMedia.mimeType === 'video/embed' ? 'VIDEO' : activeMedia.type).replace('_', ' ')}
-                </Badge>
-                {activeMedia.title || activeMedia.filename}
-              </DialogTitle>
-              {activeMedia.description && <DialogDescription className="text-slate-200 text-sm mt-1">{activeMedia.description}</DialogDescription>}
+            <DialogHeader className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 pr-6">
+                <DialogTitle className="flex items-center gap-2 text-white font-serif text-xl">
+                  <Badge className="bg-[#FFC72C] text-[#14309c] font-bold">
+                    {(activeMedia.mimeType === 'video/embed' ? 'VIDEO' : activeMedia.type).replace('_', ' ')}
+                  </Badge>
+                  {activeMedia.title || activeMedia.filename}
+                </DialogTitle>
+
+                {isMediaVideo(activeMedia) && (
+                  <a
+                    href={getDirectWatchUrl(activeMedia)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#FFC72C] px-3.5 py-1.5 text-xs font-extrabold text-[#14309c] shadow hover:bg-amber-400 transition-all"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> Watch on {activeMedia.platform || 'YouTube'}
+                  </a>
+                )}
+              </div>
+              {activeMedia.description && <DialogDescription className="text-slate-200 text-sm">{activeMedia.description}</DialogDescription>}
             </DialogHeader>
 
             {isMediaVideo(activeMedia) ? (
