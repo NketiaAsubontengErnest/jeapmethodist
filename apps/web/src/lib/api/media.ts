@@ -7,6 +7,7 @@ export type MediaType = 'PHOTO' | 'VIDEO' | 'LIVE_VIDEO';
 export interface MediaItem {
   id: string;
   filename: string;
+  storedName?: string;
   url: string;
   mimeType: string;
   size: number;
@@ -20,7 +21,7 @@ export interface MediaItem {
   albumId: string | null;
   album?: { id: string; title: string; slug?: string } | null;
   createdAt: string;
-  uploadedBy: { firstName: string; lastName: string } | null;
+  uploadedBy?: { firstName: string; lastName: string } | null;
 }
 
 export function fetchMediaAdmin(params: {

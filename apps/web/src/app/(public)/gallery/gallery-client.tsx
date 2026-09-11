@@ -63,7 +63,7 @@ function isMediaVideo(item: MediaItem): boolean {
     Boolean(item.externalUrl) ||
     Boolean(getThumbnailUrl(item)) ||
     Boolean(item.url && (item.url.includes('youtu') || item.url.includes('youtube') || item.url.includes('facebook') || item.url.includes('embed'))) ||
-    Boolean((item as any).storedName && (item as any).storedName.startsWith('embed_'))
+    Boolean(item.storedName && item.storedName.startsWith('embed_'))
   );
 }
 
