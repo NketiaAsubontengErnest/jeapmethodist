@@ -11,19 +11,60 @@ import { fetchPublicGallery, type MediaItem } from '@/lib/api/media';
 import { fetchAlbumById } from '@/lib/api/albums';
 import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, Sparkles } from 'lucide-react';
 
+function getThumbnailUrl(item: MediaItem): string | null {
+  const url = item.externalUrl || item.url || '';
+  const clean = url.trim();
+
+  if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || clean.includes('youtube'))) {
+    return `https://img.youtube.com/vi/${item.embedId}/hqdefault.jpg`;
+  }
+
+  const match =
+    clean.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/|shorts\/))([\w-]{11})/) ||
+    clean.match(/^([\w-]{11})$/);
+
+  if (match?.[1]) {
+    return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
+  }
+
+  return null;
+}
+
 function getEmbedUrl(item: MediaItem): string {
-  if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || item.url.includes('youtube'))) {
+  const url = item.externalUrl || item.url || '';
+  const clean = url.trim();
+
+  if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || clean.includes('youtube'))) {
     return `https://www.youtube.com/embed/${item.embedId}`;
   }
-  if (item.url.includes('watch?v=')) {
-    const match = item.url.match(/v=([\w-]{11})/);
-    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+
+  const match =
+    clean.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/|shorts\/))([\w-]{11})/) ||
+    clean.match(/^([\w-]{11})$/);
+
+  if (match?.[1]) {
+    return `https://www.youtube.com/embed/${match[1]}`;
   }
-  if (item.url.includes('youtu.be/')) {
-    const match = item.url.match(/youtu\.be\/([\w-]{11})/);
-    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+
+  if (clean.includes('facebook.com') || clean.includes('fb.watch')) {
+    const encoded = encodeURIComponent(clean);
+    return `https://www.facebook.com/plugins/video.php?href=${encoded}&show_text=false`;
   }
-  return item.url;
+
+  return clean;
+}
+
+function isMediaVideo(item: MediaItem): boolean {
+  return (
+    item.type === 'LIVE_VIDEO' ||
+    item.type === 'VIDEO' ||
+    item.mimeType === 'video/embed' ||
+    Boolean(item.embedId) ||
+    Boolean(item.externalUrl) ||
+    Boolean(getThumbnailUrl(item)) ||
+    Boolean(item.url && (item.url.includes('youtu') || item.url.includes('youtube') || item.url.includes('facebook') || item.url.includes('embed'))) ||
+    Boolean(item.storedName && item.storedName.startsWith('embed_'))
+  );
 }
 
 export default function GalleryClient() {
@@ -49,10 +90,10 @@ export default function GalleryClient() {
 
   const liveVideos = items.filter((i) => i.type === 'LIVE_VIDEO');
   const recordedVideos = items.filter(
-    (i) => i.type === 'VIDEO' || (i.type as string) !== 'LIVE_VIDEO' && (i.mimeType === 'video/embed' || Boolean(i.embedId))
+    (i) => i.type === 'VIDEO' || (i.type as string) !== 'LIVE_VIDEO' && (i.mimeType === 'video/embed' || Boolean(i.embedId) || isMediaVideo(i))
   );
   const photos = items.filter(
-    (i) => i.type === 'PHOTO' && i.mimeType !== 'video/embed' && !i.embedId
+    (i) => i.type === 'PHOTO' && !isMediaVideo(i)
   );
 
   return (
@@ -117,13 +158,15 @@ export default function GalleryClient() {
           </div>
 
           {albumDetailQuery.data.photos?.length === 0 ? (
-            <p className="py-12 text-center text-sm text-muted-foreground">No photos posted in this album yet.</p>
+            <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+              This album is currently empty.
+            </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {albumDetailQuery.data.photos?.map((photo) => (
                 <Card
                   key={photo.id}
-                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md hover:shadow-xl transition-all cursor-pointer dark:bg-card"
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all cursor-pointer dark:bg-card"
                   onClick={() => setActiveMedia(photo as unknown as MediaItem)}
                 >
                   <div className="aspect-4/3 overflow-hidden bg-muted">
@@ -227,10 +270,7 @@ export default function GalleryClient() {
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {[...liveVideos, ...recordedVideos].map((video) => {
-                    const ytThumb =
-                      video.embedId && (video.platform === 'YOUTUBE' || !video.platform)
-                        ? `https://img.youtube.com/vi/${video.embedId}/hqdefault.jpg`
-                        : null;
+                    const ytThumb = getThumbnailUrl(video);
 
                     return (
                       <Card
@@ -342,12 +382,7 @@ export default function GalleryClient() {
               {activeMedia.description && <DialogDescription className="text-slate-300">{activeMedia.description}</DialogDescription>}
             </DialogHeader>
 
-            {activeMedia.type === 'LIVE_VIDEO' ||
-            activeMedia.type === 'VIDEO' ||
-            activeMedia.mimeType === 'video/embed' ||
-            Boolean(activeMedia.embedId) ||
-            activeMedia.url?.includes('youtube.com') ||
-            activeMedia.url?.includes('facebook.com') ? (
+            {isMediaVideo(activeMedia) ? (
               <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-black shadow-2xl border border-blue-900/60">
                 <iframe
                   src={getEmbedUrl(activeMedia)}
