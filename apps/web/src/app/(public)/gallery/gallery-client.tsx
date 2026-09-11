@@ -11,6 +11,21 @@ import { fetchPublicGallery, type MediaItem } from '@/lib/api/media';
 import { fetchAlbumById } from '@/lib/api/albums';
 import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, Sparkles } from 'lucide-react';
 
+function getEmbedUrl(item: MediaItem): string {
+  if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || item.url.includes('youtube'))) {
+    return `https://www.youtube.com/embed/${item.embedId}`;
+  }
+  if (item.url.includes('watch?v=')) {
+    const match = item.url.match(/v=([\w-]{11})/);
+    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  if (item.url.includes('youtu.be/')) {
+    const match = item.url.match(/youtu\.be\/([\w-]{11})/);
+    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  return item.url;
+}
+
 export default function GalleryClient() {
   const [filterType, setFilterType] = useState<'ALL' | 'ALBUMS' | 'LIVE' | 'VIDEOS'>('ALL');
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
@@ -335,7 +350,7 @@ export default function GalleryClient() {
             activeMedia.url?.includes('facebook.com') ? (
               <div className="aspect-16/9 w-full overflow-hidden rounded-xl bg-black shadow-2xl border border-blue-900/60">
                 <iframe
-                  src={activeMedia.url}
+                  src={getEmbedUrl(activeMedia)}
                   title={activeMedia.title || 'Video Player'}
                   className="h-full w-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

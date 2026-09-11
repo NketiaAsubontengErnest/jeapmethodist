@@ -70,6 +70,21 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function getEmbedUrl(item: MediaItem): string {
+  if (item.embedId && (item.platform === 'YOUTUBE' || !item.platform || item.url.includes('youtube'))) {
+    return `https://www.youtube.com/embed/${item.embedId}`;
+  }
+  if (item.url.includes('watch?v=')) {
+    const match = item.url.match(/v=([\w-]{11})/);
+    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  if (item.url.includes('youtu.be/')) {
+    const match = item.url.match(/youtu\.be\/([\w-]{11})/);
+    if (match?.[1]) return `https://www.youtube.com/embed/${match[1]}`;
+  }
+  return item.url;
+}
+
 function MediaThumbnail({ item }: { item: MediaItem }) {
   const isVideo =
     item.type === 'LIVE_VIDEO' ||
@@ -963,7 +978,7 @@ export default function MediaPage() {
 
             <div className="aspect-16/9 w-full overflow-hidden rounded-lg bg-black">
               <iframe
-                src={previewMedia.url}
+                src={getEmbedUrl(previewMedia)}
                 title={previewMedia.title || 'Video Player'}
                 className="h-full w-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
