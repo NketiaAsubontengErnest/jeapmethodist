@@ -185,10 +185,16 @@ export class MediaService implements OnModuleInit {
         include: {
           _count: { select: { photos: true } },
           photos: {
+            // Plain `NOT: [{ category: 'identity' }, ...]` silently drops
+            // every row with a NULL category/title too — SQL's NOT(x = y)
+            // is NULL (neither true nor false) when x is NULL, and a WHERE
+            // clause only keeps rows where the condition is true. Most
+            // photos have no category/title set, so that excluded almost
+            // everything. Same fix as findAllAdmin/findPublicGallery above.
             where: {
-              NOT: [
-                { category: 'identity' },
-                { title: { in: ['logo_url', 'favicon_url'] } },
+              AND: [
+                { OR: [{ category: null }, { category: { not: 'identity' } }] },
+                { OR: [{ title: null }, { title: { notIn: ['logo_url', 'favicon_url'] } }] },
               ],
             },
             take: 4,

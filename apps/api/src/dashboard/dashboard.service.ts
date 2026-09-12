@@ -99,21 +99,24 @@ export class DashboardService {
         _count: { id: true },
       }),
 
-      // Media (excluding identity logo and favicon)
+      // Media (excluding identity logo and favicon). NULL-safe: a plain
+      // `NOT: [{ category: 'identity' }, ...]` silently drops every row
+      // with a NULL category/title too, since SQL's NOT(x = y) is neither
+      // true nor false when x is NULL — and most media has no category set.
       this.prisma.media.count({
         where: {
-          NOT: [
-            { category: 'identity' },
-            { title: { in: ['logo_url', 'favicon_url'] } },
+          AND: [
+            { OR: [{ category: null }, { category: { not: 'identity' } }] },
+            { OR: [{ title: null }, { title: { notIn: ['logo_url', 'favicon_url'] } }] },
           ],
         },
       }),
       this.prisma.media.groupBy({
         by: ['type'],
         where: {
-          NOT: [
-            { category: 'identity' },
-            { title: { in: ['logo_url', 'favicon_url'] } },
+          AND: [
+            { OR: [{ category: null }, { category: { not: 'identity' } }] },
+            { OR: [{ title: null }, { title: { notIn: ['logo_url', 'favicon_url'] } }] },
           ],
         },
         _count: { id: true },
