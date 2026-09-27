@@ -599,15 +599,11 @@ export default function PublicHomePage() {
         </div>
       </section>
 
-      {/* 7.5 ONLINE GIVING & STEWARDSHIP SECTION — Royal Blue Accent */}
       <section className="bg-white py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#14309c] via-[#1c37ae] to-[#0f2478] p-8 text-white shadow-xl sm:p-12">
             <div className="grid items-center gap-8 md:grid-cols-12">
               <div className="space-y-4 md:col-span-8">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3 py-1 text-xs font-bold text-[#FFC72C]">
-                  <Heart className="h-3.5 w-3.5 fill-[#FFC72C]" /> Online Giving &amp; Stewardship
-                </div>
                 <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl text-white">
                   Support the Gospel &amp; Church Expansion
                 </h2>

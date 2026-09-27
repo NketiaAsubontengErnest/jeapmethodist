@@ -130,7 +130,7 @@ export default async function NewsPage() {
             size="lg"
             className="shrink-0 rounded-lg bg-[#FFC72C] px-8 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-colors hover:bg-amber-400"
           >
-            <Link href="/contact">Contact Us For Updates</Link>
+            <Link href="/contact">Get in Touch</Link>
           </Button>
         </div>
       </section>
