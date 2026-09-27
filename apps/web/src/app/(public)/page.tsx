@@ -139,8 +139,8 @@ export default function PublicHomePage() {
                 />
               );
             })}
-            {/* Royal blue overlay covering the images */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#14309c]/90 via-[#14309c]/80 to-[#14309c]/85 backdrop-blur-[1px]" />
+            {/* Royal blue overlay covering the images with lighter opacity */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#14309c]/70 via-[#14309c]/50 to-[#14309c]/60" />
           </div>
         )}
         <div className="relative z-10 mx-auto max-w-7xl">
