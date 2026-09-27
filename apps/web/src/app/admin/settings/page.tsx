@@ -99,13 +99,15 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Social media',
-    description: 'Only configured networks are shown on the public site.',
+    description: 'Only configured networks are shown on the public footer & header.',
     fields: [
-      { key: 'facebook_url', label: 'Facebook URL', type: 'url' },
-      { key: 'youtube_url', label: 'YouTube URL', type: 'url' },
-      { key: 'instagram_url', label: 'Instagram URL', type: 'url' },
-      { key: 'tiktok_url', label: 'TikTok URL', type: 'url' },
-      { key: 'x_url', label: 'X (Twitter) URL', type: 'url' },
+      { key: 'facebook_url', label: 'Facebook URL', type: 'url', placeholder: 'https://facebook.com/...' },
+      { key: 'youtube_url', label: 'YouTube URL', type: 'url', placeholder: 'https://youtube.com/@...' },
+      { key: 'instagram_url', label: 'Instagram URL', type: 'url', placeholder: 'https://instagram.com/...' },
+      { key: 'tiktok_url', label: 'TikTok URL', type: 'url', placeholder: 'https://tiktok.com/@...' },
+      { key: 'x_url', label: 'X (Twitter) URL', type: 'url', placeholder: 'https://x.com/...' },
+      { key: 'whatsapp_channel_url', label: 'WhatsApp Channel URL', type: 'url', placeholder: 'https://whatsapp.com/channel/...' },
+      { key: 'threads_url', label: 'Threads URL', type: 'url', placeholder: 'https://threads.net/@...' },
     ],
   },
   {
@@ -190,7 +192,17 @@ export default function SettingsPage() {
   };
 
   const isUrlField = (key: string) =>
-    ['logo_url', 'favicon_url', 'facebook_url', 'youtube_url', 'instagram_url', 'tiktok_url', 'x_url'].includes(key);
+    [
+      'logo_url',
+      'favicon_url',
+      'facebook_url',
+      'youtube_url',
+      'instagram_url',
+      'tiktok_url',
+      'x_url',
+      'whatsapp_channel_url',
+      'threads_url',
+    ].includes(key);
 
   const toggleUnlock = (key: string) => {
     setUnlockedFields((prev) => ({ ...prev, [key]: !prev[key] }));

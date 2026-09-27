@@ -24,6 +24,12 @@ export interface PublicSettings {
   bank_account_number?: string;
   facebook_url?: string;
   youtube_url?: string;
+  instagram_url?: string;
+  tiktok_url?: string;
+  x_url?: string;
+  whatsapp_channel_url?: string;
+  threads_url?: string;
+  giving_categories?: string;
   paystack_enabled?: string;
   paystack_public_key?: string;
   paystack_secret_key?: string;

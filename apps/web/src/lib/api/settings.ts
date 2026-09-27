@@ -29,6 +29,8 @@ export interface SettingsMap {
   instagram_url?: string;
   tiktok_url?: string;
   x_url?: string;
+  whatsapp_channel_url?: string;
+  threads_url?: string;
   hero_title?: string;
   hero_subtitle?: string;
   footer_text?: string;

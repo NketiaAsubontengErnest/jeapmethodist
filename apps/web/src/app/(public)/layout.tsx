@@ -37,6 +37,13 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         sundayServiceTimes={settings?.sunday_service_times}
         midweekServiceTimes={settings?.midweek_service_times}
         logoUrl={settings?.logo_url}
+        facebookUrl={settings?.facebook_url}
+        youtubeUrl={settings?.youtube_url}
+        instagramUrl={settings?.instagram_url}
+        tiktokUrl={settings?.tiktok_url}
+        xUrl={settings?.x_url}
+        whatsappChannelUrl={settings?.whatsapp_channel_url}
+        threadsUrl={settings?.threads_url}
       />
     </div>
   );
