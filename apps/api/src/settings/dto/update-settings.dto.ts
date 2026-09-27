@@ -140,6 +140,16 @@ export class UpdateSettingsDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
+  whatsapp_channel_url?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  threads_url?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
   @MaxLength(200)
   hero_title?: string;
 
@@ -230,4 +240,9 @@ export class UpdateSettingsDto {
   @IsOptional()
   @IsString()
   giving_currency?: string;
+
+  @ApiProperty({ required: false, description: 'Comma-separated list of giving categories' })
+  @IsOptional()
+  @IsString()
+  giving_categories?: string;
 }
