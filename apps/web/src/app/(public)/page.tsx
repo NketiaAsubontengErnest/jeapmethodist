@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -25,6 +25,7 @@ import {
   submitPrayerRequest,
 } from '@/lib/api/public';
 import { fetchPublicGallery } from '@/lib/api/media';
+import { formatMediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,8 +66,11 @@ export default function PublicHomePage() {
 
   const { data: galleryData } = useQuery({
     queryKey: ['public-gallery-home'],
-    queryFn: () => fetchPublicGallery({ limit: 6 }),
+    queryFn: () => fetchPublicGallery({ limit: 50 }),
   });
+
+  // Hero section slide carousel state
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   // Prayer / Thanksgiving Sheet state
   const [prayerSheetOpen, setPrayerSheetOpen] = useState(false);
@@ -103,20 +107,48 @@ export default function PublicHomePage() {
   const latestNews = news.slice(0, 2);
   const topMinistries = ministries.slice(0, 6);
   const galleryAlbums = galleryData?.albums || [];
+  const heroSlides = (galleryData?.items || []).filter((i) => i.category === 'hero_slide');
   const galleryItems = (galleryData?.items || []).filter(
-    (i) => i.category !== 'identity' && i.title !== 'logo_url' && i.title !== 'favicon_url'
+    (i) => i.category !== 'identity' && i.category !== 'hero_slide' && i.title !== 'logo_url' && i.title !== 'favicon_url'
   );
+
+  useEffect(() => {
+    if (heroSlides.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveSlideIndex((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
 
   return (
     <div className="flex flex-col bg-white text-slate-900">
-      {/* 1. HERO SECTION — Royal Blue #14309c Background */}
+      {/* 1. HERO SECTION — Royal Blue #14309c Background with Overlay & Images */}
       <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+        {heroSlides.length > 0 && (
+          <div className="absolute inset-0 z-0">
+            {heroSlides.map((slide, index) => {
+              const imgUrl = formatMediaUrl(slide.url);
+              if (!imgUrl) return null;
+              return (
+                <div
+                  key={slide.id || index}
+                  className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+                    index === activeSlideIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{ backgroundImage: `url('${imgUrl}')` }}
+                />
+              );
+            })}
+            {/* Royal blue overlay covering the images */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#14309c]/90 via-[#14309c]/80 to-[#14309c]/85 backdrop-blur-[1px]" />
+          </div>
+        )}
+        <div className="relative z-10 mx-auto max-w-7xl">
           <div className="grid items-center gap-12 lg:grid-cols-12">
             <div className="space-y-6 lg:col-span-7">
               {(settings?.church_name || settings?.society_name) && (
                 <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-                  {settings?.church_name?.toUpperCase()}
+                  {(settings?.church_name || settings?.society_name || '').toUpperCase()}
                 </span>
               )}
 
