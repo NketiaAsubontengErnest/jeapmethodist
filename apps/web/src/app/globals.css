@@ -1,27 +1,71 @@
+@import url('https://fonts.cdnfonts.com/css/creato-display');
 @import "tailwindcss";
 
-/* A second, independent dark variant used only by admin/** components —
-   keyed off the manual data-theme attribute (see admin/layout.tsx's
-   toggle) rather than prefers-color-scheme, so it never fires from the
-   visitor's OS setting the way the public site's `dark:` still does.
-   `&:where(...)` keeps this at zero specificity, matching Tailwind's own
-   dark: output, so admin-dark: utilities override base utilities the same
-   way dark: ones do (source order, not specificity). */
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Creato Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-RegularItalic.woff') format('woff');
+}
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-Medium.woff') format('woff');
+}
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-Medium.woff') format('woff');
+}
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-Bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-ExtraBold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Creato Display';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: local('Creato Display'), url('https://fonts.cdnfonts.com/s/57864/CreatoDisplay-Black.woff') format('woff');
+}
+
+/* A second, independent dark variant used only by admin/** components */
 @custom-variant admin-dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/*
- * Methodist Church Ghana — design tokens.
- *
- * Palette drawn from the official Methodist Church Ghana crest: royal blue
- * (the seal's field) as the primary brand color, with heritage gold (the
- * seal's trim/lettering) as the supporting accent. Visual direction stays
- * classic and professional: white/cream carries the body of every page
- * (content sections, cards, forms), while the navbar and page heroes are
- * deliberately solid blue brand surfaces — mirroring the crest itself —
- * with gold used throughout as the accent on top of both. See
- * docs/architecture.md.
- */
 :root {
+  --font-body: 'Creato Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Creato Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
   --background: #ffffff;
   --foreground: #14213d;
 
@@ -32,17 +76,12 @@
   --primary: #14309c;
   --primary-foreground: #ffffff;
 
-  /* Pale blue-white, not a tinted gray — keeps "secondary" surfaces still
-     reading as white-family rather than introducing a second hue. */
   --secondary: #eef3fa;
   --secondary-foreground: #1b3a63;
 
   --muted: #f2f5fa;
   --muted-foreground: #5b6b82;
 
-  /* Heritage gold — the crest's trim and lettering. Used for small
-     highlights, rules, icons, quote marks — never as a large fill (fails
-     contrast at that scale). */
   --accent: #b8860b;
   --accent-foreground: #2a1d08;
 
@@ -55,8 +94,7 @@
 
   --radius: 0.5rem;
 
-  /* Full scales for direct utility use (bg-blue-700, text-gold-600, ...).
-     blue-700 (#14309c) is matched directly to the crest's field color. */
+  /* Full scales for direct utility use */
   --color-blue-50: #eef1fc;
   --color-blue-100: #d3daf7;
   --color-blue-200: #a8b8ef;
@@ -80,9 +118,6 @@
   --color-gold-800: #523b05;
   --color-gold-900: #302303;
 
-  /* Cross red — the crest's cross-and-flame mark. A third brand color, used
-     deliberately (the brand mark itself, urgent/featured badges) rather
-     than scattered everywhere — blue still carries the large surfaces. */
   --color-red-50: #fdeceb;
   --color-red-100: #f9cac6;
   --color-red-200: #f2a29b;
@@ -111,7 +146,7 @@
   --color-charcoal-800: #121b30;
   --color-charcoal-900: #0a1220;
 
-  /* Brand Palette from Reference Design */
+  /* Brand Palette */
   --navy-deep: #14309c;
   --navy-dark: #0f2478;
   --gold-vibrant: #ffc72c;
@@ -142,8 +177,8 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-  --font-sans: var(--font-body);
-  --font-serif: var(--font-heading);
+  --font-sans: 'Creato Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Creato Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
@@ -173,9 +208,11 @@
 }
 
 body {
+  font-family: 'Creato Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--background);
   color: var(--foreground);
 }
+
 
 /* The admin portal's theme is switched manually (see the header toggle in
    admin/layout.tsx), independent of the visitor's OS/browser preference —

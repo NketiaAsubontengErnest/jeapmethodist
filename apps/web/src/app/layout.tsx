@@ -1,19 +1,7 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Lato, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
-
-const ebGaramond = EB_Garamond({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const lato = Lato({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["300", "400", "700", "900"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -26,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | Methodist Church Ghana",
   },
   description:
-    "A Methodist Church Ghana society website and church management portal. Placeholder content — to be replaced with the church's own details.",
+    "A Methodist Church Ghana society website and church management portal.",
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",
@@ -38,7 +26,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${ebGaramond.variable} ${lato.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistMono.variable} h-full antialiased`}
+      style={{ fontFamily: "'Creato Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}
     >
       <body className="min-h-full flex flex-col font-sans">
         {/* Runs before first paint, ahead of React hydration, so a hard
@@ -58,3 +47,4 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </html>
   );
 }
+
