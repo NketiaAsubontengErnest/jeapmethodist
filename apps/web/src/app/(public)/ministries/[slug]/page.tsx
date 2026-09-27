@@ -2,9 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { fetchPublicMinistryBySlug, MinistryPublicDetail } from '@/lib/api/public';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Clock, MapPin, User, Send } from 'lucide-react';
+import { ChevronLeft, Clock, MapPin, User, Send, Users } from 'lucide-react';
 
 export const revalidate = 60;
 
@@ -49,83 +48,106 @@ export default async function MinistryDetailPage({ params }: Props) {
     : null;
 
   return (
-    <div className="min-h-screen bg-white py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Back link */}
-        <div>
-          <Link
-            href="/ministries"
-            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" /> Back to All Organizations
-          </Link>
-        </div>
+    <div className="flex flex-col min-h-screen bg-white text-slate-900">
+      {/* 1. HERO SECTION — Royal Blue #14309c Background */}
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 text-white">
+        <div className="mx-auto max-w-4xl space-y-6">
+          <div>
+            <Link
+              href="/ministries"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#FFC72C] hover:underline"
+            >
+              <ChevronLeft className="w-4 h-4" /> Back to All Organizations
+            </Link>
+          </div>
 
-        {/* Hero Card */}
-        <div className="bg-white border border-border rounded-2xl p-6 sm:p-10 shadow-sm space-y-6">
-          {typeof ministry._count?.members === 'number' && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <Badge className="bg-blue-50 text-primary border-transparent">
-                {ministry._count.members} Member{ministry._count.members === 1 ? '' : 's'}
+          <div className="space-y-3">
+            {typeof ministry._count?.members === 'number' && (
+              <Badge className="bg-[#FFC72C]/20 border border-[#FFC72C]/40 text-[#FFC72C] font-extrabold uppercase text-[11px] tracking-wider px-3 py-1">
+                <Users className="w-3.5 h-3.5 mr-1" /> {ministry._count.members} Registered Member
+                {ministry._count.members === 1 ? '' : 's'}
               </Badge>
-            </div>
-          )}
+            )}
 
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-foreground">
-            {ministry.name}
-          </h1>
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white">
+              {ministry.name}
+            </h1>
 
-          {ministry.description && (
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {ministry.description}
-            </p>
-          )}
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-border">
-            <div className="flex items-center gap-3 text-foreground">
-              <Clock className="w-5 h-5 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">Meeting Schedule</p>
-                <p className="text-sm font-semibold">{ministry.meetingSchedule || 'Contact us for details'}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-foreground">
-              <MapPin className="w-5 h-5 text-primary" />
-              <div>
-                <p className="text-xs text-muted-foreground">Location</p>
-                <p className="text-sm font-semibold">{ministry.meetingVenue || 'Main Church Hall / Chapel'}</p>
-              </div>
-            </div>
-
-            {leaderName && (
-              <div className="flex items-center gap-3 text-foreground">
-                <User className="w-5 h-5 text-primary" />
-                <div>
-                  <p className="text-xs text-muted-foreground">Organization Leader</p>
-                  <p className="text-sm font-semibold">{leaderName}</p>
-                </div>
-              </div>
+            {ministry.description && (
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-3xl">
+                {ministry.description}
+              </p>
             )}
           </div>
         </div>
+      </section>
 
-        {/* Sidebar CTA */}
-        <Card className="rounded-2xl border-border border-t-4 border-t-gold-500 bg-white">
-          <CardContent className="p-6 space-y-4">
-            <h3 className="font-serif text-lg font-bold text-foreground">Want to Join?</h3>
-            <p className="text-sm text-muted-foreground">
-              We welcome new members! Simply attend one of our upcoming weekly meetings or contact us to get connected.
-            </p>
+      {/* 2. DETAILS & JOIN SECTION — White Background */}
+      <section className="bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
+          {/* Information Grid Card */}
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-10 shadow-sm space-y-6">
+            <h2 className="font-serif text-2xl font-bold text-slate-900 border-b border-slate-100 pb-3">
+              Meeting &amp; Organization Details
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#14309c]">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Meeting Schedule</p>
+                  <p className="text-sm font-bold text-slate-900 mt-0.5">
+                    {ministry.meetingSchedule || 'Contact us for details'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#14309c]">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Meeting Venue</p>
+                  <p className="text-sm font-bold text-slate-900 mt-0.5">
+                    {ministry.meetingVenue || 'Main Church Hall / Chapel'}
+                  </p>
+                </div>
+              </div>
+
+              {leaderName && (
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#14309c]">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Fellowship Leader</p>
+                    <p className="text-sm font-bold text-slate-900 mt-0.5">{leaderName}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Join CTA Card */}
+          <div className="rounded-2xl border border-slate-200 border-t-4 border-t-[#FFC72C] bg-slate-50 p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="space-y-1 text-center sm:text-left">
+              <h3 className="font-serif text-2xl font-bold text-slate-900">Want to Join This Organization?</h3>
+              <p className="text-xs text-slate-600 max-w-md">
+                We warmly welcome all new members! Attend any of our weekly meetings or contact the Secretariat to get connected.
+              </p>
+            </div>
+
             <Link
               href="/contact"
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg text-sm transition-colors shadow sm:w-auto"
+              className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#14309c] hover:bg-[#0f2478] text-white font-extrabold rounded-xl text-xs transition-all shadow-md hover:scale-105"
             >
-              <Send className="w-4 h-4" /> Contact Fellowship Leader
+              <Send className="w-4 h-4 text-[#FFC72C]" /> Contact Fellowship Leader
             </Link>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
