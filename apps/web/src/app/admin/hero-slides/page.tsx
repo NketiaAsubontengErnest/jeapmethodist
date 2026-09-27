@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Link as LinkIcon,
   Globe,
+  Type,
 } from 'lucide-react';
 import {
   fetchMediaAdmin,
@@ -40,6 +41,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetBody,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 type AddMode = 'upload' | 'url';
 
@@ -57,6 +68,10 @@ export default function HeroSlidesAdminPage() {
     queryKey: ['admin-settings-hero'],
     queryFn: fetchSettings,
   });
+
+  // Off-canvas Sheet states
+  const [heroTextSheetOpen, setHeroTextSheetOpen] = useState(false);
+  const [addSlideSheetOpen, setAddSlideSheetOpen] = useState(false);
 
   // State — upload tab
   const [addMode, setAddMode] = useState<AddMode>('upload');
@@ -128,6 +143,7 @@ export default function HeroSlidesAdminPage() {
       setPreviewUrl(null);
       setSlideTitle('');
       setSlideDescription('');
+      setAddSlideSheetOpen(false);
     },
     onError: (err) => {
       const msg = err instanceof ApiError ? err.message : 'Failed to upload hero slide image.';
@@ -154,6 +170,7 @@ export default function HeroSlidesAdminPage() {
       setExternalUrl('');
       setUrlSlideTitle('');
       setUrlSlideDescription('');
+      setAddSlideSheetOpen(false);
     },
     onError: (err) => {
       const msg = err instanceof ApiError ? err.message : 'Failed to link external image.';
@@ -201,6 +218,7 @@ export default function HeroSlidesAdminPage() {
       toast.success('Hero title & subtitle updated!');
       queryClient.invalidateQueries({ queryKey: ['admin-settings-hero'] });
       queryClient.invalidateQueries({ queryKey: ['public-settings'] });
+      setHeroTextSheetOpen(false);
     },
     onError: (err) => {
       toast.error('Failed to save settings', err instanceof ApiError ? err.message : 'Error updating text settings');
@@ -210,241 +228,251 @@ export default function HeroSlidesAdminPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-          <SlidersHorizontal className="h-6 w-6 text-[#14309c]" />
-          Hero Section Slides
-        </h1>
-        <p className="text-sm text-slate-600 mt-1">
-          Add slide images via file upload or external link (Facebook, Cloudinary, etc.) and configure the homepage hero banner.
-        </p>
-      </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            <SlidersHorizontal className="h-6 w-6 text-[#14309c]" />
+            Hero Section Slides
+          </h1>
+          <p className="text-sm text-slate-600 mt-1">
+            Manage slide images and main headline for the homepage hero banner.
+          </p>
+        </div>
 
-      {/* Hero Headline Text Settings */}
-      <Card className="border border-slate-200 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-bold text-slate-900">Main Hero Headline &amp; Subtitle</CardTitle>
-          <CardDescription>
-            Primary heading and subtitle displayed over the homepage hero section.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="hero_title" className="font-semibold text-xs text-slate-700">
-                Hero Headline
-              </Label>
-              <Input
-                id="hero_title"
-                placeholder="e.g. Welcome to Trinity Methodist Society"
-                value={heroTitle}
-                onChange={(e) => setHeroTitle(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="hero_subtitle" className="font-semibold text-xs text-slate-700">
-                Hero Subtitle
-              </Label>
-              <Input
-                id="hero_subtitle"
-                placeholder="e.g. Worshipping God, Serving Humanity"
-                value={heroSubtitle}
-                onChange={(e) => setHeroSubtitle(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <Button
-              onClick={() => settingsMutation.mutate()}
-              disabled={settingsMutation.isPending || isLoadingSettings}
-              className="bg-[#14309c] text-white hover:bg-[#0f2478]"
-            >
-              {settingsMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              Save Hero Text
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Add Slide Card — Tabbed */}
-      <Card className="border border-slate-200 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-[#14309c]" />
-            Add New Hero Slide
-          </CardTitle>
-          <CardDescription>
-            Upload an image from your device or paste a direct image link from Facebook albums, Cloudinary, Google Photos, or any public image URL.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
-
-          {/* Mode Toggle */}
-          <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1 w-fit">
-            <button
-              type="button"
-              onClick={() => setAddMode('upload')}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all ${
-                addMode === 'upload'
-                  ? 'bg-white text-[#14309c] shadow-sm border border-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <Upload className="h-4 w-4" />
-              Upload File
-            </button>
-            <button
-              type="button"
-              onClick={() => setAddMode('url')}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all ${
-                addMode === 'url'
-                  ? 'bg-white text-[#14309c] shadow-sm border border-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <LinkIcon className="h-4 w-4" />
-              Link from URL
-            </button>
-          </div>
-
-          {/* ── Upload Tab ── */}
-          {addMode === 'upload' && (
-            <div className="grid gap-6 md:grid-cols-12 items-start">
-              {/* File Picker */}
-              <div className="md:col-span-5 space-y-3">
-                <Label className="font-semibold text-xs text-slate-700">Select Image File</Label>
-                <div
-                  className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 p-6 transition-all hover:border-[#14309c] bg-slate-50 cursor-pointer overflow-hidden min-h-[180px]"
-                  onClick={() => document.getElementById('hero-file-input')?.click()}
-                >
-                  {previewUrl ? (
-                    <div className="relative w-full h-44 rounded-lg overflow-hidden border border-slate-200">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <span className="text-xs font-bold text-white bg-black/60 px-3 py-1.5 rounded-md">Change Image</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center space-y-2">
-                      <Upload className="mx-auto h-9 w-9 text-slate-400" />
-                      <p className="text-xs font-semibold text-slate-700">Click to choose image file</p>
-                      <p className="text-[11px] text-slate-500">PNG, JPG, WEBP up to 10 MB</p>
-                    </div>
-                  )}
-                  <input
-                    id="hero-file-input"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Off-canvas Sheet 1: Main Hero Headline & Subtitle */}
+          <Sheet open={heroTextSheetOpen} onOpenChange={setHeroTextSheetOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-50">
+                <Type className="mr-2 h-4 w-4 text-[#14309c]" />
+                Main Headline &amp; Subtitle
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <Type className="h-5 w-5 text-[#14309c]" />
+                  Hero Headline &amp; Subtitle
+                </SheetTitle>
+                <SheetDescription>
+                  Primary heading and subtitle displayed over the homepage hero section.
+                </SheetDescription>
+              </SheetHeader>
+              <SheetBody className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="hero_title" className="font-semibold text-xs text-slate-700">
+                    Hero Headline
+                  </Label>
+                  <Input
+                    id="hero_title"
+                    placeholder="e.g. Welcome to Trinity Methodist Society"
+                    value={heroTitle}
+                    onChange={(e) => setHeroTitle(e.target.value)}
                   />
                 </div>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hero_subtitle" className="font-semibold text-xs text-slate-700">
+                    Hero Subtitle
+                  </Label>
+                  <Input
+                    id="hero_subtitle"
+                    placeholder="e.g. Worshipping God, Serving Humanity"
+                    value={heroSubtitle}
+                    onChange={(e) => setHeroSubtitle(e.target.value)}
+                  />
+                </div>
+              </SheetBody>
+              <SheetFooter>
+                <Button
+                  onClick={() => settingsMutation.mutate()}
+                  disabled={settingsMutation.isPending || isLoadingSettings}
+                  className="bg-[#14309c] text-white hover:bg-[#0f2478] w-full"
+                >
+                  {settingsMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  Save Hero Text
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
 
-              {/* Metadata */}
-              <div className="md:col-span-7 space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="slide_title" className="font-semibold text-xs text-slate-700">Caption Title (Optional)</Label>
-                  <Input id="slide_title" placeholder="e.g. Annual Harvest Thanksgiving 2026" value={slideTitle} onChange={(e) => setSlideTitle(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="slide_desc" className="font-semibold text-xs text-slate-700">Subtitle / Details (Optional)</Label>
-                  <Textarea id="slide_desc" rows={3} placeholder="e.g. Join us as we praise the Lord for His bountiful blessings." value={slideDescription} onChange={(e) => setSlideDescription(e.target.value)} />
-                </div>
-                <div className="flex justify-end pt-1">
-                  <Button
-                    onClick={() => uploadMutation.mutate()}
-                    disabled={!selectedFile || isUploading}
-                    className="bg-[#14309c] text-white hover:bg-[#0f2478]"
+          {/* Off-canvas Sheet 2: Add New Hero Slide */}
+          <Sheet open={addSlideSheetOpen} onOpenChange={setAddSlideSheetOpen}>
+            <SheetTrigger asChild>
+              <Button className="bg-[#14309c] text-white hover:bg-[#0f2478]">
+                <Plus className="mr-2 h-4 w-4" />
+                Add New Hero Slide
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="sm:max-w-lg overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2">
+                  <Plus className="h-5 w-5 text-[#14309c]" />
+                  Add New Hero Slide
+                </SheetTitle>
+                <SheetDescription>
+                  Upload an image from your device or paste a direct image link from Facebook albums, Cloudinary, or any public image URL.
+                </SheetDescription>
+              </SheetHeader>
+              <SheetBody className="space-y-5 py-4">
+                {/* Mode Toggle */}
+                <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-1 w-full justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setAddMode('upload')}
+                    className={`flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all ${
+                      addMode === 'upload'
+                        ? 'bg-white text-[#14309c] shadow-sm border border-slate-200'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
                   >
-                    {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                    Upload Slide
-                  </Button>
+                    <Upload className="h-4 w-4" />
+                    Upload File
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddMode('url')}
+                    className={`flex-1 flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-all ${
+                      addMode === 'url'
+                        ? 'bg-white text-[#14309c] shadow-sm border border-slate-200'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    <LinkIcon className="h-4 w-4" />
+                    Link from URL
+                  </button>
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* ── Link from URL Tab ── */}
-          {addMode === 'url' && (
-            <div className="space-y-5">
-              {/* Help tip */}
-              <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
-                <Globe className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-500" />
-                <div className="text-xs text-blue-700 leading-relaxed">
-                  <p className="font-bold mb-1">How to get a direct image link from Facebook:</p>
-                  <ol className="list-decimal list-inside space-y-0.5 ml-1">
-                    <li>Open the Facebook album and click on the photo you want.</li>
-                    <li>Right-click (or long-press) the image and choose <strong>"Copy image address"</strong>.</li>
-                    <li>Paste the link below. It should end with <code>.jpg</code>, <code>.png</code>, or <code>.webp</code>.</li>
-                  </ol>
-                  <p className="mt-2 text-blue-600">You can also paste links from <strong>Google Drive</strong>, <strong>Cloudinary</strong>, <strong>Dropbox</strong>, or any public direct image URL.</p>
-                </div>
-              </div>
+                {/* ── Upload Tab ── */}
+                {addMode === 'upload' && (
+                  <div className="space-y-4">
+                    {/* File Picker */}
+                    <div className="space-y-2">
+                      <Label className="font-semibold text-xs text-slate-700">Select Image File</Label>
+                      <div
+                        className="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 p-6 transition-all hover:border-[#14309c] bg-slate-50 cursor-pointer overflow-hidden min-h-[160px]"
+                        onClick={() => document.getElementById('hero-file-input-sheet')?.click()}
+                      >
+                        {previewUrl ? (
+                          <div className="relative w-full h-40 rounded-lg overflow-hidden border border-slate-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                              <span className="text-xs font-bold text-white bg-black/60 px-3 py-1.5 rounded-md">Change Image</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center space-y-2">
+                            <Upload className="mx-auto h-8 w-8 text-slate-400" />
+                            <p className="text-xs font-semibold text-slate-700">Click to choose image file</p>
+                            <p className="text-[11px] text-slate-500">PNG, JPG, WEBP up to 10 MB</p>
+                          </div>
+                        )}
+                        <input
+                          id="hero-file-input-sheet"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                    </div>
 
-              <div className="grid gap-5 md:grid-cols-12 items-start">
-                <div className="md:col-span-7 space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="ext_url" className="font-semibold text-xs text-slate-700">
-                      Direct Image URL <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="ext_url"
-                      type="url"
-                      placeholder="https://scontent.example.com/photo.jpg"
-                      value={externalUrl}
-                      onChange={(e) => setExternalUrl(e.target.value)}
-                      className="font-mono text-xs"
-                    />
+                    {/* Metadata */}
+                    <div className="space-y-2">
+                      <Label htmlFor="sheet_slide_title" className="font-semibold text-xs text-slate-700">Caption Title (Optional)</Label>
+                      <Input id="sheet_slide_title" placeholder="e.g. Annual Harvest Thanksgiving 2026" value={slideTitle} onChange={(e) => setSlideTitle(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="sheet_slide_desc" className="font-semibold text-xs text-slate-700">Subtitle / Details (Optional)</Label>
+                      <Textarea id="sheet_slide_desc" rows={3} placeholder="e.g. Join us as we praise the Lord for His bountiful blessings." value={slideDescription} onChange={(e) => setSlideDescription(e.target.value)} />
+                    </div>
+                    <Button
+                      onClick={() => uploadMutation.mutate()}
+                      disabled={!selectedFile || isUploading}
+                      className="bg-[#14309c] text-white hover:bg-[#0f2478] w-full"
+                    >
+                      {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                      Upload Slide
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="url_title" className="font-semibold text-xs text-slate-700">Caption Title (Optional)</Label>
-                    <Input id="url_title" placeholder="e.g. Men's Fellowship Camp 2026" value={urlSlideTitle} onChange={(e) => setUrlSlideTitle(e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="url_desc" className="font-semibold text-xs text-slate-700">Subtitle / Details (Optional)</Label>
-                    <Textarea id="url_desc" rows={2} placeholder="Short description of the image…" value={urlSlideDescription} onChange={(e) => setUrlSlideDescription(e.target.value)} />
-                  </div>
-                  <div className="flex justify-end pt-1">
+                )}
+
+                {/* ── Link from URL Tab ── */}
+                {addMode === 'url' && (
+                  <div className="space-y-4">
+                    {/* Help tip */}
+                    <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3.5">
+                      <Globe className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
+                      <div className="text-xs text-blue-700 leading-relaxed">
+                        <p className="font-bold mb-1">How to get a direct image link from Facebook:</p>
+                        <ol className="list-decimal list-inside space-y-0.5 ml-1">
+                          <li>Open the Facebook album photo.</li>
+                          <li>Right-click image and select <strong>"Copy image address"</strong>.</li>
+                          <li>Paste the direct URL below.</li>
+                        </ol>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="sheet_ext_url" className="font-semibold text-xs text-slate-700">
+                        Direct Image URL <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="sheet_ext_url"
+                        type="url"
+                        placeholder="https://scontent.example.com/photo.jpg"
+                        value={externalUrl}
+                        onChange={(e) => setExternalUrl(e.target.value)}
+                        className="font-mono text-xs"
+                      />
+                    </div>
+
+                    {/* Live Preview */}
+                    <div className="space-y-2">
+                      <Label className="font-semibold text-xs text-slate-700 block">Live Preview</Label>
+                      <div className="h-36 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 overflow-hidden flex items-center justify-center">
+                        {externalUrl.trim() ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={externalUrl}
+                            alt="Preview"
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="text-center text-slate-400">
+                            <ImageIcon className="mx-auto h-7 w-7 mb-1" />
+                            <p className="text-xs">Paste a URL to preview</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="sheet_url_title" className="font-semibold text-xs text-slate-700">Caption Title (Optional)</Label>
+                      <Input id="sheet_url_title" placeholder="e.g. Men's Fellowship Camp 2026" value={urlSlideTitle} onChange={(e) => setUrlSlideTitle(e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="sheet_url_desc" className="font-semibold text-xs text-slate-700">Subtitle / Details (Optional)</Label>
+                      <Textarea id="sheet_url_desc" rows={2} placeholder="Short description of the image…" value={urlSlideDescription} onChange={(e) => setUrlSlideDescription(e.target.value)} />
+                    </div>
                     <Button
                       onClick={() => externalUrlMutation.mutate()}
                       disabled={!externalUrl.trim() || externalUrlMutation.isPending}
-                      className="bg-[#14309c] text-white hover:bg-[#0f2478]"
+                      className="bg-[#14309c] text-white hover:bg-[#0f2478] w-full"
                     >
                       {externalUrlMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LinkIcon className="mr-2 h-4 w-4" />}
                       Link Slide Image
                     </Button>
                   </div>
-                </div>
-
-                {/* Live Preview */}
-                <div className="md:col-span-5">
-                  <Label className="font-semibold text-xs text-slate-700 block mb-2">Live Preview</Label>
-                  <div className="h-44 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 overflow-hidden flex items-center justify-center">
-                    {externalUrl.trim() ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={externalUrl}
-                        alt="Preview"
-                        className="h-full w-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <div className="text-center text-slate-400">
-                        <ImageIcon className="mx-auto h-8 w-8 mb-1" />
-                        <p className="text-xs">Paste a URL to preview</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                )}
+              </SheetBody>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
 
       {/* Slides List */}
       <Card className="border border-slate-200 shadow-sm">
@@ -465,7 +493,7 @@ export default function HeroSlidesAdminPage() {
             <div className="py-12 text-center text-slate-500 space-y-2">
               <ImageIcon className="mx-auto h-12 w-12 text-slate-300" />
               <p className="text-sm font-medium">No hero slide images yet.</p>
-              <p className="text-xs text-slate-400">Upload a file or link an image URL above.</p>
+              <p className="text-xs text-slate-400">Click &quot;Add New Hero Slide&quot; above to upload or link an image.</p>
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
