@@ -188,9 +188,6 @@ export default function GivingPage() {
           <h1 className="font-serif text-4xl font-bold text-slate-900 sm:text-5xl tracking-tight">
             Online Giving
           </h1>
-          <p className="text-base text-slate-600">
-            &ldquo;Gain all you can, save all you can, give all you can.&rdquo; — John Wesley. Support the Gospel, church expansion, and community relief securely via <strong>Paystack</strong> and <strong>Moolre</strong>.
-          </p>
         </div>
 
         {/* Giving Scripture Banner — Royal Blue & Crimson Accent */}
@@ -201,9 +198,6 @@ export default function GivingPage() {
               &ldquo;Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver.&rdquo;
             </p>
           </div>
-          <div className="shrink-0 bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center">
-            <p className="text-xs text-[#FFC72C] font-extrabold uppercase tracking-wider">Methodist Stewardship</p>
-          </div>
         </div>
 
         {/* MAIN ONLINE DONATION PORTAL CARD */}
@@ -213,9 +207,6 @@ export default function GivingPage() {
               <h2 className="font-serif text-2xl font-bold text-white flex items-center gap-2">
                 <CreditCard className="h-6 w-6 text-[#FFC72C]" /> Instant Online Donation
               </h2>
-              <p className="text-xs text-slate-200">
-                Pay Tithes, Offerings &amp; Harvest Pledges via Paystack, Moolre, Debit/Credit Card or Mobile Money.
-              </p>
             </div>
           </div>
 
@@ -465,24 +456,11 @@ export default function GivingPage() {
 
             <div className="text-center pt-2 border-t border-slate-100">
               <p className="text-[11px] text-slate-500">
-                Secure processing via encrypted Methodist payment integration.
+                Secure processing.
               </p>
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Security & Accountability Note */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[#14309c]">
-            <ShieldCheck className="w-7 h-7" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-md font-bold text-slate-900">Financial Transparency &amp; Stewardship</h3>
-            <p className="text-xs text-slate-600">
-              All contributions are audited by the Society Finance Committee and Synod auditors according to the Financial Regulations of the Methodist Church Ghana. Receipts for digital payments can be requested at the church office.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
