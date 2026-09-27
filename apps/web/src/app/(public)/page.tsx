@@ -116,7 +116,7 @@ export default function PublicHomePage() {
             <div className="space-y-6 lg:col-span-7">
               {(settings?.church_name || settings?.society_name) && (
                 <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-                  {[settings?.church_name, settings?.society_name].filter(Boolean).join(' • ').toUpperCase()}
+                  {settings?.church_name?.toUpperCase()}
                 </span>
               )}
 
@@ -146,7 +146,7 @@ export default function PublicHomePage() {
                   className="rounded-lg bg-[#FFC72C] px-7 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-all hover:bg-amber-400 hover:scale-[1.02]"
                 >
                   <Link href="/giving" className="flex items-center gap-2">
-                    <Heart className="h-4 w-4 fill-[#14309c]" /> Donate Online
+                    <Heart className="h-4 w-4 fill-[#14309c]" /> Donate
                   </Link>
                 </Button>
 
@@ -155,7 +155,7 @@ export default function PublicHomePage() {
                   size="lg"
                   className="rounded-lg border border-white/30 bg-white/10 px-6 py-6 text-sm font-bold text-white shadow backdrop-blur-sm transition-all hover:bg-white/20"
                 >
-                  <Link href="/visit-us">Join Us This Sunday</Link>
+                  <Link href="/visit-us">Visit Us</Link>
                 </Button>
 
                 <Button
@@ -194,12 +194,12 @@ export default function PublicHomePage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <h3 className="font-serif text-2xl font-bold">Walking in Divine Grace</h3>
+                    <h3 className="font-serif text-2xl font-bold">Sunday Divine Service</h3>
                     <p className="text-xs leading-relaxed text-slate-300">
                       Join our vibrant services every Sunday. Be refreshed, empowered, and built up in faith through God&apos;s holy word.
                     </p>
                     <div className="border-t border-white/10 pt-3 text-xs font-semibold text-[#FFC72C]">
-                      Services: 7:00 AM &amp; 9:45 AM
+                      Service: 8:00 AM
                     </div>
                     <Button
                       asChild
@@ -276,22 +276,20 @@ export default function PublicHomePage() {
                   <button
                     type="button"
                     onClick={() => setSubmissionType('prayer')}
-                    className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
-                      submissionType === 'prayer'
-                        ? 'bg-[#14309c] text-white border-[#14309c]'
-                        : 'bg-slate-50 text-slate-600 border-slate-200'
-                    }`}
+                    className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${submissionType === 'prayer'
+                      ? 'bg-[#14309c] text-white border-[#14309c]'
+                      : 'bg-slate-50 text-slate-600 border-slate-200'
+                      }`}
                   >
                     Prayer Request
                   </button>
                   <button
                     type="button"
                     onClick={() => setSubmissionType('thanksgiving')}
-                    className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
-                      submissionType === 'thanksgiving'
-                        ? 'bg-amber-500 text-white border-amber-500'
-                        : 'bg-slate-50 text-slate-600 border-slate-200'
-                    }`}
+                    className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${submissionType === 'thanksgiving'
+                      ? 'bg-amber-500 text-white border-amber-500'
+                      : 'bg-slate-50 text-slate-600 border-slate-200'
+                      }`}
                   >
                     Thanksgiving
                   </button>
@@ -352,9 +350,8 @@ export default function PublicHomePage() {
                 <Button
                   type="submit"
                   disabled={status === 'submitting'}
-                  className={`w-full text-xs font-bold py-2.5 rounded-lg ${
-                    submissionType === 'thanksgiving' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-[#14309c] hover:bg-[#0f2478] text-white'
-                  }`}
+                  className={`w-full text-xs font-bold py-2.5 rounded-lg ${submissionType === 'thanksgiving' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-[#14309c] hover:bg-[#0f2478] text-white'
+                    }`}
                 >
                   <Send className="w-3.5 h-3.5 mr-1.5" />
                   {status === 'submitting' ? 'Submitting…' : submissionType === 'thanksgiving' ? 'Submit Thanksgiving' : 'Submit Prayer Request'}
@@ -577,10 +574,10 @@ export default function PublicHomePage() {
                     <span className="font-extrabold uppercase tracking-wider text-[#FFC72C]">
                       {n.publishedAt
                         ? new Date(n.publishedAt).toLocaleDateString(undefined, {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })
                         : 'Recently'}
                     </span>
                     <div className="text-slate-400 group-hover:text-slate-600">
