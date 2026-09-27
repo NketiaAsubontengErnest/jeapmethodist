@@ -89,6 +89,8 @@ export default function GivingPage() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
 
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+
   const sessionsQuery = useQuery({ queryKey: ['offering-sessions', page], queryFn: () => fetchOfferingSessions({ page }) });
   const programmeTypesQuery = useQuery({ queryKey: ['programme-types'], queryFn: fetchProgrammeTypes });
   const incomeCategoriesQuery = useQuery({ queryKey: ['income-categories'], queryFn: fetchIncomeCategories });
@@ -229,258 +231,272 @@ export default function GivingPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Giving</h1>
           <p className="text-muted-foreground">Offering sessions and category totals collected per service</p>
         </div>
-        {canCreate && (
-          <div className="flex gap-2">
-          <Sheet open={donationOpen} onOpenChange={setDonationOpen}>
+        <div className="flex flex-wrap gap-2">
+          {/* Off-canvas Giving Categories Sheet */}
+          <Sheet open={categoriesOpen} onOpenChange={setCategoriesOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" className="print:hidden">
-                <Plus className="h-4 w-4" />
-                Record a donation
+                <Edit className="h-4 w-4 mr-1.5" />
+                Giving Categories
               </Button>
             </SheetTrigger>
-            <SheetContent>
-              <form
-                onSubmit={donationForm.handleSubmit((values) => {
-                  setDonationError(null);
-                  donationMutation.mutate(values);
-                })}
-                className="flex h-full flex-col"
-                noValidate
-              >
-                <SheetHeader>
-                  <SheetTitle>Record a donation</SheetTitle>
-                  <SheetDescription>
-                    For a named or one-off gift outside a Sunday offering session.
-                  </SheetDescription>
-                </SheetHeader>
-                <SheetBody className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="d-date">Date</Label>
-                      <Input id="d-date" type="date" {...donationForm.register('date')} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="d-amount">Amount (GHS)</Label>
-                      <Input id="d-amount" type="number" step="0.01" min="0" {...donationForm.register('amount')} />
-                    </div>
+            <SheetContent className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>Giving Categories / Purposes</SheetTitle>
+                <SheetDescription>
+                  Categories shown on the public <strong>/giving</strong> page. Add, edit, or delete entries. Changes save automatically.
+                </SheetDescription>
+              </SheetHeader>
+              <SheetBody className="space-y-4 py-4">
+                {settingsQuery.isLoading ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Loading categories…
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="d-category">Category</Label>
-                    <Controller
-                      control={donationForm.control}
-                      name="incomeCategoryId"
-                      render={({ field }) => (
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger id="d-category">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {incomeCategoriesQuery.data?.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>
-                                {c.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="d-donor">Donor name (optional)</Label>
-                    <Input id="d-donor" {...donationForm.register('donorName')} />
-                  </div>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" {...donationForm.register('isAnonymous')} className="h-4 w-4 rounded border-input" />
-                    Keep this donor anonymous
-                  </label>
-                  {donationError && <p className="text-sm text-destructive">{donationError}</p>}
-                </SheetBody>
-                <SheetFooter>
-                  <Button type="submit" disabled={donationMutation.isPending}>
-                    {donationMutation.isPending ? 'Saving…' : 'Save donation'}
-                  </Button>
-                </SheetFooter>
-              </form>
-            </SheetContent>
-          </Sheet>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button className="print:hidden">
-                <Plus className="h-4 w-4" />
-                New offering session
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <form
-                onSubmit={handleSubmit((values) => {
-                  setError(null);
-                  createMutation.mutate(values);
-                })}
-                className="flex h-full flex-col"
-                noValidate
-              >
-                <SheetHeader>
-                  <SheetTitle>Start an offering session</SheetTitle>
-                  <SheetDescription>Add category totals (Tithe, Missions, ...) on the next screen.</SheetDescription>
-                </SheetHeader>
-                <SheetBody className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="programmeTypeId">Programme</Label>
-                    <Controller
-                      control={control}
-                      name="programmeTypeId"
-                      render={({ field }) => (
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger id="programmeTypeId">
-                            <SelectValue placeholder="Select a programme" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {programmeTypesQuery.data?.map((t) => (
-                              <SelectItem key={t.id} value={t.id}>
-                                {t.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    {formState.errors.programmeTypeId && (
-                      <p className="text-sm text-destructive">{formState.errors.programmeTypeId.message}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="sessionDate">Date</Label>
-                    <Input id="sessionDate" type="date" {...register('sessionDate')} />
-                    {formState.errors.sessionDate && (
-                      <p className="text-sm text-destructive">{formState.errors.sessionDate.message}</p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="notes">Notes (optional)</Label>
-                    <Input id="notes" {...register('notes')} />
-                  </div>
-                  {error && <p className="text-sm text-destructive">{error}</p>}
-                </SheetBody>
-                <SheetFooter>
-                  <Button type="submit" disabled={createMutation.isPending}>
-                    {createMutation.isPending ? 'Starting…' : 'Start session'}
-                  </Button>
-                </SheetFooter>
-              </form>
-            </SheetContent>
-          </Sheet>
-          </div>
-        )}
-      </div>
-
-      {/* ── Giving Categories Management Card ── */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base font-bold">Giving Categories / Purposes</CardTitle>
-          <CardDescription>
-            These categories are shown on the public <strong>/giving</strong> page. Add, rename, or remove
-            any entry — changes save instantly.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {settingsQuery.isLoading ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading categories…
-            </div>
-          ) : (
-            <>
-              {/* Existing categories list */}
-              <div className="space-y-2">
-                {categories.length === 0 && (
-                  <p className="text-sm text-muted-foreground italic">No categories configured yet. Add one below.</p>
-                )}
-                {categories.map((cat, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
-                  >
-                    {editingIndex === idx ? (
-                      <>
+                ) : (
+                  <>
+                    {/* Add new category */}
+                    <div className="space-y-2 pb-2 border-b border-slate-100">
+                      <Label className="text-xs font-semibold text-slate-700">Add New Category</Label>
+                      <div className="flex items-center gap-2">
                         <Input
-                          value={editingValue}
-                          onChange={(e) => setEditingValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleSaveEdit();
-                            if (e.key === 'Escape') { setEditingIndex(null); setEditingValue(''); }
-                          }}
-                          className="h-8 flex-1 text-sm"
-                          autoFocus
+                          placeholder="e.g. Special Mission Fund"
+                          value={newCategory}
+                          onChange={(e) => setNewCategory(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                          className="flex-1"
                         />
                         <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-green-600 hover:bg-green-50"
-                          onClick={handleSaveEdit}
+                          onClick={handleAddCategory}
+                          disabled={!newCategory.trim() || saveCategoriesMutation.isPending}
+                          className="gap-1.5"
                         >
-                          <Save className="h-3.5 w-3.5" />
+                          {saveCategoriesMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                          Add
                         </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-slate-500 hover:bg-slate-100"
-                          onClick={() => { setEditingIndex(null); setEditingValue(''); }}
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Badge variant="secondary" className="flex-1 justify-start font-normal text-sm py-1">
-                          {cat}
-                        </Badge>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
-                          onClick={() => { setEditingIndex(idx); setEditingValue(cat); }}
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                          onClick={() => handleDeleteCategory(idx)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      </div>
+                    </div>
 
-              {/* Add new category */}
-              <div className="flex items-center gap-2 pt-2">
-                <Input
-                  placeholder="e.g. Special Mission Fund"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleAddCategory}
-                  disabled={!newCategory.trim() || saveCategoriesMutation.isPending}
-                  className="gap-1.5"
-                >
-                  {saveCategoriesMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
+                    {/* Existing categories list */}
+                    <div className="space-y-2">
+                      <Label className="text-xs font-semibold text-slate-700">Existing Categories ({categories.length})</Label>
+                      {categories.length === 0 && (
+                        <p className="text-sm text-muted-foreground italic">No categories configured yet. Add one above.</p>
+                      )}
+                      {categories.map((cat, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+                        >
+                          {editingIndex === idx ? (
+                            <>
+                              <Input
+                                value={editingValue}
+                                onChange={(e) => setEditingValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveEdit();
+                                  if (e.key === 'Escape') { setEditingIndex(null); setEditingValue(''); }
+                                }}
+                                className="h-8 flex-1 text-sm bg-white"
+                                autoFocus
+                              />
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-green-600 hover:bg-green-50"
+                                onClick={handleSaveEdit}
+                              >
+                                <Save className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-slate-500 hover:bg-slate-100"
+                                onClick={() => { setEditingIndex(null); setEditingValue(''); }}
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Badge variant="secondary" className="flex-1 justify-start font-normal text-sm py-1 bg-white border border-slate-200">
+                                {cat}
+                              </Badge>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
+                                onClick={() => { setEditingIndex(idx); setEditingValue(cat); }}
+                              >
+                                <Edit className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                                onClick={() => handleDeleteCategory(idx)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </SheetBody>
+            </SheetContent>
+          </Sheet>
+
+          {canCreate && (
+            <>
+              <Sheet open={donationOpen} onOpenChange={setDonationOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="print:hidden">
                     <Plus className="h-4 w-4" />
-                  )}
-                  Add
-                </Button>
-              </div>
+                    Record a donation
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <form
+                    onSubmit={donationForm.handleSubmit((values) => {
+                      setDonationError(null);
+                      donationMutation.mutate(values);
+                    })}
+                    className="flex h-full flex-col"
+                    noValidate
+                  >
+                    <SheetHeader>
+                      <SheetTitle>Record a donation</SheetTitle>
+                      <SheetDescription>
+                        For a named or one-off gift outside a Sunday offering session.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <SheetBody className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="d-date">Date</Label>
+                          <Input id="d-date" type="date" {...donationForm.register('date')} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="d-amount">Amount (GHS)</Label>
+                          <Input id="d-amount" type="number" step="0.01" min="0" {...donationForm.register('amount')} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="d-category">Category</Label>
+                        <Controller
+                          control={donationForm.control}
+                          name="incomeCategoryId"
+                          render={({ field }) => (
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger id="d-category">
+                                <SelectValue placeholder="Select a category" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {incomeCategoriesQuery.data?.map((c) => (
+                                  <SelectItem key={c.id} value={c.id}>
+                                    {c.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="d-donor">Donor name (optional)</Label>
+                        <Input id="d-donor" {...donationForm.register('donorName')} />
+                      </div>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" {...donationForm.register('isAnonymous')} className="h-4 w-4 rounded border-input" />
+                        Keep this donor anonymous
+                      </label>
+                      {donationError && <p className="text-sm text-destructive">{donationError}</p>}
+                    </SheetBody>
+                    <SheetFooter>
+                      <Button type="submit" disabled={donationMutation.isPending}>
+                        {donationMutation.isPending ? 'Saving…' : 'Save donation'}
+                      </Button>
+                    </SheetFooter>
+                  </form>
+                </SheetContent>
+              </Sheet>
+
+              <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                  <Button className="print:hidden">
+                    <Plus className="h-4 w-4" />
+                    New offering session
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <form
+                    onSubmit={handleSubmit((values) => {
+                      setError(null);
+                      createMutation.mutate(values);
+                    })}
+                    className="flex h-full flex-col"
+                    noValidate
+                  >
+                    <SheetHeader>
+                      <SheetTitle>Start an offering session</SheetTitle>
+                      <SheetDescription>Add category totals (Tithe, Missions, ...) on the next screen.</SheetDescription>
+                    </SheetHeader>
+                    <SheetBody className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="programmeTypeId">Programme</Label>
+                        <Controller
+                          control={control}
+                          name="programmeTypeId"
+                          render={({ field }) => (
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger id="programmeTypeId">
+                                <SelectValue placeholder="Select a programme" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {programmeTypesQuery.data?.map((t) => (
+                                  <SelectItem key={t.id} value={t.id}>
+                                    {t.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {formState.errors.programmeTypeId && (
+                          <p className="text-sm text-destructive">{formState.errors.programmeTypeId.message}</p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="sessionDate">Date</Label>
+                        <Input id="sessionDate" type="date" {...register('sessionDate')} />
+                        {formState.errors.sessionDate && (
+                          <p className="text-sm text-destructive">{formState.errors.sessionDate.message}</p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="notes">Notes (optional)</Label>
+                        <Input id="notes" {...register('notes')} />
+                      </div>
+                      {error && <p className="text-sm text-destructive">{error}</p>}
+                    </SheetBody>
+                    <SheetFooter>
+                      <Button type="submit" disabled={createMutation.isPending}>
+                        {createMutation.isPending ? 'Starting…' : 'Start session'}
+                      </Button>
+                    </SheetFooter>
+                  </form>
+                </SheetContent>
+              </Sheet>
             </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
