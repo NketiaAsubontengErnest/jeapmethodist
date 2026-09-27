@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { Cross, LogOut, Loader2, User, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Cross, LogOut, Loader2, User, ChevronDown, Sun, Moon, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { NAV_ITEMS } from '@/lib/nav-items';
@@ -32,6 +32,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { data: settings } = useQuery({
     queryKey: ['public-settings'],
@@ -78,6 +79,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       // Non-fatal — the toggle still works for the rest of this session.
     }
   };
+
+  // Mobile sidebar toggle handlers
+  const openSidebar = () => setSidebarOpen(true);
+  const closeSidebar = () => setSidebarOpen(false);
 
   if (isLoading || !user) {
     return (
@@ -157,6 +162,71 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </nav>
       </aside>
 
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-50 flex" onClick={closeSidebar}>
+            {/* Sidebar panel */}
+            <aside className="w-64 flex-shrink-0 flex flex-col border-r border-border bg-card print:hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex h-16 shrink-0 items-center gap-3 border-b border-border px-5">
+                {logoSrc ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={logoSrc}
+                    alt={settings?.church_name || 'Church Logo'}
+                    className="h-9 w-9 rounded-full border border-amber-500/60 bg-white object-contain p-0.5 shrink-0"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-amber-500 bg-white text-red-600 shadow-sm">
+                    <Cross className="h-4.5 w-4.5" strokeWidth={2.5} />
+                  </div>
+                )}
+                <div className="flex flex-col min-w-0">
+                  <span className="truncate font-serif text-sm font-bold text-foreground">
+                    {settings?.church_name || 'Methodist Church'}
+                  </span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                    Church Portal
+                  </span>
+                </div>
+              </div>
+              <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+                {visibleItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+                  if (item.comingSoon) {
+                    return (
+                      <span
+                        key={item.href}
+                        title="Coming soon"
+                        className="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground/50"
+                      >
+                        <Icon className="h-4 w-4" />
+                        {item.label}
+                        <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase">Soon</span>
+                      </span>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                        isActive ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted',
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </aside>
+            {/* Dark overlay to close */}
+            <div className="flex-1 bg-black/30" />
+          </div>
+        )}
+
       <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden print:block print:h-auto print:overflow-visible">
         {/* Fixed — never scrolls with the page content */}
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 md:px-6 print:hidden">
@@ -179,6 +249,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 {settings?.church_name || 'Church Portal'}
               </span>
             </div>
+            {/* Mobile sidebar toggle button (visible on small screens) */}
+            <button
+              type="button"
+              onClick={openSidebar}
+              className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
 
             {/* Desktop Role Badge */}
             <p className="hidden text-sm text-muted-foreground md:block font-medium">

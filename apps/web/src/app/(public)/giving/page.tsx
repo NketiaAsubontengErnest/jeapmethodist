@@ -1,12 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import {
   Heart,
   Smartphone,
@@ -15,24 +22,26 @@ import {
   Sparkles,
   CheckCircle2,
   CreditCard,
-  Zap,
-  Lock,
   ArrowRight,
   Check,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { useToast } from '@/lib/toast-context';
 
 const PRESET_AMOUNTS = [20, 50, 100, 200, 500, 1000];
 
-const GIVING_TYPES = [
-  { id: 'Tithe', label: 'Tithe (10%)' },
-  { id: 'Offertory', label: 'Sunday Offertory' },
-  { id: 'Harvest', label: 'Annual Harvest Pledge' },
-  { id: 'Building', label: 'Building & Capital Fund' },
-  { id: 'Class Dues', label: 'Class Monthly Dues' },
-  { id: 'Welfare', label: 'Welfare Relief' },
-  { id: 'General', label: 'General Donation' },
+const DEFAULT_GIVING_TYPES = [
+  'Tithe (10%)',
+  'Sunday Offertory',
+  'Annual Harvest Pledge',
+  'Building & Capital Fund',
+  'Class Monthly Dues',
+  'Welfare Relief',
+  'General Donation',
 ];
 
 const NOT_YET_CONFIGURED = 'Not yet configured — please contact the church office';
@@ -52,25 +61,111 @@ export default function GivingPage() {
     queryFn: fetchPublicSettings,
   });
 
+  // Dynamic Giving Categories State
+  const [categories, setCategories] = useState<string[]>(DEFAULT_GIVING_TYPES);
+  const [givingType, setGivingType] = useState<string>('Tithe (10%)');
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingName, setEditingName] = useState('');
+
+  // Hydrate categories from localStorage safely
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('jeap_giving_categories');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCategories(parsed);
+          setGivingType(parsed[0]);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const saveCategories = (newCats: string[]) => {
+    setCategories(newCats);
+    try {
+      localStorage.setItem('jeap_giving_categories', JSON.stringify(newCats));
+    } catch {}
+  };
+
+  const handleAddCategory = () => {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      toast.error('Please enter a category name');
+      return;
+    }
+    if (categories.includes(trimmed)) {
+      toast.error('Category already exists');
+      return;
+    }
+    const updated = [...categories, trimmed];
+    saveCategories(updated);
+    setGivingType(trimmed);
+    setNewCategoryName('');
+    setIsAddingCategory(false);
+    toast.success(`Added giving category: "${trimmed}"`);
+  };
+
+  const startEditCategory = (index: number, currentName: string) => {
+    setEditingIndex(index);
+    setEditingName(currentName);
+  };
+
+  const handleSaveEditCategory = (index: number) => {
+    const trimmed = editingName.trim();
+    if (!trimmed) {
+      toast.error('Category name cannot be empty');
+      return;
+    }
+    const oldName = categories[index];
+    const updated = [...categories];
+    updated[index] = trimmed;
+    saveCategories(updated);
+
+    if (givingType === oldName) {
+      setGivingType(trimmed);
+    }
+    setEditingIndex(null);
+    toast.success('Category updated successfully');
+  };
+
+  const handleDeleteCategory = (index: number) => {
+    if (categories.length <= 1) {
+      toast.error('At least one giving category must remain.');
+      return;
+    }
+    const categoryToDelete = categories[index];
+    const updated = categories.filter((_, i) => i !== index);
+    saveCategories(updated);
+
+    if (givingType === categoryToDelete) {
+      setGivingType(updated[0]);
+    }
+    toast.success(`Deleted category: "${categoryToDelete}"`);
+  };
+
+  // Form State
   const [amount, setAmount] = useState<number | string>(100);
   const [customAmount, setCustomAmount] = useState('');
-  const [givingType, setGivingType] = useState('Tithe');
-  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'moolre' | 'momo' | 'bank'>('paystack');
 
-  // Donor state
+  // Donor Details State
   const [donorName, setDonorName] = useState('');
   const [donorEmail, setDonorEmail] = useState('');
   const [donorPhone, setDonorPhone] = useState('');
+
+  // Gateway Selector Modal & Processing State
+  const [isGatewayModalOpen, setIsGatewayModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  const selectedAmountNum = amount === 'custom' ? parseFloat(customAmount) || 0 : typeof amount === 'number' ? amount : 0;
+  const selectedAmountNum =
+    amount === 'custom' ? parseFloat(customAmount) || 0 : typeof amount === 'number' ? amount : 0;
   const currency = settings?.giving_currency || 'GHS';
 
-  const paystackEnabled = settings?.paystack_enabled !== 'false' && Boolean(settings?.paystack_public_key);
-  const moolreEnabled = settings?.moolre_enabled !== 'false' && Boolean(settings?.moolre_merchant_id);
-
-  const handleDonateSubmit = (e: React.FormEvent) => {
+  // Open Gateway Choice Modal on Proceed
+  const handleProceedClick = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedAmountNum <= 0) {
       toast.error('Please enter a valid donation amount.');
@@ -82,27 +177,34 @@ export default function GivingPage() {
       return;
     }
 
+    setIsGatewayModalOpen(true);
+  };
+
+  // Execute Payment via chosen Gateway inside Modal
+  const executePayment = (gateway: 'paystack' | 'moolre') => {
+    setIsGatewayModalOpen(false);
     setIsProcessing(true);
 
-    if (paymentMethod === 'paystack') {
+    if (gateway === 'paystack') {
       const publicKey = settings?.paystack_public_key;
       if (!publicKey) {
         toast.info('Paystack is in demonstration mode (API Key pending Steward setup).');
         setTimeout(() => {
           setIsProcessing(false);
           setPaymentSuccess(true);
-          toast.success(`Thank you, ${donorName}! Simulated donation of ${currency} ${selectedAmountNum} received.`);
+          toast.success(
+            `Thank you, ${donorName}! Simulated Paystack donation of ${currency} ${selectedAmountNum} received.`
+          );
         }, 1500);
         return;
       }
 
-      // Load Paystack inline JS dynamically if needed
       const triggerPaystack = () => {
         if (window.PaystackPop) {
           const handler = window.PaystackPop.setup({
             key: publicKey,
             email: donorEmail || 'donor@methodistchurch.org.gh',
-            amount: Math.round(selectedAmountNum * 100), // convert to pesewas/kobo
+            amount: Math.round(selectedAmountNum * 100),
             currency: currency,
             ref: 'MCG_' + Math.floor(Math.random() * 1000000000 + 1),
             metadata: {
@@ -124,7 +226,6 @@ export default function GivingPage() {
           });
           handler.openIframe();
         } else {
-          // Fallback script tag injection
           const script = document.createElement('script');
           script.src = 'https://js.paystack.co/v1/inline.js';
           script.onload = () => {
@@ -135,29 +236,25 @@ export default function GivingPage() {
       };
 
       triggerPaystack();
-    } else if (paymentMethod === 'moolre') {
+    } else if (gateway === 'moolre') {
       const merchantId = settings?.moolre_merchant_id;
       if (!merchantId) {
         toast.info('Moolre is in demonstration mode (Merchant ID pending Steward setup).');
         setTimeout(() => {
           setIsProcessing(false);
           setPaymentSuccess(true);
-          toast.success(`Thank you, ${donorName}! Simulated Moolre payment of ${currency} ${selectedAmountNum} received.`);
+          toast.success(
+            `Thank you, ${donorName}! Simulated Moolre payment of ${currency} ${selectedAmountNum} received.`
+          );
         }, 1500);
         return;
       }
 
-      // Simulate Moolre API flow
       setTimeout(() => {
         setIsProcessing(false);
         setPaymentSuccess(true);
         toast.success(`Moolre Payment initialized for Merchant ${merchantId}! Reference: MLR_${Date.now()}`);
       }, 1200);
-    } else {
-      // Manual MoMo or Bank Wire
-      setIsProcessing(false);
-      setPaymentSuccess(true);
-      toast.success(`Instruction saved! Please complete your ${paymentMethod.toUpperCase()} transfer using the details below.`);
     }
   };
 
@@ -196,16 +293,11 @@ export default function GivingPage() {
           <div className="bg-[#14309c] px-6 py-5 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h2 className="font-serif text-2xl font-bold text-white flex items-center gap-2">
-                <Zap className="h-6 w-6 text-[#FFC72C] fill-[#FFC72C]" /> Instant Online Donation
+                <CreditCard className="h-6 w-6 text-[#FFC72C]" /> Instant Online Donation
               </h2>
               <p className="text-xs text-slate-200">
                 Pay Tithes, Offerings &amp; Harvest Pledges via Paystack, Moolre, Debit/Credit Card or Mobile Money.
               </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 bg-white/10 text-[#FFC72C] border border-[#FFC72C]/30 text-[11px] font-extrabold px-3 py-1 rounded-full">
-                <Lock className="w-3 h-3" /> 256-Bit SSL Encrypted
-              </span>
             </div>
           </div>
 
@@ -232,27 +324,144 @@ export default function GivingPage() {
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handleDonateSubmit} className="space-y-8">
-                {/* 1. Select Purpose */}
+              <form onSubmit={handleProceedClick} className="space-y-8">
+                {/* 1. Dynamic Select Purpose / Category (Add, Edit, Delete) */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs">
-                    1. Select Giving Category / Purpose
-                  </Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {GIVING_TYPES.map((type) => (
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs">
+                      1. Select Giving Category / Purpose
+                    </Label>
+                    {!isAddingCategory && (
                       <button
-                        key={type.id}
                         type="button"
-                        onClick={() => setGivingType(type.label)}
-                        className={`px-3 py-2.5 rounded-xl border text-xs font-bold text-left transition-all ${
-                          givingType === type.label
-                            ? 'border-[#14309c] bg-[#14309c] text-white shadow-md'
-                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
-                        }`}
+                        onClick={() => setIsAddingCategory(true)}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#14309c] hover:underline"
                       >
-                        {type.label}
+                        <Plus className="w-3.5 h-3.5" /> Add Category
                       </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    {categories.map((cat, idx) => (
+                      <div key={idx} className="relative">
+                        {editingIndex === idx ? (
+                          <div className="flex items-center gap-1 bg-white p-1.5 rounded-xl border border-[#14309c] shadow-sm">
+                            <Input
+                              value={editingName}
+                              onChange={(e) => setEditingName(e.target.value)}
+                              className="h-8 text-xs font-bold border-slate-200"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleSaveEditCategory(idx);
+                                }
+                                if (e.key === 'Escape') setEditingIndex(null);
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEditCategory(idx)}
+                              className="p-1 text-emerald-600 hover:text-emerald-700"
+                              title="Save"
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingIndex(null)}
+                              className="p-1 text-slate-400 hover:text-slate-600"
+                              title="Cancel"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div
+                            className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                              givingType === cat
+                                ? 'border-[#14309c] bg-[#14309c] text-white shadow-md'
+                                : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setGivingType(cat)}
+                              className="flex-1 text-left truncate mr-2"
+                            >
+                              {cat}
+                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEditCategory(idx, cat);
+                                }}
+                                className={`p-1 rounded transition-colors ${
+                                  givingType === cat
+                                    ? 'text-white/80 hover:text-white hover:bg-white/20'
+                                    : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200'
+                                }`}
+                                title="Edit Category"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteCategory(idx);
+                                }}
+                                className={`p-1 rounded transition-colors ${
+                                  givingType === cat
+                                    ? 'text-white/80 hover:text-rose-200 hover:bg-white/20'
+                                    : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
+                                }`}
+                                title="Delete Category"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
+
+                    {isAddingCategory && (
+                      <div className="flex items-center gap-1 bg-white p-1.5 rounded-xl border-2 border-dashed border-[#14309c]">
+                        <Input
+                          placeholder="New Category Name"
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          className="h-8 text-xs font-bold border-slate-200"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddCategory();
+                            }
+                            if (e.key === 'Escape') setIsAddingCategory(false);
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleAddCategory}
+                          className="h-8 px-2.5 bg-[#14309c] text-white text-xs font-bold"
+                        >
+                          Add
+                        </Button>
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingCategory(false)}
+                          className="p-1 text-slate-400 hover:text-slate-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -308,98 +517,10 @@ export default function GivingPage() {
                   </div>
                 </div>
 
-                {/* 3. Payment Method */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs">
-                    3. Choose Payment Gateway Provider
-                  </Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {/* Paystack Option */}
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('paystack')}
-                      className={`p-4 rounded-xl border-2 text-left transition-all relative ${
-                        paymentMethod === 'paystack'
-                          ? 'border-[#14309c] bg-blue-50/50 text-[#14309c] shadow'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <CreditCard className="w-5 h-5 text-[#14309c]" />
-                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-100 text-[#14309c]">
-                          Paystack
-                        </span>
-                      </div>
-                      <p className="font-bold text-sm text-slate-900">Paystack Gateway</p>
-                      <p className="text-[11px] text-slate-500 mt-1">Cards, Mobile Money, Apple Pay</p>
-                    </button>
-
-                    {/* Moolre Option */}
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('moolre')}
-                      className={`p-4 rounded-xl border-2 text-left transition-all relative ${
-                        paymentMethod === 'moolre'
-                          ? 'border-[#14309c] bg-amber-50/50 text-[#14309c] shadow'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Zap className="w-5 h-5 text-amber-600" />
-                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">
-                          Moolre
-                        </span>
-                      </div>
-                      <p className="font-bold text-sm text-slate-900">Moolre Gateway</p>
-                      <p className="text-[11px] text-slate-500 mt-1">Direct Wallet &amp; MoMo</p>
-                    </button>
-
-                    {/* Direct MoMo Option */}
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('momo')}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
-                        paymentMethod === 'momo'
-                          ? 'border-[#14309c] bg-slate-100 text-[#14309c] shadow'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Smartphone className="w-5 h-5 text-slate-700" />
-                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-800">
-                          Manual USSD
-                        </span>
-                      </div>
-                      <p className="font-bold text-sm text-slate-900">MoMo Transfer</p>
-                      <p className="text-[11px] text-slate-500 mt-1">MTN, Telecel, AT USSD</p>
-                    </button>
-
-                    {/* Bank Wire Option */}
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('bank')}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${
-                        paymentMethod === 'bank'
-                          ? 'border-[#14309c] bg-slate-100 text-[#14309c] shadow'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Building2 className="w-5 h-5 text-slate-700" />
-                        <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-slate-200 text-slate-800">
-                          Bank Wire
-                        </span>
-                      </div>
-                      <p className="font-bold text-sm text-slate-900">Bank Deposit</p>
-                      <p className="text-[11px] text-slate-500 mt-1">Direct Bank Transfer</p>
-                    </button>
-                  </div>
-                </div>
-
-                {/* 4. Donor Details */}
+                {/* 3. Donor Details */}
                 <div className="space-y-4 pt-2 border-t border-slate-200">
                   <Label className="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs">
-                    4. Donor Details
+                    3. Donor Details
                   </Label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
@@ -462,7 +583,7 @@ export default function GivingPage() {
                       'Connecting to Gateway…'
                     ) : (
                       <span className="flex items-center gap-2">
-                        Proceed to Donate ({paymentMethod.toUpperCase()}) <ArrowRight className="w-5 h-5" />
+                        Proceed to Donate <ArrowRight className="w-5 h-5" />
                       </span>
                     )}
                   </Button>
@@ -471,6 +592,86 @@ export default function GivingPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Modal: Gateway Selection on Proceed */}
+        <Dialog open={isGatewayModalOpen} onOpenChange={setIsGatewayModalOpen}>
+          <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
+            <DialogHeader className="space-y-1 text-left">
+              <DialogTitle className="font-serif text-2xl font-bold text-slate-900">
+                Choose Payment Gateway
+              </DialogTitle>
+              <DialogDescription className="text-xs text-slate-600">
+                Select your preferred gateway to complete your donation of{' '}
+                <strong className="text-[#14309c] font-bold">
+                  {currency} {selectedAmountNum}
+                </strong>{' '}
+                towards <strong className="text-slate-900">{givingType}</strong>.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-3 py-4">
+              {/* Paystack Option */}
+              <button
+                type="button"
+                onClick={() => executePayment('paystack')}
+                className="w-full p-4 rounded-xl border-2 border-slate-200 hover:border-[#14309c] bg-white hover:bg-blue-50/50 transition-all text-left flex items-center justify-between group shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 text-[#14309c] flex items-center justify-center font-bold">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-slate-900 group-hover:text-[#14309c]">
+                        Paystack Gateway
+                      </span>
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-100 text-[#14309c]">
+                        Recommended
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Debit/Credit Cards, Mobile Money, Apple Pay
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-[#14309c] transition-transform group-hover:translate-x-1" />
+              </button>
+
+              {/* Moolre Option */}
+              <button
+                type="button"
+                onClick={() => executePayment('moolre')}
+                className="w-full p-4 rounded-xl border-2 border-slate-200 hover:border-[#FFC72C] bg-white hover:bg-amber-50/50 transition-all text-left flex items-center justify-between group shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                    <Smartphone className="w-5 h-5 text-amber-700" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-slate-900 group-hover:text-amber-900">
+                        Moolre Gateway
+                      </span>
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                        Instant MoMo
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Direct Wallet &amp; Mobile Money Checkout
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-amber-700 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+
+            <div className="text-center pt-2 border-t border-slate-100">
+              <p className="text-[11px] text-slate-500">
+                Secure processing via encrypted Methodist payment integration.
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Giving Options Grid (Offline MoMo & Bank Details) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -570,30 +771,12 @@ export default function GivingPage() {
               <div className="space-y-3 pt-2">
                 <h3 className="text-sm font-bold text-slate-900">Categories of Giving:</h3>
                 <ul className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium">
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                    <span>Tithe (10%)</span>
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                    <span>Sunday Offertory</span>
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                    <span>Annual Harvest Pledge</span>
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                    <span>Building &amp; Capital Fund</span>
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                    <span>Class Monthly Dues</span>
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                    <span>Welfare Relief Fund</span>
-                  </li>
+                  {categories.slice(0, 6).map((cat, i) => (
+                    <li key={i} className="flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
+                      <span>{cat}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </CardContent>
