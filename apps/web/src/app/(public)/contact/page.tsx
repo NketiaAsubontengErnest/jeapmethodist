@@ -130,7 +130,7 @@ export default function ContactPage() {
             </span>
 
             <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Contact &amp; Location
+              Contact
             </h1>
 
             <p className="text-base leading-relaxed text-slate-200 sm:text-lg">

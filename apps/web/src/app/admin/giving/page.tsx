@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Plus, Search } from 'lucide-react';
+import { Loader2, Plus, Search, Edit, Trash2, Save, X } from 'lucide-react';
 import {
   fetchOfferingSessions,
   createOfferingSession,
@@ -15,6 +15,7 @@ import {
 } from '@/lib/api/offering-sessions';
 import { fetchProgrammeTypes } from '@/lib/api/attendance';
 import { createTransaction, fetchIncomeCategories } from '@/lib/api/finance';
+import { fetchSettings, updateSettings } from '@/lib/api/settings';
 import { ApiError } from '@/lib/api-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/lib/toast-context';
@@ -24,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   Sheet,
@@ -58,6 +59,16 @@ function formatGHS(amount: number) {
   return new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(amount);
 }
 
+const DEFAULT_CATEGORIES = [
+  'Tithe (10%)',
+  'Sunday Offertory',
+  'Annual Harvest Pledge',
+  'Building & Capital Fund',
+  'Class Monthly Dues',
+  'Welfare Relief',
+  'General Donation',
+];
+
 export default function GivingPage() {
   const { hasPermission } = useAuth();
   const { toast } = useToast();
@@ -71,9 +82,69 @@ export default function GivingPage() {
   const [search, setSearch] = useState('');
   const [isExporting, setIsExporting] = useState(false);
 
+  // Giving Categories State
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+
   const sessionsQuery = useQuery({ queryKey: ['offering-sessions', page], queryFn: () => fetchOfferingSessions({ page }) });
   const programmeTypesQuery = useQuery({ queryKey: ['programme-types'], queryFn: fetchProgrammeTypes });
   const incomeCategoriesQuery = useQuery({ queryKey: ['income-categories'], queryFn: fetchIncomeCategories });
+  const settingsQuery = useQuery({ queryKey: ['admin-settings-giving'], queryFn: fetchSettings });
+
+  // Load categories from settings once
+  if (settingsQuery.data && !categoriesLoaded) {
+    const raw = settingsQuery.data.giving_categories;
+    setCategories(
+      raw ? raw.split(',').map((c) => c.trim()).filter(Boolean) : DEFAULT_CATEGORIES
+    );
+    setCategoriesLoaded(true);
+  }
+
+  const saveCategoriesMutation = useMutation({
+    mutationFn: (cats: string[]) =>
+      updateSettings({ giving_categories: cats.join(', ') }),
+    onSuccess: () => {
+      toast.success('Giving categories saved!');
+      queryClient.invalidateQueries({ queryKey: ['admin-settings-giving'] });
+      queryClient.invalidateQueries({ queryKey: ['public-settings'] });
+    },
+    onError: (e) => {
+      toast.error('Failed to save categories', e instanceof ApiError ? e.message : 'Unknown error');
+    },
+  });
+
+  const handleAddCategory = () => {
+    const trimmed = newCategory.trim();
+    if (!trimmed) return;
+    if (categories.includes(trimmed)) {
+      toast.error('Category already exists.');
+      return;
+    }
+    const updated = [...categories, trimmed];
+    setCategories(updated);
+    setNewCategory('');
+    saveCategoriesMutation.mutate(updated);
+  };
+
+  const handleDeleteCategory = (idx: number) => {
+    const updated = categories.filter((_, i) => i !== idx);
+    setCategories(updated);
+    saveCategoriesMutation.mutate(updated);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingIndex === null) return;
+    const trimmed = editingValue.trim();
+    if (!trimmed) return;
+    const updated = categories.map((c, i) => (i === editingIndex ? trimmed : c));
+    setCategories(updated);
+    setEditingIndex(null);
+    setEditingValue('');
+    saveCategoriesMutation.mutate(updated);
+  };
 
   const visibleSessions = useMemo(() => {
     const items = sessionsQuery.data?.items ?? [];
@@ -301,6 +372,115 @@ export default function GivingPage() {
           </div>
         )}
       </div>
+
+      {/* ── Giving Categories Management Card ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-bold">Giving Categories / Purposes</CardTitle>
+          <CardDescription>
+            These categories are shown on the public <strong>/giving</strong> page. Add, rename, or remove
+            any entry — changes save instantly.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {settingsQuery.isLoading ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading categories…
+            </div>
+          ) : (
+            <>
+              {/* Existing categories list */}
+              <div className="space-y-2">
+                {categories.length === 0 && (
+                  <p className="text-sm text-muted-foreground italic">No categories configured yet. Add one below.</p>
+                )}
+                {categories.map((cat, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+                  >
+                    {editingIndex === idx ? (
+                      <>
+                        <Input
+                          value={editingValue}
+                          onChange={(e) => setEditingValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveEdit();
+                            if (e.key === 'Escape') { setEditingIndex(null); setEditingValue(''); }
+                          }}
+                          className="h-8 flex-1 text-sm"
+                          autoFocus
+                        />
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-green-600 hover:bg-green-50"
+                          onClick={handleSaveEdit}
+                        >
+                          <Save className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-slate-500 hover:bg-slate-100"
+                          onClick={() => { setEditingIndex(null); setEditingValue(''); }}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Badge variant="secondary" className="flex-1 justify-start font-normal text-sm py-1">
+                          {cat}
+                        </Badge>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-slate-500 hover:bg-blue-50 hover:text-blue-600"
+                          onClick={() => { setEditingIndex(idx); setEditingValue(cat); }}
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                          onClick={() => handleDeleteCategory(idx)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Add new category */}
+              <div className="flex items-center gap-2 pt-2">
+                <Input
+                  placeholder="e.g. Special Mission Fund"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleAddCategory}
+                  disabled={!newCategory.trim() || saveCategoriesMutation.isPending}
+                  className="gap-1.5"
+                >
+                  {saveCategoriesMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                  Add
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">

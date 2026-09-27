@@ -99,3 +99,16 @@ export function deleteMedia(id: string) {
   return apiFetch<{ message: string }>(`/media/${id}`, { method: 'DELETE' });
 }
 
+export function createExternalImage(data: {
+  imageUrl: string;
+  title?: string;
+  description?: string;
+  category?: string;
+}) {
+  return apiFetch<MediaItem>('/media/external-image', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+

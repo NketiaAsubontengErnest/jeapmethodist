@@ -11,6 +11,7 @@ import {
   CalendarDays,
   Mic2,
   Images,
+  SlidersHorizontal,
   Newspaper,
   Megaphone,
   HeartHandshake,
@@ -40,6 +41,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { label: 'Hero Slides', href: '/admin/hero-slides', icon: SlidersHorizontal, permission: 'media.view' },
   { label: 'Members', href: '/admin/members', icon: Users, permission: 'member.view' },
   { label: 'Families', href: '/admin/families', icon: Home, permission: 'member.view' },
   { label: 'Attendance', href: '/admin/attendance', icon: CalendarCheck, permission: 'attendance.view' },

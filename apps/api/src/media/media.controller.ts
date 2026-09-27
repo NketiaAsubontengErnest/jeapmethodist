@@ -25,6 +25,7 @@ import { MediaType } from '@prisma/client';
 import { MediaService } from './media.service';
 import { UploadMediaDto } from './dto/upload-media.dto';
 import { CreateVideoPostDto } from './dto/create-video-post.dto';
+import { CreateExternalImageDto } from './dto/create-external-image.dto';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { PERMISSIONS } from '../common/constants/permissions';
 import { AuditService } from '../audit/audit.service';
@@ -98,6 +99,38 @@ export class MediaController {
       ipAddress: req.ip,
       userAgent: req.get('user-agent'),
       newValue: { title: media.title, type: media.type },
+    });
+    return media;
+  }
+
+  @Post('external-image')
+  @ApiBearerAuth()
+  @RequirePermissions(PERMISSIONS.MEDIA_UPLOAD)
+  async createExternalImage(
+    @Body() dto: CreateExternalImageDto,
+    @CurrentUser() actor: AuthenticatedUser,
+    @Req() req: Request,
+  ) {
+    const media = await this.service.create({
+      filename: dto.title || 'external_image',
+      storedName: `external_${require('crypto').randomUUID()}`,
+      mimeType: 'image/external',
+      size: 0,
+      url: dto.imageUrl,
+      category: dto.category,
+      title: dto.title,
+      description: dto.description,
+      uploadedById: actor.id,
+    });
+    await this.auditService.record({
+      userId: actor.id,
+      action: 'media.external_image_linked',
+      module: 'media',
+      entityType: 'Media',
+      entityId: media.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+      newValue: { imageUrl: dto.imageUrl, category: dto.category },
     });
     return media;
   }
