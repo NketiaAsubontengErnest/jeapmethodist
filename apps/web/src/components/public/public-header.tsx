@@ -135,19 +135,6 @@ export function PublicHeader({
                 {link.label}
               </Link>
             ))}
-            <div className="flex flex-col gap-2 border-t border-white/15 pt-3">
-              <Button asChild className="w-full justify-center bg-[#FFC72C] font-bold text-[#14309c]">
-                <Link href="/giving" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2">
-                  <Heart className="h-4 w-4 fill-[#14309c]" />
-                  Donate Online
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="w-full justify-center text-slate-300 hover:text-white">
-                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  Login
-                </Link>
-              </Button>
-            </div>
           </div>
         )}
       </div>
