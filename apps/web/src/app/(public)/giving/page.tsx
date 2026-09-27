@@ -30,7 +30,6 @@ import { useToast } from '@/lib/toast-context';
 const PRESET_AMOUNTS = [20, 50, 100, 200, 500, 1000];
 
 const DEFAULT_GIVING_TYPES = [
-  'Tithe (10%)',
   'Sunday Offertory',
   'Annual Harvest Pledge',
   'Building & Capital Fund',
@@ -64,7 +63,7 @@ export default function GivingPage() {
       .filter(Boolean)
     : DEFAULT_GIVING_TYPES;
 
-  const [givingType, setGivingType] = useState<string>('Tithe (10%)');
+  const [givingType, setGivingType] = useState<string>('Sunday Offertory');
 
   // Form State
   const [amount, setAmount] = useState<number | string>(100);
@@ -84,7 +83,7 @@ export default function GivingPage() {
     amount === 'custom' ? parseFloat(customAmount) || 0 : typeof amount === 'number' ? amount : 0;
   const currency = settings?.giving_currency || 'GHS';
 
-  const activeCategory = categories.includes(givingType) ? givingType : categories[0] || 'Tithe (10%)';
+  const activeCategory = categories.includes(givingType) ? givingType : categories[0] || 'Sunday Offertory';
 
   // Open Gateway Choice Modal on Proceed
   const handleProceedClick = (e: React.FormEvent) => {
