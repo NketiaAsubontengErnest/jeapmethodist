@@ -60,7 +60,7 @@ export default function LoginPage() {
         <div className="absolute -right-20 -bottom-20 h-80 w-80 rounded-full bg-red-500/10 blur-3xl" />
 
         <div className="relative z-10 space-y-6 max-w-md flex flex-col items-center w-full">
-          {/* Uploaded Logo or Loading Skeleton */}
+          {/* Logo — skeleton pulse while loading, then uploaded logo, then cross icon */}
           {isLoading ? (
             <div className="h-28 w-28 rounded-full border-4 border-[#FFC72C]/40 bg-white/10 animate-pulse shadow-2xl" />
           ) : logoSrc ? (
@@ -76,16 +76,21 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Church Name & System Subtitle */}
+          {/* Church Name & System Subtitle — always visible with fallback */}
           <div className="space-y-1 w-full flex flex-col items-center">
             {isLoading ? (
               <div className="h-9 w-64 rounded-lg bg-white/15 animate-pulse my-1" />
-            ) : settings?.church_name ? (
+            ) : (
               <h1 className="font-serif text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-                {settings.church_name}
+                {settings?.church_name || 'Methodist Church Ghana'}
               </h1>
-            ) : null}
-            <p className="text-xs font-mono font-extrabold uppercase tracking-widest text-[#FFC72C]">
+            )}
+            {settings?.society_name && (
+              <p className="text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]/80">
+                {settings.society_name}
+              </p>
+            )}
+            <p className="text-xs font-mono font-extrabold uppercase tracking-widest text-[#FFC72C] pt-0.5">
               MANAGEMENT SYSTEM
             </p>
           </div>
@@ -97,11 +102,21 @@ export default function LoginPage() {
               <div className="h-3 w-5/6 rounded bg-white/10 animate-pulse" />
               <div className="h-3 w-4/6 rounded bg-white/10 animate-pulse" />
             </div>
-          ) : settings?.tagline ? (
-            <p className="text-xs text-slate-300 leading-relaxed max-w-sm">
-              {settings.tagline}
+          ) : (
+            <p className="text-xs text-slate-300 leading-relaxed max-w-sm text-center">
+              {settings?.tagline || settings?.slogan || '"Gain all you can, save all you can, give all you can." — John Wesley'}
             </p>
-          ) : null}
+          )}
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-[#FFC72C]">
+              <Sparkles className="h-3 w-3" /> Staff Portal
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-slate-300">
+              Secure Login
+            </span>
+          </div>
         </div>
       </div>
 

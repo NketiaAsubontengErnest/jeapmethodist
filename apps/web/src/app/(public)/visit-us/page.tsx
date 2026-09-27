@@ -3,9 +3,83 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPublicSettings } from '@/lib/api/public';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { HeartHandshake, Smile, BookOpen, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  HeartHandshake,
+  Smile,
+  BookOpen,
+  ChevronRight,
+  MapPin,
+  Clock,
+  Shirt,
+  Car,
+  Cross,
+  Coffee,
+} from 'lucide-react';
+
+const WHAT_TO_EXPECT = [
+  {
+    icon: Smile,
+    title: 'Warm Welcome & Ushering',
+    description:
+      'Our welcoming team of stewards and ushers will greet you at the entrance, help you locate a seat, and hand you a service order bulletin.',
+    accentColor: 'bg-[#14309c]',
+  },
+  {
+    icon: BookOpen,
+    title: 'Liturgical & Spirit-Filled Worship',
+    description:
+      'Experience sound Methodist hymnody (from the Methodist Hymn Book / CAN), sacred choir anthems, biblically grounded preaching, and passionate prayer.',
+    accentColor: 'bg-[#FFC72C]',
+  },
+  {
+    icon: HeartHandshake,
+    title: "Children's Sunday School",
+    description:
+      'Bring your children! Dedicated Sunday school teachers provide age-appropriate Bible lessons, memory verses, and snacks in a safe environment.',
+    accentColor: 'bg-[#14309c]',
+  },
+];
+
+const FAQ = [
+  {
+    icon: Clock,
+    question: 'What are your service times?',
+    settingsKey: 'serviceSchedule' as const,
+    fallback: 'Service times will be posted here once configured.',
+  },
+  {
+    icon: Shirt,
+    question: 'What should I wear?',
+    answer:
+      'Feel free to wear traditional Ghanaian cloth/Kente or formal smart-casual attire. Members of fellowship organizations wear their uniforms on special Sundays.',
+  },
+  {
+    icon: Car,
+    question: 'Is there parking on premises?',
+    answer:
+      'Yes! Secure parking is available on the church grounds with traffic wardens guiding arrivals.',
+  },
+  {
+    icon: Cross,
+    question: 'Who can take Holy Communion?',
+    answer:
+      'Holy Communion is celebrated monthly (usually 1st Sunday). In the Methodist tradition, all baptized and confirmed believers who love the Lord are welcome at Christ\u2019s table.',
+  },
+  {
+    icon: Coffee,
+    question: 'Is there fellowship after service?',
+    answer:
+      'Yes! After the main service there is a period of fellowship where newcomers can meet class leaders and members over refreshments.',
+  },
+  {
+    icon: HeartHandshake,
+    question: 'How do I join a Class?',
+    answer:
+      'Speak with any of our stewards or pastoral team. Every Methodist is assigned to a Class led by a Class Leader for discipleship and pastoral care.',
+  },
+];
 
 export default function VisitUsPage() {
   const { data: settings } = useQuery({
@@ -13,125 +87,165 @@ export default function VisitUsPage() {
     queryFn: fetchPublicSettings,
   });
 
-  const churchTitle = settings?.church_name && settings?.society_name
-    ? `${settings.church_name} — ${settings.society_name}`
-    : settings?.church_name || settings?.society_name;
+  const churchTitle =
+    settings?.church_name && settings?.society_name
+      ? `${settings.church_name} — ${settings.society_name}`
+      : settings?.church_name || settings?.society_name;
 
-  const serviceSchedule = [settings?.sunday_service_1, settings?.sunday_service_2, settings?.midweek_service]
-    .filter(Boolean)
-    .join(', ') || settings?.sunday_service_times;
+  const serviceSchedule =
+    [settings?.sunday_service_1, settings?.sunday_service_2, settings?.midweek_service]
+      .filter(Boolean)
+      .join(' | ') || settings?.sunday_service_times;
 
   return (
-    <div className="min-h-screen bg-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="rounded-full border-blue-200 bg-blue-50 font-bold text-primary">
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* ── HERO BANNER ── */}
+      <section className="bg-[#14309c] px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl text-center space-y-5">
+          <Badge className="bg-[#FFC72C]/20 border border-[#FFC72C]/40 text-[#FFC72C] font-bold text-xs uppercase tracking-widest hover:bg-[#FFC72C]/20">
             Welcome Guest!
           </Badge>
-          <h1 className="font-serif text-4xl font-extrabold text-foreground sm:text-5xl tracking-tight">
+          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
             Plan Your First Visit
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
             {churchTitle
               ? `We are thrilled to welcome you to ${churchTitle}. `
               : 'We are thrilled to welcome you. '}
             Here is a friendly guide on what to expect when you join us for Sunday divine service.
           </p>
-        </div>
-
-        {/* What to Expect Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Card className="rounded-2xl border-border border-t-4 border-t-primary shadow-sm">
-            <CardContent className="pt-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl border border-blue-100 bg-blue-50 flex items-center justify-center text-primary">
-                <Smile className="w-6 h-6" />
-              </div>
-              <h3 className="font-serif text-xl font-bold text-foreground">Warm Welcome & Ushering</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Our welcoming team of stewards and ushers will greet you at the entrance, help you locate a seat, and hand you a service order bulletin.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border-border border-t-4 border-t-gold-500 shadow-sm">
-            <CardContent className="pt-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl border border-gold-200 bg-gold-50 flex items-center justify-center text-gold-700">
-                <BookOpen className="w-6 h-6" />
-              </div>
-              <h3 className="font-serif text-xl font-bold text-foreground">Liturgical & Spirit-Filled Worship</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Experience sound Methodist hymnody (from the Methodist Hymn Book / CAN), sacred choir anthems, biblically grounded preaching, and passionate prayer.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border-border border-t-4 border-t-primary shadow-sm">
-            <CardContent className="pt-6 space-y-3">
-              <div className="w-12 h-12 rounded-xl border border-blue-100 bg-blue-50 flex items-center justify-center text-primary">
-                <HeartHandshake className="w-6 h-6" />
-              </div>
-              <h3 className="font-serif text-xl font-bold text-foreground">Children’s Sunday School</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Bring your children! Dedicated Sunday school teachers provide age-appropriate Bible lessons, memory verses, and snacks in a safe environment.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Detailed Visitor Info */}
-        <div className="bg-white border border-border rounded-2xl p-8 sm:p-12 shadow-sm space-y-8">
-          <h2 className="font-serif text-2xl font-bold text-foreground border-b pb-4 border-border">
-            Frequently Asked Questions by Visitors
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-            <div className="space-y-2">
-              <h3 className="font-serif font-bold text-foreground text-base">What are your service times?</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {serviceSchedule || 'Service times will be posted here once configured.'}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-serif font-bold text-foreground text-base">What should I wear?</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Feel free to wear traditional Ghanaian cloth/Kente or formal smart-casual attire. Members of fellowship organizations wear their uniforms on special Sundays.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-serif font-bold text-foreground text-base">Is there parking on premises?</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Yes! Secure parking is available on the church grounds with traffic wardens guiding arrivals.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="font-serif font-bold text-foreground text-base">Who can take Holy Communion?</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Holy Communion is celebrated monthly (usually 1st Sunday). In the Methodist tradition, all baptized and confirmed believers who love the Lord are welcome at Christ&apos;s table.
-              </p>
-            </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-lg bg-[#FFC72C] px-7 py-6 text-sm font-extrabold text-[#14309c] shadow-md hover:bg-amber-400 transition-all hover:scale-[1.02]"
+            >
+              <Link href="/contact">Contact Secretariat</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-lg border-white/30 bg-white/10 px-7 py-6 text-sm font-bold text-white hover:bg-white/20 transition-all"
+            >
+              <Link href="/about">Learn About Us</Link>
+            </Button>
           </div>
         </div>
+      </section>
 
-        {/* CTA — the one deliberate dark accent block on this page */}
-        <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-red-700 text-white rounded-2xl p-8 text-center space-y-4 shadow-xl border border-gold-500/30">
-          <h2 className="font-serif text-2xl font-bold">Have Questions Before Coming?</h2>
-          <p className="text-cream-200 max-w-xl mx-auto text-sm">
-            Reach out to our welcoming stewards or pastoral team. We can arrange someone to meet you at the door!
-          </p>
-          <div className="pt-2">
-            <Link
-              href="/contact"
-              className="px-6 py-3 bg-gold-400 hover:bg-gold-500 text-blue-950 font-bold rounded-lg shadow inline-flex items-center gap-2 text-sm transition-colors"
-            >
+      {/* ── WHAT TO EXPECT ── */}
+      <section className="bg-[#FAF8F5] py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center space-y-2">
+            <h2 className="font-serif text-3xl font-bold text-slate-900">What to Expect on Sunday</h2>
+            <p className="text-sm text-slate-500 max-w-xl mx-auto">
+              From the moment you arrive, you will experience warmth, reverence, and authentic community.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {WHAT_TO_EXPECT.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm flex flex-col gap-5 hover:shadow-md transition-shadow"
+              >
+                <div
+                  className={`w-12 h-12 rounded-xl ${item.accentColor} flex items-center justify-center text-white flex-shrink-0`}
+                >
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-xl font-bold text-slate-900">{item.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SERVICE SCHEDULE QUICK-VIEW ── */}
+      {serviceSchedule && (
+        <section className="bg-white py-12">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-2xl border border-[#14309c]/20 bg-[#14309c]/5 p-8 flex flex-col sm:flex-row items-center gap-6">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#14309c] text-white">
+                <Clock className="w-6 h-6" />
+              </div>
+              <div className="space-y-1 text-center sm:text-left flex-1">
+                <p className="text-xs font-extrabold uppercase tracking-widest text-[#14309c]">
+                  Service Schedule
+                </p>
+                <p className="text-sm font-semibold text-slate-900">{serviceSchedule}</p>
+              </div>
+              <Button asChild className="rounded-lg bg-[#14309c] text-white font-bold hover:bg-[#0f2478] transition-colors">
+                <Link href="/contact" className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4" /> Get Directions
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── VISITOR FAQ ── */}
+      <section className="bg-[#FAF8F5] py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="text-center space-y-2">
+            <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
+              Common Questions
+            </span>
+            <h2 className="font-serif text-3xl font-bold text-slate-900">
+              Frequently Asked Questions by Visitors
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {FAQ.map((item) => (
+              <div
+                key={item.question}
+                className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm space-y-3 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#14309c]/10 text-[#14309c]">
+                    <item.icon className="w-4.5 h-4.5" />
+                  </div>
+                  <h3 className="font-serif font-bold text-slate-900 text-base">{item.question}</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed pl-12">
+                  {item.settingsKey === 'serviceSchedule'
+                    ? serviceSchedule || item.fallback
+                    : item.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA BANNER — Royal Blue gradient ── */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-between gap-6 rounded-2xl bg-gradient-to-r from-[#14309c] via-[#1c37ae] to-[#0f2478] border border-[#FFC72C]/20 p-8 shadow-xl text-center sm:p-12 md:flex-row md:text-left">
+          <div className="space-y-2 max-w-xl">
+            <h2 className="font-serif text-2xl font-bold text-white sm:text-3xl">
+              Have Questions Before Coming?
+            </h2>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              Reach out to our welcoming stewards or pastoral team. We can arrange someone to meet you at the door!
+            </p>
+          </div>
+          <Button
+            asChild
+            size="lg"
+            className="shrink-0 rounded-lg bg-[#FFC72C] px-8 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-all hover:bg-amber-400 hover:scale-[1.02]"
+          >
+            <Link href="/contact" className="flex items-center gap-2">
               Contact Welcome Secretariat <ChevronRight className="w-4 h-4" />
             </Link>
-          </div>
+          </Button>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
