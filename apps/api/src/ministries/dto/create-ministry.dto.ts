@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsUUID, ValidateIf } from 'class-validator';
 
 export class CreateMinistryDto {
   @IsString()
@@ -21,6 +21,7 @@ export class CreateMinistryDto {
   contactPhone?: string;
 
   @IsOptional()
+  @ValidateIf((o) => Boolean(o.contactEmail && o.contactEmail.trim()))
   @IsEmail()
   contactEmail?: string;
 

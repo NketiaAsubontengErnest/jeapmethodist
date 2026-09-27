@@ -33,10 +33,24 @@ const createMinistrySchema = z.object({
   meetingSchedule: z.string().optional(),
   meetingVenue: z.string().optional(),
   contactPhone: z.string().optional(),
-  contactEmail: z.string().email('Invalid email').or(z.literal('')).optional(),
+  contactEmail: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.trim() === '' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+      message: 'Invalid email address',
+    }),
 });
 
 type CreateMinistryValues = z.infer<typeof createMinistrySchema>;
+
+const sanitizeMinistryValues = (values: CreateMinistryValues) => ({
+  ...values,
+  contactPhone: values.contactPhone?.trim() || undefined,
+  contactEmail: values.contactEmail?.trim() || undefined,
+  description: values.description?.trim() || undefined,
+  meetingSchedule: values.meetingSchedule?.trim() || undefined,
+  meetingVenue: values.meetingVenue?.trim() || undefined,
+});
 
 export default function MinistriesPage() {
   const { hasPermission } = useAuth();
@@ -64,34 +78,34 @@ export default function MinistriesPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: createMinistry,
+    mutationFn: (values: CreateMinistryValues) => createMinistry(sanitizeMinistryValues(values)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ministries'] });
       setOpen(false);
       reset();
       setFormError(null);
-      toast.success('Ministry created!');
+      toast.success('Organization created!');
     },
     onError: (err) => {
-      const message = err instanceof ApiError ? err.message : 'Failed to create ministry';
+      const message = err instanceof ApiError ? err.message : 'Failed to create organization';
       setFormError(message);
-      toast.error('Failed to create ministry', message);
+      toast.error('Failed to create organization', message);
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: (values: CreateMinistryValues) => updateMinistry(editingMinistry!.id, values),
+    mutationFn: (values: CreateMinistryValues) => updateMinistry(editingMinistry!.id, sanitizeMinistryValues(values)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ministries'] });
       setEditingMinistry(null);
       editForm.reset();
       setFormError(null);
-      toast.success('Ministry updated!');
+      toast.success('Organization updated!');
     },
     onError: (err) => {
-      const message = err instanceof ApiError ? err.message : 'Failed to update ministry';
+      const message = err instanceof ApiError ? err.message : 'Failed to update organization';
       setFormError(message);
-      toast.error('Failed to update ministry', message);
+      toast.error('Failed to update organization', message);
     },
   });
 
