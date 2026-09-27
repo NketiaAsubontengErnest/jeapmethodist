@@ -10,7 +10,6 @@ import {
   Calendar,
   Users,
   Award,
-  Sparkles,
   ChevronRight,
   BookOpen,
   Video,
@@ -132,7 +131,7 @@ export default function PublicHomePage() {
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl border border-[#FFC72C]/30 bg-gradient-to-b from-[#1c37ae] to-[#14309c] p-8 text-white shadow-2xl">
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-bold text-[#FFC72C]">
-                  <Sparkles className="h-3.5 w-3.5" /> Featured Word
+                  Featured Word
                 </div>
 
                 {featuredSermon ? (

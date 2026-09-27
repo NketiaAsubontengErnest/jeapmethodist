@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,15 +19,10 @@ import {
   Smartphone,
   Building2,
   ShieldCheck,
-  Sparkles,
   CheckCircle2,
   CreditCard,
   ArrowRight,
   Check,
-  Plus,
-  Pencil,
-  Trash2,
-  X,
 } from 'lucide-react';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { useToast } from '@/lib/toast-context';
@@ -61,90 +56,15 @@ export default function GivingPage() {
     queryFn: fetchPublicSettings,
   });
 
-  // Dynamic Giving Categories State
-  const [categories, setCategories] = useState<string[]>(DEFAULT_GIVING_TYPES);
+  // Dynamic Giving Categories derived from Admin Settings (or defaults)
+  const categories: string[] = settings?.giving_categories
+    ? settings.giving_categories
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean)
+    : DEFAULT_GIVING_TYPES;
+
   const [givingType, setGivingType] = useState<string>('Tithe (10%)');
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingName, setEditingName] = useState('');
-
-  // Hydrate categories from localStorage safely
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('jeap_giving_categories');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setCategories(parsed);
-          setGivingType(parsed[0]);
-        }
-      }
-    } catch {}
-  }, []);
-
-  const saveCategories = (newCats: string[]) => {
-    setCategories(newCats);
-    try {
-      localStorage.setItem('jeap_giving_categories', JSON.stringify(newCats));
-    } catch {}
-  };
-
-  const handleAddCategory = () => {
-    const trimmed = newCategoryName.trim();
-    if (!trimmed) {
-      toast.error('Please enter a category name');
-      return;
-    }
-    if (categories.includes(trimmed)) {
-      toast.error('Category already exists');
-      return;
-    }
-    const updated = [...categories, trimmed];
-    saveCategories(updated);
-    setGivingType(trimmed);
-    setNewCategoryName('');
-    setIsAddingCategory(false);
-    toast.success(`Added giving category: "${trimmed}"`);
-  };
-
-  const startEditCategory = (index: number, currentName: string) => {
-    setEditingIndex(index);
-    setEditingName(currentName);
-  };
-
-  const handleSaveEditCategory = (index: number) => {
-    const trimmed = editingName.trim();
-    if (!trimmed) {
-      toast.error('Category name cannot be empty');
-      return;
-    }
-    const oldName = categories[index];
-    const updated = [...categories];
-    updated[index] = trimmed;
-    saveCategories(updated);
-
-    if (givingType === oldName) {
-      setGivingType(trimmed);
-    }
-    setEditingIndex(null);
-    toast.success('Category updated successfully');
-  };
-
-  const handleDeleteCategory = (index: number) => {
-    if (categories.length <= 1) {
-      toast.error('At least one giving category must remain.');
-      return;
-    }
-    const categoryToDelete = categories[index];
-    const updated = categories.filter((_, i) => i !== index);
-    saveCategories(updated);
-
-    if (givingType === categoryToDelete) {
-      setGivingType(updated[0]);
-    }
-    toast.success(`Deleted category: "${categoryToDelete}"`);
-  };
 
   // Form State
   const [amount, setAmount] = useState<number | string>(100);
@@ -163,6 +83,8 @@ export default function GivingPage() {
   const selectedAmountNum =
     amount === 'custom' ? parseFloat(customAmount) || 0 : typeof amount === 'number' ? amount : 0;
   const currency = settings?.giving_currency || 'GHS';
+
+  const activeCategory = categories.includes(givingType) ? givingType : categories[0] || 'Tithe (10%)';
 
   // Open Gateway Choice Modal on Proceed
   const handleProceedClick = (e: React.FormEvent) => {
@@ -210,7 +132,7 @@ export default function GivingPage() {
             metadata: {
               custom_fields: [
                 { display_name: 'Donor Name', variable_name: 'donor_name', value: donorName },
-                { display_name: 'Giving Purpose', variable_name: 'giving_purpose', value: givingType },
+                { display_name: 'Giving Purpose', variable_name: 'giving_purpose', value: activeCategory },
                 { display_name: 'Phone', variable_name: 'donor_phone', value: donorPhone },
               ],
             },
@@ -283,7 +205,6 @@ export default function GivingPage() {
             </p>
           </div>
           <div className="shrink-0 bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center">
-            <Sparkles className="w-8 h-8 text-[#FFC72C] mx-auto mb-1" />
             <p className="text-xs text-[#FFC72C] font-extrabold uppercase tracking-wider">Methodist Stewardship</p>
           </div>
         </div>
@@ -310,7 +231,7 @@ export default function GivingPage() {
                 <div className="space-y-2">
                   <h3 className="font-serif text-3xl font-bold text-slate-900">Thank You for Giving!</h3>
                   <p className="text-sm text-slate-600">
-                    Your contribution of <strong className="text-[#14309c] font-bold">{currency} {selectedAmountNum}</strong> towards <strong className="text-slate-900">{givingType}</strong> has been processed successfully.
+                    Your contribution of <strong className="text-[#14309c] font-bold">{currency} {selectedAmountNum}</strong> towards <strong className="text-slate-900">{activeCategory}</strong> has been processed successfully.
                   </p>
                   <p className="text-xs text-slate-500">
                     &ldquo;God is not unjust; He will not forget your work and the love you have shown Him.&rdquo; — Hebrews 6:10
@@ -325,143 +246,26 @@ export default function GivingPage() {
               </div>
             ) : (
               <form onSubmit={handleProceedClick} className="space-y-8">
-                {/* 1. Dynamic Select Purpose / Category (Add, Edit, Delete) */}
+                {/* 1. Select Giving Purpose / Category (Managed via Admin Settings) */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs">
-                      1. Select Giving Category / Purpose
-                    </Label>
-                    {!isAddingCategory && (
-                      <button
-                        type="button"
-                        onClick={() => setIsAddingCategory(true)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[#14309c] hover:underline"
-                      >
-                        <Plus className="w-3.5 h-3.5" /> Add Category
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  <Label className="text-sm font-bold text-slate-900 uppercase tracking-wider text-xs">
+                    1. Select Giving Category / Purpose
+                  </Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {categories.map((cat, idx) => (
-                      <div key={idx} className="relative">
-                        {editingIndex === idx ? (
-                          <div className="flex items-center gap-1 bg-white p-1.5 rounded-xl border border-[#14309c] shadow-sm">
-                            <Input
-                              value={editingName}
-                              onChange={(e) => setEditingName(e.target.value)}
-                              className="h-8 text-xs font-bold border-slate-200"
-                              autoFocus
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  handleSaveEditCategory(idx);
-                                }
-                                if (e.key === 'Escape') setEditingIndex(null);
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleSaveEditCategory(idx)}
-                              className="p-1 text-emerald-600 hover:text-emerald-700"
-                              title="Save"
-                            >
-                              <Check className="w-4 h-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setEditingIndex(null)}
-                              className="p-1 text-slate-400 hover:text-slate-600"
-                              title="Cancel"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ) : (
-                          <div
-                            className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all ${
-                              givingType === cat
-                                ? 'border-[#14309c] bg-[#14309c] text-white shadow-md'
-                                : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
-                            }`}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => setGivingType(cat)}
-                              className="flex-1 text-left truncate mr-2"
-                            >
-                              {cat}
-                            </button>
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  startEditCategory(idx, cat);
-                                }}
-                                className={`p-1 rounded transition-colors ${
-                                  givingType === cat
-                                    ? 'text-white/80 hover:text-white hover:bg-white/20'
-                                    : 'text-slate-400 hover:text-slate-700 hover:bg-slate-200'
-                                }`}
-                                title="Edit Category"
-                              >
-                                <Pencil className="w-3 h-3" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteCategory(idx);
-                                }}
-                                className={`p-1 rounded transition-colors ${
-                                  givingType === cat
-                                    ? 'text-white/80 hover:text-rose-200 hover:bg-white/20'
-                                    : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
-                                }`}
-                                title="Delete Category"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setGivingType(cat)}
+                        className={`px-3 py-2.5 rounded-xl border text-xs font-bold text-left transition-all truncate ${
+                          activeCategory === cat
+                            ? 'border-[#14309c] bg-[#14309c] text-white shadow-md'
+                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {cat}
+                      </button>
                     ))}
-
-                    {isAddingCategory && (
-                      <div className="flex items-center gap-1 bg-white p-1.5 rounded-xl border-2 border-dashed border-[#14309c]">
-                        <Input
-                          placeholder="New Category Name"
-                          value={newCategoryName}
-                          onChange={(e) => setNewCategoryName(e.target.value)}
-                          className="h-8 text-xs font-bold border-slate-200"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              handleAddCategory();
-                            }
-                            if (e.key === 'Escape') setIsAddingCategory(false);
-                          }}
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={handleAddCategory}
-                          className="h-8 px-2.5 bg-[#14309c] text-white text-xs font-bold"
-                        >
-                          Add
-                        </Button>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddingCategory(false)}
-                          className="p-1 text-slate-400 hover:text-slate-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -570,7 +374,7 @@ export default function GivingPage() {
                   <div className="text-left space-y-0.5">
                     <p className="text-xs text-slate-500">Total Donation Summary:</p>
                     <p className="text-2xl font-extrabold text-[#14309c]">
-                      {currency} {selectedAmountNum} <span className="text-xs font-normal text-slate-600">for {givingType}</span>
+                      {currency} {selectedAmountNum} <span className="text-xs font-normal text-slate-600">for {activeCategory}</span>
                     </p>
                   </div>
 
@@ -605,7 +409,7 @@ export default function GivingPage() {
                 <strong className="text-[#14309c] font-bold">
                   {currency} {selectedAmountNum}
                 </strong>{' '}
-                towards <strong className="text-slate-900">{givingType}</strong>.
+                towards <strong className="text-slate-900">{activeCategory}</strong>.
               </DialogDescription>
             </DialogHeader>
 

@@ -6,7 +6,7 @@ import { submitContactMessage, fetchPublicSettings } from '@/lib/api/public';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const { data: settings } = useQuery({
@@ -53,7 +53,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-              <Sparkles className="h-3.5 w-3.5" /> Reach Out to Us
+              Reach Out to Us
             </span>
 
             <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">

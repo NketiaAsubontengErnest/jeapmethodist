@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cross, Mail, Lock, LogIn, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { Cross, Mail, Lock, LogIn, ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { ApiError } from '@/lib/api-client';
@@ -111,7 +111,7 @@ export default function LoginPage() {
           {/* Trust badges */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-[#FFC72C]">
-              <Sparkles className="h-3 w-3" /> Staff Portal
+              Staff Portal
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold text-slate-300">
               Secure Login

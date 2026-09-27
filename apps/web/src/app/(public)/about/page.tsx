@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPublicSettings } from '@/lib/api/public';
-import { ShieldCheck, Heart, Users, BookOpen, Target, Eye, Sparkles, ChevronRight, MapPin } from 'lucide-react';
+import { ShieldCheck, Heart, Users, BookOpen, Target, Eye, ChevronRight, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function AboutPage() {
@@ -25,7 +25,7 @@ export default function AboutPage() {
           <div className="grid items-center gap-12 lg:grid-cols-12">
             <div className="space-y-6 lg:col-span-8">
               <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-                <Sparkles className="h-3.5 w-3.5" /> About Our Church &amp; Heritage
+                About Our Church &amp; Heritage
               </span>
 
               <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">

@@ -74,9 +74,10 @@ const SECTIONS: SectionSpec[] = [
     ],
   },
   {
-    title: 'Offline Giving details (MoMo & Bank)',
-    description: 'Manual payment instructions shown on the Giving page for direct transfers and USSD.',
+    title: 'Offline Giving details & Categories',
+    description: 'Manage giving categories/purposes shown on the public Giving page, and manual payment instructions.',
     fields: [
+      { key: 'giving_categories', label: 'Giving Categories / Purposes (comma-separated list)', textarea: true, placeholder: 'Tithe (10%), Sunday Offertory, Annual Harvest Pledge, Building & Capital Fund, Class Monthly Dues, Welfare Relief, General Donation' },
       { key: 'momo_number', label: 'Mobile Money merchant number', placeholder: '0240000000' },
       { key: 'bank_name', label: 'Bank name', placeholder: 'GCB Bank / Ecobank' },
       { key: 'bank_account_number', label: 'Bank account number', placeholder: '1234567890123' },

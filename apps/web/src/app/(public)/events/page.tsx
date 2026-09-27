@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { fetchPublicEvents, EventItem } from '@/lib/api/public';
-import { MapPin, Clock, ArrowRight, Calendar, Sparkles, Share2 } from 'lucide-react';
+import { MapPin, Clock, ArrowRight, Calendar, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const revalidate = 60;
@@ -26,7 +26,7 @@ export default async function EventsPage() {
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-              <Sparkles className="h-3.5 w-3.5" /> Calendar &amp; Programmes
+              Calendar &amp; Programmes
             </span>
 
             <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">

@@ -42,6 +42,7 @@ export interface SettingsMap {
   moolre_merchant_id?: string;
   active_payment_gateway?: string;
   giving_currency?: string;
+  giving_categories?: string;
 }
 
 export function fetchSettings() {

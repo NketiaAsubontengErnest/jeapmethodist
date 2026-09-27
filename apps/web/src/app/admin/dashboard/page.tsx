@@ -18,7 +18,6 @@ import {
   PieChart as PieIcon,
   BarChart3,
   Layers,
-  Sparkles,
   Cake,
   Gift,
 } from 'lucide-react';
@@ -94,7 +93,7 @@ export default function DashboardPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Badge className="bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold uppercase text-[11px] tracking-wider">
-                <Sparkles className="mr-1 h-3 w-3" /> System Command Center
+                System Command Center
               </Badge>
             </div>
             <h1 className="font-serif text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
@@ -463,7 +462,6 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
             <div>
               <CardTitle className="flex items-center gap-2 font-serif text-base font-bold text-[#14309c] admin-dark:text-white">
-                <Sparkles className="h-5 w-5 text-amber-500" />
                 Upcoming Church Events &amp; Programmes
               </CardTitle>
               <CardDescription>Scheduled conventions, services, and activities</CardDescription>

@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { fetchPublicGallery, type MediaItem } from '@/lib/api/media';
 import { fetchAlbumById } from '@/lib/api/albums';
-import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, Sparkles, ExternalLink } from 'lucide-react';
+import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, ExternalLink } from 'lucide-react';
 
 function getThumbnailUrl(item: MediaItem): string | null {
   const url = item.externalUrl || item.url || '';
@@ -109,7 +109,7 @@ export default function GalleryClient() {
         <div className="absolute left-1/2 top-0 -translate-x-1/2 -mt-20 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
         <div className="relative z-10 space-y-4">
           <Badge className="bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold uppercase text-[11px] tracking-widest px-3 py-1">
-            <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Visual Storytelling &amp; Live Streams
+            Visual Storytelling &amp; Live Streams
           </Badge>
           <h1 className="font-serif text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
             Church Photo Gallery &amp; Live Streams
