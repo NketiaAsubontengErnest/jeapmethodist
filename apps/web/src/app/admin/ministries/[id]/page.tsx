@@ -166,9 +166,9 @@ export default function MinistryDetailPage() {
     return (
       <div className="space-y-4">
         <Button variant="ghost" onClick={() => router.push('/admin/ministries')}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Ministries
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Organizations
         </Button>
-        <p className="text-destructive font-medium">Ministry not found.</p>
+        <p className="text-destructive font-medium">Organization not found.</p>
       </div>
     );
   }

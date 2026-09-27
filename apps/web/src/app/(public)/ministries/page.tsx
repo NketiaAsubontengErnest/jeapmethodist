@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Ministries & Organizations | Methodist Church Ghana',
-  description: 'Explore the fellowship organizations, choir, youth ministries, and class systems of the Methodist Church Ghana.',
+  title: 'Church Organizations | Methodist Church Ghana',
+  description: 'Explore the fellowship organizations, choir, youth organizations, and class systems of the Methodist Church Ghana.',
 };
 
 export default async function MinistriesPage() {
@@ -16,7 +16,7 @@ export default async function MinistriesPage() {
   try {
     ministries = await fetchPublicMinistries();
   } catch (err) {
-    console.error('Failed to fetch public ministries:', err);
+    console.error('Failed to fetch public organizations:', err);
   }
 
   return (
@@ -30,7 +30,7 @@ export default async function MinistriesPage() {
             </span>
 
             <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Church Ministries &amp; Organizations
+              Church Organizations
             </h1>
 
             <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
@@ -44,13 +44,13 @@ export default async function MinistriesPage() {
       <section className="bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-bold text-slate-900 sm:text-3xl">All Active Ministries</h2>
+            <h2 className="font-serif text-2xl font-bold text-slate-900 sm:text-3xl">All Active Organizations</h2>
             <div className="mx-4 hidden h-[2px] flex-1 bg-[#FFC72C]/70 sm:block" />
           </div>
 
           {ministries.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-200 p-12 text-center text-xs text-slate-500">
-              No ministries have been published yet. Check back soon, or visit the admin dashboard to add one.
+              No organizations have been published yet. Check back soon, or visit the admin dashboard to add one.
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -65,7 +65,7 @@ export default async function MinistriesPage() {
                         <Users className="h-7 w-7" />
                       </div>
                       <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-extrabold uppercase text-[#14309c]">
-                        Ministry
+                        Organization
                       </span>
                     </div>
 

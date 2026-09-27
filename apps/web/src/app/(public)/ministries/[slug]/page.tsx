@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   if (!ministry) {
-    return { title: 'Ministry Not Found | Methodist Church Ghana' };
+    return { title: 'Organization Not Found | Methodist Church Ghana' };
   }
 
   return {
@@ -57,7 +57,7 @@ export default async function MinistryDetailPage({ params }: Props) {
             href="/ministries"
             className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" /> Back to All Ministries
+            <ChevronLeft className="w-4 h-4" /> Back to All Organizations
           </Link>
         </div>
 
@@ -102,7 +102,7 @@ export default async function MinistryDetailPage({ params }: Props) {
               <div className="flex items-center gap-3 text-foreground">
                 <User className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Ministry Leader</p>
+                  <p className="text-xs text-muted-foreground">Organization Leader</p>
                   <p className="text-sm font-semibold">{leaderName}</p>
                 </div>
               </div>

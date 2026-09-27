@@ -44,7 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Families', href: '/admin/families', icon: Home, permission: 'member.view' },
   { label: 'Attendance', href: '/admin/attendance', icon: CalendarCheck, permission: 'attendance.view' },
   { label: 'Visitors', href: '/admin/visitors', icon: UserPlus, permission: 'visitor.view' },
-  { label: 'Ministries', href: '/admin/ministries', icon: HandHeart, permission: 'ministry.view' },
+  { label: 'Organizations', href: '/admin/ministries', icon: HandHeart, permission: 'ministry.view' },
   { label: 'Groups', href: '/admin/groups', icon: UsersRound, permission: 'group.view' },
   { label: 'Leadership', href: '/admin/leadership', icon: Crown, permission: 'leadership.view' },
   { label: 'Events', href: '/admin/events', icon: CalendarDays, permission: 'event.view' },

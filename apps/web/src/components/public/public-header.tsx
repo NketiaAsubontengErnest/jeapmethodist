@@ -10,7 +10,7 @@ import { cn, formatMediaUrl } from '@/lib/utils';
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
-  { label: 'Ministries', href: '/ministries' },
+  { label: 'Organizations', href: '/ministries' },
   { label: 'Sermons', href: '/sermons' },
   { label: 'Events', href: '/events' },
   { label: 'News', href: '/news' },

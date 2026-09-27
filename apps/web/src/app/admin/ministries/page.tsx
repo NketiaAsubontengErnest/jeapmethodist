@@ -130,10 +130,10 @@ export default function MinistriesPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <HandHeart className="h-6 w-6 text-primary" />
-            Church Ministries
+            Church Organizations
           </h1>
           <p className="text-sm text-muted-foreground">
-            Manage church ministries, leadership assignments, meeting schedules, and member rosters.
+            Manage church organizations, leadership assignments, meeting schedules, and member rosters.
           </p>
         </div>
 
@@ -141,15 +141,15 @@ export default function MinistriesPage() {
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button className="gap-2">
-                <Plus className="h-4 w-4" /> Add Ministry
+                <Plus className="h-4 w-4" /> Add Organization
               </Button>
             </SheetTrigger>
             <SheetContent className="sm:max-w-[500px]">
               <form onSubmit={handleSubmit((values) => createMutation.mutate(values))} className="flex h-full flex-col">
                 <SheetHeader>
-                  <SheetTitle>Add New Ministry</SheetTitle>
+                  <SheetTitle>Add New Organization</SheetTitle>
                   <SheetDescription>
-                    Create a new ministry or service unit in the church.
+                    Create a new organization or fellowship unit in the church.
                   </SheetDescription>
                 </SheetHeader>
 
@@ -161,7 +161,7 @@ export default function MinistriesPage() {
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="name">Ministry Name *</Label>
+                    <Label htmlFor="name">Organization Name *</Label>
                     <Input id="name" placeholder="e.g. Men's Fellowship" {...register('name')} />
                     {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
                   </div>
@@ -189,7 +189,7 @@ export default function MinistriesPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="contactEmail">Contact Email</Label>
-                      <Input id="contactEmail" placeholder="ministry@church.org" {...register('contactEmail')} />
+                      <Input id="contactEmail" placeholder="organization@church.org" {...register('contactEmail')} />
                       {errors.contactEmail && <p className="text-xs text-destructive">{errors.contactEmail.message}</p>}
                     </div>
                   </div>
@@ -201,7 +201,7 @@ export default function MinistriesPage() {
                   </Button>
                   <Button type="submit" disabled={createMutation.isPending}>
                     {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Save Ministry
+                    Save Organization
                   </Button>
                 </SheetFooter>
               </form>
@@ -214,7 +214,7 @@ export default function MinistriesPage() {
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search ministries..."
+            placeholder="Search organizations..."
             className="pl-8"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -229,8 +229,8 @@ export default function MinistriesPage() {
       ) : filtered.length === 0 ? (
         <div className="flex h-48 flex-col items-center justify-center text-center">
           <HandHeart className="h-10 w-10 text-muted-foreground/50 mb-2" />
-          <p className="font-medium text-foreground">No ministries found</p>
-          <p className="text-sm text-muted-foreground">Add a new ministry to begin managing rosters.</p>
+          <p className="font-medium text-foreground">No organizations found</p>
+          <p className="text-sm text-muted-foreground">Add a new organization to begin managing rosters.</p>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

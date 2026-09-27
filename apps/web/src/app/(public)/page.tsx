@@ -197,11 +197,11 @@ export default function PublicHomePage() {
         </div>
       </section>
 
-      {/* 4. OUR ACTIVITIES & MINISTRIES SECTION — White Background */}
+      {/* 4. OUR ACTIVITIES & ORGANIZATIONS SECTION — White Background */}
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-bold text-slate-900">Our Activities &amp; Ministries</h2>
+            <h2 className="font-serif text-2xl font-bold text-slate-900">Our Activities &amp; Organizations</h2>
             <div className="mx-4 hidden h-[2px] flex-1 bg-[#FFC72C]/70 sm:block" />
             <Link href="/ministries" className="flex items-center gap-1 text-xs font-bold text-[#FFC72C] hover:underline">
               See all &rarr;
@@ -230,7 +230,7 @@ export default function PublicHomePage() {
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-slate-200 p-8 text-center text-xs text-slate-500">
-              Ministries added from the admin dashboard will appear here.
+              Organizations added from the admin dashboard will appear here.
             </div>
           )}
         </div>
