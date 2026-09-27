@@ -116,21 +116,6 @@ export function PublicHeader({
             })}
           </nav>
 
-          <div className="hidden items-center gap-2.5 md:flex">
-            <Button asChild className="rounded-lg bg-[#FFC72C] px-4 py-2 text-xs font-bold text-[#14309c] shadow hover:bg-amber-400 transition-colors">
-              <Link href="/giving" className="flex items-center gap-1.5">
-                <Heart className="h-3.5 w-3.5 fill-[#14309c] text-[#14309c]" />
-                Donate
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-lg border-white/30 bg-white/5 text-xs font-semibold text-white hover:bg-white/15 hover:text-white">
-              <Link href="/visit-us">Join Us</Link>
-            </Button>
-            <Button asChild variant="ghost" className="rounded-lg text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white">
-              <Link href="/login">Login</Link>
-            </Button>
-          </div>
-
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="rounded-md p-2 text-white hover:bg-white/10 md:hidden"

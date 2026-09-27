@@ -263,7 +263,6 @@ export function PublicFooter({
 
           {socialLinks.length > 0 && (
             <div className="flex items-center gap-3">
-              <span className="text-[11px] font-semibold text-slate-400">Connect:</span>
               <div className="flex items-center gap-2">
                 {socialLinks.map((s) => (
                   <a
