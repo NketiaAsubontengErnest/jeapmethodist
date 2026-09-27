@@ -59,9 +59,9 @@ export default function GivingPage() {
   // Dynamic Giving Categories derived from Admin Settings (or defaults)
   const categories: string[] = settings?.giving_categories
     ? settings.giving_categories
-        .split(',')
-        .map((c) => c.trim())
-        .filter(Boolean)
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean)
     : DEFAULT_GIVING_TYPES;
 
   const [givingType, setGivingType] = useState<string>('Tithe (10%)');
@@ -185,11 +185,8 @@ export default function GivingPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="border-blue-200 bg-blue-50 font-bold text-[#14309c]">
-            <Heart className="mr-1.5 h-3.5 w-3.5 fill-[#14309c]" /> Faithful Stewardship &amp; Generosity
-          </Badge>
           <h1 className="font-serif text-4xl font-bold text-slate-900 sm:text-5xl tracking-tight">
-            Online &amp; Electronic Giving
+            Online Giving
           </h1>
           <p className="text-base text-slate-600">
             &ldquo;Gain all you can, save all you can, give all you can.&rdquo; — John Wesley. Support the Gospel, church expansion, and community relief securely via <strong>Paystack</strong> and <strong>Moolre</strong>.
@@ -257,11 +254,10 @@ export default function GivingPage() {
                         key={idx}
                         type="button"
                         onClick={() => setGivingType(cat)}
-                        className={`px-3 py-2.5 rounded-xl border text-xs font-bold text-left transition-all truncate ${
-                          activeCategory === cat
-                            ? 'border-[#14309c] bg-[#14309c] text-white shadow-md'
-                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
-                        }`}
+                        className={`px-3 py-2.5 rounded-xl border text-xs font-bold text-left transition-all truncate ${activeCategory === cat
+                          ? 'border-[#14309c] bg-[#14309c] text-white shadow-md'
+                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                          }`}
                       >
                         {cat}
                       </button>
@@ -283,11 +279,10 @@ export default function GivingPage() {
                           setAmount(amt);
                           setCustomAmount('');
                         }}
-                        className={`py-3 rounded-xl border text-sm font-bold transition-all ${
-                          amount === amt
-                            ? 'border-[#FFC72C] bg-[#FFC72C] text-[#14309c] shadow-md scale-[1.02]'
-                            : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
-                        }`}
+                        className={`py-3 rounded-xl border text-sm font-bold transition-all ${amount === amt
+                          ? 'border-[#FFC72C] bg-[#FFC72C] text-[#14309c] shadow-md scale-[1.02]'
+                          : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
+                          }`}
                       >
                         {currency} {amt}
                       </button>
@@ -298,11 +293,10 @@ export default function GivingPage() {
                     <button
                       type="button"
                       onClick={() => setAmount('custom')}
-                      className={`px-4 py-2.5 rounded-xl border text-xs font-bold shrink-0 transition-all ${
-                        amount === 'custom'
-                          ? 'border-[#14309c] bg-[#14309c] text-white'
-                          : 'border-slate-200 bg-slate-50 text-slate-700'
-                      }`}
+                      className={`px-4 py-2.5 rounded-xl border text-xs font-bold shrink-0 transition-all ${amount === 'custom'
+                        ? 'border-[#14309c] bg-[#14309c] text-white'
+                        : 'border-slate-200 bg-slate-50 text-slate-700'
+                        }`}
                     >
                       Custom Amount
                     </button>
@@ -476,116 +470,6 @@ export default function GivingPage() {
             </div>
           </DialogContent>
         </Dialog>
-
-        {/* Giving Options Grid (Offline MoMo & Bank Details) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Mobile Money Card */}
-          <Card className="border-t-4 border-t-[#FFC72C] shadow-md bg-white">
-            <CardContent className="p-8 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
-                  <Smartphone className="w-6 h-6" />
-                </div>
-                <div>
-                  <Badge className="bg-amber-50 text-amber-800 border border-amber-200 mb-0.5 font-bold">
-                    Fast &amp; Convenient
-                  </Badge>
-                  <h2 className="font-serif text-2xl font-bold text-slate-900">Mobile Money (MoMo)</h2>
-                </div>
-              </div>
-
-              <p className="text-sm text-slate-600">
-                You can pay your Tithes, Monthly Class Dues, Harvest Pledges, or Welfare Contributions directly via Mobile Money on all networks (MTN, Telecel, AT).
-              </p>
-
-              <div className="bg-amber-50/60 border border-amber-200 rounded-xl p-6 space-y-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Official MoMo Number</p>
-                  <p className="text-2xl font-extrabold text-amber-900 tracking-wider">
-                    {settings?.momo_number || NOT_YET_CONFIGURED}
-                  </p>
-                </div>
-
-                <div className="space-y-1 pt-2 border-t border-amber-200/70">
-                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Account Merchant Name</p>
-                  <p className="text-sm font-bold text-slate-900">{settings?.church_name || 'Methodist Church Ghana'}</p>
-                </div>
-
-                <div className="space-y-1 pt-2 border-t border-amber-200/70">
-                  <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Reference Format</p>
-                  <p className="text-xs text-slate-700 font-medium">
-                    State your <span className="font-bold text-[#14309c]">Full Name</span> &amp; <span className="font-bold text-[#14309c]">Purpose</span> (e.g. &ldquo;Kwame Mensah - Tithe&rdquo; or &ldquo;Ama Osei - Harvest&rdquo;)
-                  </p>
-                </div>
-              </div>
-
-              {settings?.momo_number && (
-                <div className="space-y-2 text-xs text-slate-600">
-                  <p className="font-semibold text-slate-900">How to send via USSD:</p>
-                  <ol className="list-decimal list-inside space-y-1 text-slate-600">
-                    <li>Dial *170# (MTN) or *110# (Telecel / AT).</li>
-                    <li>Select Transfer Money or Pay Merchant.</li>
-                    <li>Enter Number: <strong>{settings.momo_number}</strong>.</li>
-                    <li>Enter Amount and reference (e.g., Tithe/Harvest).</li>
-                    <li>Confirm with your MoMo PIN.</li>
-                  </ol>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Bank Wire / Account Card */}
-          <Card className="border-t-4 border-t-[#14309c] shadow-md bg-white">
-            <CardContent className="p-8 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-[#14309c]">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <Badge className="bg-blue-50 text-[#14309c] border border-blue-200 mb-0.5 font-bold">
-                    Direct Deposit
-                  </Badge>
-                  <h2 className="font-serif text-2xl font-bold text-slate-900">Bank Transfer / Standing Orders</h2>
-                </div>
-              </div>
-
-              <p className="text-sm text-slate-600">
-                For larger offerings, monthly standing orders, and corporate or international wire transfers:
-              </p>
-
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-4">
-                <div>
-                  <p className="text-slate-500 font-medium text-xs">Bank Name</p>
-                  <p className="font-bold text-slate-900 text-sm">{settings?.bank_name || NOT_YET_CONFIGURED}</p>
-                </div>
-
-                <div className="space-y-1 pt-2 border-t border-slate-200">
-                  <p className="text-xs text-slate-500 font-medium">Account Name</p>
-                  <p className="font-bold text-slate-900">{settings?.church_name || 'Methodist Church Ghana'}</p>
-                </div>
-
-                <div className="space-y-1 pt-2 border-t border-slate-200">
-                  <p className="text-xs text-slate-500 font-medium">Account Number</p>
-                  <p className="text-xl font-extrabold text-[#14309c] tracking-wider">
-                    {settings?.bank_account_number || NOT_YET_CONFIGURED}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <h3 className="text-sm font-bold text-slate-900">Categories of Giving:</h3>
-                <ul className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium">
-                  {categories.slice(0, 6).map((cat, i) => (
-                    <li key={i} className="flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-[#14309c] shrink-0" />
-                      <span>{cat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Security & Accountability Note */}
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
