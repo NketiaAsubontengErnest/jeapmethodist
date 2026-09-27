@@ -32,6 +32,16 @@ export interface SettingsMap {
   hero_title?: string;
   hero_subtitle?: string;
   footer_text?: string;
+
+  // Online Giving & Gateways
+  paystack_enabled?: string;
+  paystack_public_key?: string;
+  paystack_secret_key?: string;
+  moolre_enabled?: string;
+  moolre_api_key?: string;
+  moolre_merchant_id?: string;
+  active_payment_gateway?: string;
+  giving_currency?: string;
 }
 
 export function fetchSettings() {

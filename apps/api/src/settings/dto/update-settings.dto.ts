@@ -190,4 +190,44 @@ export class UpdateSettingsDto {
   @IsString()
   @MaxLength(500)
   midweek_service?: string;
+
+  @ApiProperty({ required: false, description: 'Enable Paystack giving (true/false)' })
+  @IsOptional()
+  @IsString()
+  paystack_enabled?: string;
+
+  @ApiProperty({ required: false, description: 'Paystack Public Key' })
+  @IsOptional()
+  @IsString()
+  paystack_public_key?: string;
+
+  @ApiProperty({ required: false, description: 'Paystack Secret Key' })
+  @IsOptional()
+  @IsString()
+  paystack_secret_key?: string;
+
+  @ApiProperty({ required: false, description: 'Enable Moolre giving (true/false)' })
+  @IsOptional()
+  @IsString()
+  moolre_enabled?: string;
+
+  @ApiProperty({ required: false, description: 'Moolre API Key' })
+  @IsOptional()
+  @IsString()
+  moolre_api_key?: string;
+
+  @ApiProperty({ required: false, description: 'Moolre Merchant ID' })
+  @IsOptional()
+  @IsString()
+  moolre_merchant_id?: string;
+
+  @ApiProperty({ required: false, description: 'Active payment gateway mode (paystack/moolre/both/momo_only)' })
+  @IsOptional()
+  @IsString()
+  active_payment_gateway?: string;
+
+  @ApiProperty({ required: false, description: 'Default giving currency (GHS, USD)' })
+  @IsOptional()
+  @IsString()
+  giving_currency?: string;
 }

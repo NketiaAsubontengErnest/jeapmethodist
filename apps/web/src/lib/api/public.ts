@@ -24,6 +24,14 @@ export interface PublicSettings {
   bank_account_number?: string;
   facebook_url?: string;
   youtube_url?: string;
+  paystack_enabled?: string;
+  paystack_public_key?: string;
+  paystack_secret_key?: string;
+  moolre_enabled?: string;
+  moolre_api_key?: string;
+  moolre_merchant_id?: string;
+  active_payment_gateway?: string;
+  giving_currency?: string;
   [key: string]: string | undefined;
 }
 

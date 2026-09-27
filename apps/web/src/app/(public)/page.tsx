@@ -99,11 +99,21 @@ export default function PublicHomePage() {
                 </p>
               )}
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Button
                   asChild
                   size="lg"
                   className="rounded-lg bg-[#FFC72C] px-7 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-all hover:bg-amber-400 hover:scale-[1.02]"
+                >
+                  <Link href="/giving" className="flex items-center gap-2">
+                    <Heart className="h-4 w-4 fill-[#14309c]" /> Donate Online
+                  </Link>
+                </Button>
+
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-lg border border-white/30 bg-white/10 px-6 py-6 text-sm font-bold text-white shadow backdrop-blur-sm transition-all hover:bg-white/20"
                 >
                   <Link href="/visit-us">Join Us This Sunday</Link>
                 </Button>
@@ -111,7 +121,7 @@ export default function PublicHomePage() {
                 <Button
                   asChild
                   size="lg"
-                  className="rounded-lg border border-[#5C1615] bg-[#3B0E0D] px-7 py-6 text-sm font-bold text-white shadow transition-all hover:bg-[#4A1513]"
+                  className="rounded-lg border border-[#5C1615] bg-[#3B0E0D] px-6 py-6 text-sm font-bold text-white shadow transition-all hover:bg-[#4A1513]"
                 >
                   <Link href="/about">Our Story</Link>
                 </Button>
@@ -402,6 +412,42 @@ export default function PublicHomePage() {
               News and announcements added from the admin dashboard will appear here.
             </div>
           )}
+        </div>
+      </section>
+
+      {/* 7.5 ONLINE GIVING & STEWARDSHIP SECTION — Royal Blue Accent */}
+      <section className="bg-white py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#14309c] via-[#1c37ae] to-[#0f2478] p-8 text-white shadow-xl sm:p-12">
+            <div className="grid items-center gap-8 md:grid-cols-12">
+              <div className="space-y-4 md:col-span-8">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3 py-1 text-xs font-bold text-[#FFC72C]">
+                  <Heart className="h-3.5 w-3.5 fill-[#FFC72C]" /> Online Giving &amp; Stewardship
+                </div>
+                <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-4xl text-white">
+                  Support the Gospel &amp; Church Expansion
+                </h2>
+                <p className="max-w-2xl text-xs leading-relaxed text-slate-200 sm:text-sm">
+                  Give your Tithes, Offertory, Building Pledges, and Harvest contributions conveniently online using <strong>Paystack</strong>, <strong>Moolre</strong>, Mobile Money, or Bank Wire.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 md:col-span-4 md:items-end">
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full rounded-xl bg-[#FFC72C] px-8 py-6 text-sm font-extrabold text-[#14309c] shadow-lg transition-all hover:bg-amber-400 hover:scale-105 md:w-auto"
+                >
+                  <Link href="/giving" className="flex items-center justify-center gap-2">
+                    <Heart className="h-4 w-4 fill-[#14309c]" /> Donate Now
+                  </Link>
+                </Button>
+                <span className="text-[11px] font-semibold text-[#FFC72C]/80 text-center md:text-right">
+                  Instant &amp; Secure Checkout via Paystack &amp; Moolre
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

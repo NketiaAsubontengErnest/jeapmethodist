@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { label: 'Sermons', href: '/sermons' },
   { label: 'Events', href: '/events' },
   { label: 'News', href: '/news' },
+  { label: 'Giving', href: '/giving' },
   { label: 'Gallery', href: '/gallery' },
   { label: 'Contact', href: '/contact' },
 ];
@@ -53,6 +54,10 @@ export function PublicHeader({
             )}
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/giving" className="flex items-center gap-1 font-semibold text-[#FFC72C] hover:underline transition-colors">
+              <Heart className="h-3 w-3 fill-[#FFC72C] text-[#FFC72C]" /> Donate Online
+            </Link>
+            <span className="text-white/30">|</span>
             <Link href="/visit-us" className="font-semibold text-slate-200 hover:text-[#FFC72C] transition-colors">
               Plan Your Visit &rarr;
             </Link>
@@ -111,11 +116,17 @@ export function PublicHeader({
             })}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
-            <Button asChild className="rounded-lg bg-[#FFC72C] px-5 py-2 text-xs font-bold text-[#14309c] shadow hover:bg-amber-400 transition-colors">
-              <Link href="/visit-us">Join Us</Link>
+          <div className="hidden items-center gap-2.5 md:flex">
+            <Button asChild className="rounded-lg bg-[#FFC72C] px-4 py-2 text-xs font-bold text-[#14309c] shadow hover:bg-amber-400 transition-colors">
+              <Link href="/giving" className="flex items-center gap-1.5">
+                <Heart className="h-3.5 w-3.5 fill-[#14309c] text-[#14309c]" />
+                Donate
+              </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-lg border-white/30 bg-white/5 text-xs font-semibold text-white hover:bg-white/15 hover:text-white">
+              <Link href="/visit-us">Join Us</Link>
+            </Button>
+            <Button asChild variant="ghost" className="rounded-lg text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white">
               <Link href="/login">Login</Link>
             </Button>
           </div>
@@ -146,11 +157,17 @@ export function PublicHeader({
             ))}
             <div className="flex flex-col gap-2 border-t border-white/15 pt-3">
               <Button asChild className="w-full justify-center bg-[#FFC72C] font-bold text-[#14309c]">
+                <Link href="/giving" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2">
+                  <Heart className="h-4 w-4 fill-[#14309c]" />
+                  Donate Online
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full justify-center border-white/40 text-white hover:bg-white/10">
                 <Link href="/visit-us" onClick={() => setMobileOpen(false)}>
                   Join Us
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="w-full justify-center border-white/40 text-white hover:bg-white/10">
+              <Button asChild variant="ghost" className="w-full justify-center text-slate-300 hover:text-white">
                 <Link href="/login" onClick={() => setMobileOpen(false)}>
                   Login
                 </Link>

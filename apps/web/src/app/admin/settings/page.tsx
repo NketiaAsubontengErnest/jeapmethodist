@@ -74,12 +74,26 @@ const SECTIONS: SectionSpec[] = [
     ],
   },
   {
-    title: 'Giving details',
-    description: 'Shown on the public Giving page. No online payments are processed — these are informational only.',
+    title: 'Offline Giving details (MoMo & Bank)',
+    description: 'Manual payment instructions shown on the Giving page for direct transfers and USSD.',
     fields: [
-      { key: 'momo_number', label: 'Mobile Money number' },
-      { key: 'bank_name', label: 'Bank name' },
-      { key: 'bank_account_number', label: 'Bank account number' },
+      { key: 'momo_number', label: 'Mobile Money merchant number', placeholder: '0240000000' },
+      { key: 'bank_name', label: 'Bank name', placeholder: 'GCB Bank / Ecobank' },
+      { key: 'bank_account_number', label: 'Bank account number', placeholder: '1234567890123' },
+    ],
+  },
+  {
+    title: 'Online Giving & Payment Gateways (Paystack & Moolre)',
+    description: 'Configure payment provider keys for online tithes, offertory, and harvest donations.',
+    fields: [
+      { key: 'active_payment_gateway', label: 'Active Gateway Mode', placeholder: 'paystack, moolre, both, or momo_only' },
+      { key: 'giving_currency', label: 'Giving Currency', placeholder: 'GHS' },
+      { key: 'paystack_enabled', label: 'Enable Paystack Gateway (true/false)', placeholder: 'true' },
+      { key: 'paystack_public_key', label: 'Paystack Public Key (pk_live_... / pk_test_...)', placeholder: 'pk_live_xxxxxxxx' },
+      { key: 'paystack_secret_key', label: 'Paystack Secret Key (sk_live_... / sk_test_...)', type: 'password', placeholder: 'sk_live_xxxxxxxx' },
+      { key: 'moolre_enabled', label: 'Enable Moolre Gateway (true/false)', placeholder: 'true' },
+      { key: 'moolre_api_key', label: 'Moolre API Key', type: 'password', placeholder: 'moolre_api_key_xxxxxxxx' },
+      { key: 'moolre_merchant_id', label: 'Moolre Merchant ID', placeholder: 'MERCHANT_12345' },
     ],
   },
   {
