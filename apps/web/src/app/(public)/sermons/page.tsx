@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { fetchPublicSermons, SermonItem } from '@/lib/api/public';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { BookOpen, Video, Headphones, Calendar, User, ArrowRight, PlayCircle } from 'lucide-react';
+import { BookOpen, Video, Headphones, Calendar, User, ArrowRight, PlayCircle, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export const revalidate = 60;
 
@@ -23,163 +22,202 @@ export default async function SermonsPage() {
   const featured = sermons[0];
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <Badge variant="outline" className="border-blue-200 bg-blue-50 font-bold text-primary">
-            Word of God &amp; Media
-          </Badge>
-          <h1 className="font-serif text-4xl font-bold text-foreground sm:text-5xl tracking-tight">
-            Sermons &amp; Bible Teaching
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Be encouraged and transformed by the preaching of the Gospel. Stream or listen to Sunday sermons and mid-week Bible studies anytime.
-          </p>
+    <div className="flex flex-col min-h-screen bg-white text-slate-900">
+      {/* 1. HERO SECTION — Royal Blue #14309c Background */}
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8 text-white">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-3xl space-y-6">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
+              <Sparkles className="h-3.5 w-3.5" /> Word of God &amp; Media
+            </span>
+
+            <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Sermons &amp; Bible Teaching
+            </h1>
+
+            <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
+              Be encouraged, inspired, and spiritually nourished by the preaching of the Gospel. Stream or listen to Sunday messages and mid-week Bible teachings anytime.
+            </p>
+          </div>
         </div>
+      </section>
 
-        {/* Featured Sermon Hero — deliberate dark accent block, the one exception on this page */}
-        {featured && (
-          <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-red-700 rounded-2xl overflow-hidden shadow-xl text-white border border-gold-500/30">
-            <div className="p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="space-y-6">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge className="bg-gold-400 text-blue-950 font-bold hover:bg-gold-500">
-                    Latest Message
-                  </Badge>
-                  {featured.scripture && (
-                    <span className="text-xs text-gold-300 flex items-center gap-1 font-semibold">
-                      <BookOpen className="w-3.5 h-3.5" /> {featured.scripture}
+      {/* 2. FEATURED SERMON SECTION — White Background */}
+      <section className="bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+          {featured && (
+            <div className="relative overflow-hidden rounded-2xl border border-[#FFC72C]/30 bg-gradient-to-br from-[#1c37ae] via-[#14309c] to-[#0a1a58] p-8 text-white shadow-2xl sm:p-12">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div className="space-y-6 lg:col-span-7">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFC72C] px-3.5 py-1 text-xs font-extrabold text-[#14309c]">
+                      <Sparkles className="h-3.5 w-3.5" /> Featured Message
                     </span>
-                  )}
+                    {featured.scripture && (
+                      <span className="text-xs text-[#FFC72C] flex items-center gap-1 font-bold">
+                        <BookOpen className="w-3.5 h-3.5" /> {featured.scripture}
+                      </span>
+                    )}
+                  </div>
+
+                  <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight">
+                    {featured.title}
+                  </h2>
+
+                  <p className="text-slate-300 text-sm sm:text-base leading-relaxed line-clamp-3">
+                    {featured.description}
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-6 text-xs text-slate-300 pt-2 border-t border-white/10">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-[#FFC72C]" />
+                      <span className="font-bold text-white">{featured.speaker}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-[#FFC72C]" />
+                      <span>{new Date(featured.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="rounded-lg bg-[#FFC72C] px-7 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-all hover:bg-amber-400 hover:scale-[1.02]"
+                    >
+                      <Link href={`/sermons/${featured.slug}`} className="flex items-center gap-2">
+                        <PlayCircle className="w-5 h-5" /> Watch / Listen Full Message
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
 
-                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white leading-tight">
-                  {featured.title}
-                </h2>
-
-                <p className="text-cream-200 text-sm sm:text-base leading-relaxed line-clamp-3">
-                  {featured.description}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-6 text-xs text-cream-300">
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-gold-400" />
-                    <span className="font-semibold text-white">{featured.speaker}</span>
+                <div className="lg:col-span-5">
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-950 border border-[#FFC72C]/30 flex items-center justify-center group cursor-pointer shadow-xl">
+                    {featured.thumbnailUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={featured.thumbnailUrl}
+                        alt={featured.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="text-center p-6 space-y-2">
+                        <Video className="w-12 h-12 text-[#FFC72C] mx-auto" />
+                        <p className="text-xs font-bold text-slate-300">Methodist Media Ministry</p>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-colors">
+                      <div className="w-16 h-16 rounded-full bg-[#14309c]/90 text-[#FFC72C] flex items-center justify-center shadow-2xl border border-[#FFC72C] group-hover:scale-110 transition-transform">
+                        <PlayCircle className="w-8 h-8 ml-0.5" />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gold-400" />
-                    <span>{new Date(featured.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                  </div>
-                </div>
-
-                <div className="pt-2 flex flex-wrap gap-4">
-                  <Link
-                    href={`/sermons/${featured.slug}`}
-                    className="px-6 py-3 bg-gold-400 hover:bg-gold-500 text-blue-950 font-bold rounded-lg shadow inline-flex items-center gap-2 text-sm transition-colors"
-                  >
-                    <PlayCircle className="w-5 h-5" /> Watch / Listen Now
-                  </Link>
                 </div>
               </div>
-
-              <div className="relative aspect-video rounded-xl overflow-hidden bg-charcoal-900 border border-gold-400/20 flex items-center justify-center group cursor-pointer">
-                {featured.thumbnailUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={featured.thumbnailUrl}
-                    alt={featured.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="text-center p-6 space-y-2">
-                    <Video className="w-12 h-12 text-gold-400 mx-auto" />
-                    <p className="text-sm font-semibold text-cream-300">Methodist Church Media</p>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-colors">
-                  <div className="w-16 h-16 rounded-full bg-blue-900/90 text-gold-400 flex items-center justify-center shadow-lg border border-gold-400 group-hover:scale-110 transition-transform">
-                    <PlayCircle className="w-8 h-8 ml-0.5" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Sermon Grid */}
-        <section className="space-y-6">
-          <div className="flex justify-between items-center border-b pb-4 border-border">
-            <h2 className="font-serif text-2xl font-bold text-foreground">
-              All Sermons &amp; Archives
-            </h2>
-          </div>
-
-          {sermons.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-              No sermons have been published yet. Check back soon, or visit the admin dashboard to add one.
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sermons.map((sermon) => (
-              <Card
-                key={sermon.id}
-                className="flex flex-col justify-between rounded-2xl border-border border-t-4 border-t-primary bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-              >
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(sermon.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </span>
-                    {sermon.scripture && (
-                      <Badge variant="outline" className="text-xs border-blue-200 bg-blue-50 text-primary font-semibold">
-                        {sermon.scripture}
-                      </Badge>
-                    )}
-                  </div>
+          {/* Sermon Library Grid */}
+          <div className="space-y-8">
+            <div className="flex items-center justify-between">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900">
+                Sermon Archive &amp; Messages
+              </h2>
+              <div className="mx-4 hidden h-[2px] flex-1 bg-[#FFC72C]/70 sm:block" />
+            </div>
 
-                  <div className="space-y-1">
-                    <h3 className="font-serif text-xl font-bold text-foreground line-clamp-2">
-                      {sermon.title}
-                    </h3>
-                    <p className="text-xs font-bold text-gold-700">
-                      By {sermon.speaker}
-                    </p>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                    {sermon.description}
-                  </p>
-
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2">
-                    {sermon.videoUrl && (
-                      <span className="flex items-center gap-1 text-primary font-medium">
-                        <Video className="w-3.5 h-3.5" /> Video available
-                      </span>
-                    )}
-                    {sermon.audioUrl && (
-                      <span className="flex items-center gap-1 text-gold-700 font-medium">
-                        <Headphones className="w-3.5 h-3.5" /> Audio available
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-
-                <div className="px-6 pb-6 pt-0">
-                  <Link
-                    href={`/sermons/${sermon.slug}`}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg text-sm transition-colors border border-gold-400/20"
+            {sermons.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 p-12 text-center text-xs text-slate-500">
+                No sermons have been published yet. Check back soon, or visit the admin dashboard to add one.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {sermons.map((sermon) => (
+                  <div
+                    key={sermon.id}
+                    className="group flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-[#FFC72C]/50"
                   >
-                    Listen / Watch Sermon <ArrowRight className="w-4 h-4 text-gold-300" />
-                  </Link>
-                </div>
-              </Card>
-            ))}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-slate-500 flex items-center gap-1 font-semibold">
+                          <Calendar className="w-3.5 h-3.5 text-[#14309c]" />
+                          {new Date(sermon.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                        {sermon.scripture && (
+                          <span className="rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#14309c]">
+                            {sermon.scripture}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="space-y-1">
+                        <h3 className="font-serif text-xl font-bold text-slate-900 group-hover:text-[#14309c] transition-colors line-clamp-2">
+                          {sermon.title}
+                        </h3>
+                        <p className="text-xs font-bold text-amber-700">
+                          Preacher: {sermon.speaker}
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                        {sermon.description}
+                      </p>
+
+                      <div className="flex items-center gap-4 text-xs font-medium text-slate-500 pt-2 border-t border-slate-100">
+                        {sermon.videoUrl && (
+                          <span className="flex items-center gap-1 text-[#14309c] font-bold">
+                            <Video className="w-3.5 h-3.5" /> Video
+                          </span>
+                        )}
+                        {sermon.audioUrl && (
+                          <span className="flex items-center gap-1 text-amber-700 font-bold">
+                            <Headphones className="w-3.5 h-3.5" /> Audio
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-6">
+                      <Button
+                        asChild
+                        className="w-full rounded-lg bg-[#14309c] px-5 py-3 text-xs font-extrabold text-white shadow transition-all hover:bg-[#0f2478]"
+                      >
+                        <Link href={`/sermons/${sermon.slug}`} className="flex items-center justify-center gap-2">
+                          Listen / Watch Sermon <ArrowRight className="h-4 w-4 text-[#FFC72C]" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
+      {/* 3. CALLOUT BANNER — Reddish Brown Gradient */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 w-full">
+        <div className="flex flex-col items-start justify-between gap-6 rounded-2xl border border-[#8B2519]/30 bg-gradient-to-r from-[#2B0B0A] via-[#5C1615] to-[#8B2519] p-8 text-white shadow-xl sm:p-12 md:flex-row md:items-center">
+          <div className="space-y-2 max-w-xl">
+            <h2 className="font-serif text-2xl font-bold sm:text-3xl">
+              Hear the Word Live Every Sunday
+            </h2>
+            <p className="text-xs leading-relaxed text-slate-200 sm:text-sm">
+              Join our vibrant physical and online worship services every Sunday at 7:00 AM &amp; 9:30 AM.
+            </p>
+          </div>
+
+          <Button
+            asChild
+            size="lg"
+            className="shrink-0 rounded-lg bg-[#FFC72C] px-8 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-colors hover:bg-amber-400"
+          >
+            <Link href="/visit-us">Plan Your Visit</Link>
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
+
