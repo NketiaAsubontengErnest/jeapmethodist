@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
-  MapPin,
   Target,
   Eye,
   Share2,
@@ -12,10 +11,10 @@ import {
   Users,
   Heart,
   MessageSquareHeart,
-  Sparkles,
   Send,
   CheckCircle2,
   Shield,
+  MapPin,
 } from 'lucide-react';
 import {
   fetchPublicSettings,
@@ -36,7 +35,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetBody,
-  SheetTrigger,
 } from '@/components/ui/sheet';
 
 export default function PublicHomePage() {
@@ -140,6 +138,7 @@ export default function PublicHomePage() {
                 </p>
               )}
 
+              {/* Clean Hero Action Buttons (Donate Online & Join Us This Sunday) */}
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Button
                   asChild
@@ -151,140 +150,20 @@ export default function PublicHomePage() {
                   </Link>
                 </Button>
 
-                {/* Prayer Request & Thanksgiving Sheet Button */}
-                <Sheet open={prayerSheetOpen} onOpenChange={setPrayerSheetOpen}>
-                  <SheetTrigger asChild>
-                    <Button
-                      size="lg"
-                      className="rounded-lg border border-[#FFC72C]/60 bg-[#FFC72C]/20 px-6 py-6 text-sm font-extrabold text-[#FFC72C] shadow backdrop-blur-sm transition-all hover:bg-[#FFC72C] hover:text-[#14309c]"
-                    >
-                      <MessageSquareHeart className="h-4 w-4 mr-2" /> Prayer &amp; Thanksgiving
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent className="sm:max-w-lg overflow-y-auto">
-                    <SheetHeader>
-                      <SheetTitle className="flex items-center gap-2 text-[#14309c]">
-                        <MessageSquareHeart className="h-5 w-5 text-[#FFC72C]" />
-                        Submit Prayer or Thanksgiving
-                      </SheetTitle>
-                      <SheetDescription>
-                        Share your prayer request or recount God&apos;s blessings. Our intercessory team will hold your request up in faith.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <SheetBody className="space-y-4 py-4">
-                      {status === 'success' ? (
-                        <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl space-y-3 text-center text-[#14309c]">
-                          <CheckCircle2 className="w-10 h-10 text-[#14309c] mx-auto" />
-                          <h3 className="font-serif text-xl font-bold text-slate-900">Submitted Successfully!</h3>
-                          <p className="text-xs text-slate-600">
-                            May the grace and peace of our Lord Jesus Christ rest upon you.
-                          </p>
-                          <Button variant="outline" size="sm" onClick={() => setStatus('idle')} className="text-xs border-blue-200 text-[#14309c]">
-                            Submit Another Entry
-                          </Button>
-                        </div>
-                      ) : (
-                        <form onSubmit={handlePrayerSubmit} className="space-y-4">
-                          {/* Type selection */}
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setSubmissionType('prayer')}
-                              className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
-                                submissionType === 'prayer'
-                                  ? 'bg-[#14309c] text-white border-[#14309c]'
-                                  : 'bg-slate-50 text-slate-600 border-slate-200'
-                              }`}
-                            >
-                              Prayer Request
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setSubmissionType('thanksgiving')}
-                              className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
-                                submissionType === 'thanksgiving'
-                                  ? 'bg-amber-500 text-white border-amber-500'
-                                  : 'bg-slate-50 text-slate-600 border-slate-200'
-                              }`}
-                            >
-                              Thanksgiving
-                            </button>
-                          </div>
-
-                          <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs">
-                            <span className="flex items-center gap-1.5 font-bold text-amber-900">
-                              <Shield className="h-4 w-4 text-amber-700" /> Confidential
-                            </span>
-                            <label className="flex items-center gap-1.5 cursor-pointer font-semibold text-slate-900">
-                              <input
-                                type="checkbox"
-                                checked={formData.isAnonymous}
-                                onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
-                                className="h-3.5 w-3.5 text-[#14309c] rounded"
-                              />
-                              Anonymous
-                            </label>
-                          </div>
-
-                          {!formData.isAnonymous && (
-                            <div className="space-y-3">
-                              <div className="space-y-1">
-                                <Label className="text-xs font-semibold">Your Name</Label>
-                                <Input placeholder="e.g. Grace Mensah" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                  <Label className="text-xs font-semibold">Email</Label>
-                                  <Input type="email" placeholder="grace@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
-                                </div>
-                                <div className="space-y-1">
-                                  <Label className="text-xs font-semibold">Phone</Label>
-                                  <Input placeholder="+233..." value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="space-y-1">
-                            <Label className="text-xs font-semibold">
-                              {submissionType === 'thanksgiving' ? 'Thanksgiving / Testimony Details *' : 'Prayer Request *'}
-                            </Label>
-                            <textarea
-                              rows={4}
-                              required
-                              className="w-full rounded-lg border border-slate-300 p-2 text-xs focus:ring-2 focus:ring-[#14309c] outline-none"
-                              placeholder={
-                                submissionType === 'thanksgiving'
-                                  ? 'Recount God’s blessings and answered prayers...'
-                                  : 'Share your prayer burdens and intentions...'
-                              }
-                              value={formData.request}
-                              onChange={(e) => setFormData({ ...formData, request: e.target.value })}
-                            />
-                          </div>
-
-                          <Button
-                            type="submit"
-                            disabled={status === 'submitting'}
-                            className={`w-full text-xs font-bold py-2.5 rounded-lg ${
-                              submissionType === 'thanksgiving' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-[#14309c] hover:bg-[#0f2478] text-white'
-                            }`}
-                          >
-                            <Send className="w-3.5 h-3.5 mr-1.5" />
-                            {status === 'submitting' ? 'Submitting…' : submissionType === 'thanksgiving' ? 'Submit Thanksgiving' : 'Submit Prayer Request'}
-                          </Button>
-                        </form>
-                      )}
-                    </SheetBody>
-                  </SheetContent>
-                </Sheet>
-
                 <Button
                   asChild
                   size="lg"
                   className="rounded-lg border border-white/30 bg-white/10 px-6 py-6 text-sm font-bold text-white shadow backdrop-blur-sm transition-all hover:bg-white/20"
                 >
                   <Link href="/visit-us">Join Us This Sunday</Link>
+                </Button>
+
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-lg border border-[#5C1615] bg-[#3B0E0D] px-6 py-6 text-sm font-bold text-white shadow transition-all hover:bg-[#4A1513]"
+                >
+                  <Link href="/about">Our Story</Link>
                 </Button>
               </div>
             </div>
@@ -341,8 +220,8 @@ export default function PublicHomePage() {
       <section className="bg-gradient-to-r from-blue-900 via-[#14309c] to-indigo-950 py-10 text-white shadow-inner border-y border-amber-500/20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left max-w-2xl">
-            <span className="inline-flex items-center gap-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-              <Sparkles className="h-3.5 w-3.5" /> Intercessory &amp; Praise Ministry
+            <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
+              INTERCESSORY &amp; PRAISE MINISTRY
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">Need Prayer or Have a Testimony?</h2>
             <p className="text-xs sm:text-sm text-slate-300">
@@ -360,11 +239,131 @@ export default function PublicHomePage() {
               onClick={() => { setSubmissionType('thanksgiving'); setPrayerSheetOpen(true); }}
               className="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold text-xs px-5 py-5 rounded-xl backdrop-blur-sm"
             >
-              <Sparkles className="h-4 w-4 mr-1.5 text-[#FFC72C]" /> Share Thanksgiving
+              Share Thanksgiving
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Off-Canvas Prayer & Thanksgiving Drawer */}
+      <Sheet open={prayerSheetOpen} onOpenChange={setPrayerSheetOpen}>
+        <SheetContent className="sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2 text-[#14309c]">
+              <MessageSquareHeart className="h-5 w-5 text-[#FFC72C]" />
+              Submit Prayer or Thanksgiving
+            </SheetTitle>
+            <SheetDescription>
+              Share your prayer request or recount God&apos;s blessings. Our intercessory team will hold your request up in faith.
+            </SheetDescription>
+          </SheetHeader>
+          <SheetBody className="space-y-4 py-4">
+            {status === 'success' ? (
+              <div className="p-6 bg-blue-50 border border-blue-200 rounded-xl space-y-3 text-center text-[#14309c]">
+                <CheckCircle2 className="w-10 h-10 text-[#14309c] mx-auto" />
+                <h3 className="font-serif text-xl font-bold text-slate-900">Submitted Successfully!</h3>
+                <p className="text-xs text-slate-600">
+                  May the grace and peace of our Lord Jesus Christ rest upon you.
+                </p>
+                <Button variant="outline" size="sm" onClick={() => setStatus('idle')} className="text-xs border-blue-200 text-[#14309c]">
+                  Submit Another Entry
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handlePrayerSubmit} className="space-y-4">
+                {/* Type selection */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSubmissionType('prayer')}
+                    className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
+                      submissionType === 'prayer'
+                        ? 'bg-[#14309c] text-white border-[#14309c]'
+                        : 'bg-slate-50 text-slate-600 border-slate-200'
+                    }`}
+                  >
+                    Prayer Request
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSubmissionType('thanksgiving')}
+                    className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border ${
+                      submissionType === 'thanksgiving'
+                        ? 'bg-amber-500 text-white border-amber-500'
+                        : 'bg-slate-50 text-slate-600 border-slate-200'
+                    }`}
+                  >
+                    Thanksgiving
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs">
+                  <span className="flex items-center gap-1.5 font-bold text-amber-900">
+                    <Shield className="h-4 w-4 text-amber-700" /> Confidential
+                  </span>
+                  <label className="flex items-center gap-1.5 cursor-pointer font-semibold text-slate-900">
+                    <input
+                      type="checkbox"
+                      checked={formData.isAnonymous}
+                      onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
+                      className="h-3.5 w-3.5 text-[#14309c] rounded"
+                    />
+                    Anonymous
+                  </label>
+                </div>
+
+                {!formData.isAnonymous && (
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs font-semibold">Your Name</Label>
+                      <Input placeholder="e.g. Grace Mensah" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs font-semibold">Email</Label>
+                        <Input type="email" placeholder="grace@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs font-semibold">Phone</Label>
+                        <Input placeholder="+233..." value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">
+                    {submissionType === 'thanksgiving' ? 'Thanksgiving / Testimony Details *' : 'Prayer Request *'}
+                  </Label>
+                  <textarea
+                    rows={4}
+                    required
+                    className="w-full rounded-lg border border-slate-300 p-2 text-xs focus:ring-2 focus:ring-[#14309c] outline-none"
+                    placeholder={
+                      submissionType === 'thanksgiving'
+                        ? 'Recount God’s blessings and answered prayers...'
+                        : 'Share your prayer burdens and intentions...'
+                    }
+                    value={formData.request}
+                    onChange={(e) => setFormData({ ...formData, request: e.target.value })}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={status === 'submitting'}
+                  className={`w-full text-xs font-bold py-2.5 rounded-lg ${
+                    submissionType === 'thanksgiving' ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-[#14309c] hover:bg-[#0f2478] text-white'
+                  }`}
+                >
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  {status === 'submitting' ? 'Submitting…' : submissionType === 'thanksgiving' ? 'Submit Thanksgiving' : 'Submit Prayer Request'}
+                </Button>
+              </form>
+            )}
+          </SheetBody>
+        </SheetContent>
+      </Sheet>
 
       {/* 3. MISSION & VISION SECTION — Warm Cream Background #FAF8F5 */}
       <section className="bg-[#FAF8F5] py-16">
