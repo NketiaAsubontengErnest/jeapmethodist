@@ -112,6 +112,18 @@ export default function PublicHomePage() {
     (i) => i.category !== 'identity' && i.category !== 'hero_slide' && i.title !== 'logo_url' && i.title !== 'favicon_url'
   );
 
+  const currentSlide = heroSlides[activeSlideIndex] || null;
+  const activeTitle =
+    currentSlide?.title ||
+    settings?.hero_title ||
+    settings?.society_name ||
+    'Welcome to Rev. J.E. Allotey-Pappoe Methodist Church';
+
+  const activeDescription =
+    currentSlide?.description ||
+    settings?.hero_subtitle ||
+    "A Christ-centered community where faith grows, lives are transformed, and God's love is shared with all.";
+
   useEffect(() => {
     if (heroSlides.length <= 1) return;
     const interval = setInterval(() => {
@@ -122,8 +134,8 @@ export default function PublicHomePage() {
 
   return (
     <div className="flex flex-col bg-white text-slate-900">
-      {/* 1. HERO SECTION — Royal Blue #14309c Background with Overlay & Images */}
-      <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      {/* 1. HERO SECTION — Matching target design with slide title & description */}
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         {heroSlides.length > 0 && (
           <div className="absolute inset-0 z-0">
             {heroSlides.map((slide, index) => {
@@ -139,111 +151,54 @@ export default function PublicHomePage() {
                 />
               );
             })}
-            {/* Royal blue overlay covering the images with lighter opacity */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#14309c]/70 via-[#14309c]/50 to-[#14309c]/60" />
+            {/* Dark contrast overlay for visual contrast */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/50" />
           </div>
         )}
+
         <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="grid items-center gap-12 lg:grid-cols-12">
-            <div className="space-y-6 lg:col-span-7">
-              {(settings?.church_name || settings?.society_name) && (
-                <span className="block text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
-                  {(settings?.church_name || settings?.society_name || '').toUpperCase()}
-                </span>
-              )}
+          <div className="flex flex-col items-start justify-center space-y-4 max-w-3xl">
+            {/* Big Yellow Title */}
+            <h1 className="font-sans text-4xl font-extrabold leading-tight tracking-tight text-[#FFC72C] sm:text-5xl lg:text-6xl drop-shadow-md">
+              {activeTitle}
+            </h1>
 
-              {(settings?.hero_title || settings?.society_name) && (
-                <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-                  {settings?.hero_title || settings?.society_name}
-                </h1>
-              )}
+            {/* White Divider Line */}
+            <div className="h-1 w-24 rounded-full bg-white my-2 shadow-sm" />
 
-              {settings?.slogan && (
-                <p className="text-base font-medium italic text-[#FFC72C]">
-                  &quot;{settings.slogan.replace(/^["']|["']$/g, '')}&quot;
-                </p>
-              )}
+            {/* Crisp White Description */}
+            <p className="max-w-2xl text-base font-normal leading-relaxed text-slate-100 sm:text-lg lg:text-xl drop-shadow">
+              {activeDescription}
+            </p>
 
-              {settings?.hero_subtitle && (
-                <p className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
-                  {settings.hero_subtitle}
-                </p>
-              )}
-
-              {/* Clean Hero Action Buttons (Donate Online & Join Us This Sunday) */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Button
-                  asChild
-                  size="lg"
-                  className="rounded-lg bg-[#FFC72C] px-7 py-6 text-sm font-extrabold text-[#14309c] shadow-md transition-all hover:bg-amber-400 hover:scale-[1.02]"
-                >
-                  <Link href="/giving" className="flex items-center gap-2">
-                    <Heart className="h-4 w-4 fill-[#14309c]" /> Donate
-                  </Link>
-                </Button>
-
-                <Button
-                  asChild
-                  size="lg"
-                  className="rounded-lg border border-white/30 bg-white/10 px-6 py-6 text-sm font-bold text-white shadow backdrop-blur-sm transition-all hover:bg-white/20"
-                >
-                  <Link href="/visit-us">Visit Us</Link>
-                </Button>
-
-                <Button
-                  asChild
-                  size="lg"
-                  className="rounded-lg border border-[#5C1615] bg-[#3B0E0D] px-6 py-6 text-sm font-bold text-white shadow transition-all hover:bg-[#4A1513]"
-                >
-                  <Link href="/about">Our Story</Link>
-                </Button>
-              </div>
+            {/* Join Us For Worship CTA Button */}
+            <div className="pt-4">
+              <Button
+                asChild
+                size="lg"
+                className="rounded-xl bg-[#FFC72C] px-8 py-6 text-sm font-extrabold uppercase tracking-wider text-[#14309c] shadow-lg transition-all hover:bg-amber-400 hover:scale-[1.02]"
+              >
+                <Link href="/visit-us">JOIN US FOR WORSHIP</Link>
+              </Button>
             </div>
 
-            {/* Right column: Featured Highlight Box */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-2xl border border-[#FFC72C]/30 bg-gradient-to-b from-[#1c37ae] to-[#14309c] p-8 text-white shadow-2xl">
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-bold text-[#FFC72C]">
-                  Featured Word
-                </div>
-
-                {featuredSermon ? (
-                  <div className="space-y-4">
-                    <h3 className="font-serif text-2xl font-bold leading-snug">{featuredSermon.title}</h3>
-                    <p className="line-clamp-3 text-xs leading-relaxed text-slate-300">
-                      {featuredSermon.description}
-                    </p>
-                    <div className="border-t border-white/10 pt-3 text-xs font-semibold text-[#FFC72C]">
-                      Speaker: {featuredSermon.speaker} &bull; {featuredSermon.scripture}
-                    </div>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="w-full rounded-lg border-[#FFC72C]/60 text-xs font-bold text-[#FFC72C] hover:bg-[#FFC72C] hover:text-[#14309c]"
-                    >
-                      <Link href={`/sermons/${featuredSermon.slug}`}>Watch Full Sermon</Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <h3 className="font-serif text-2xl font-bold">Sunday Divine Service</h3>
-                    <p className="text-xs leading-relaxed text-slate-300">
-                      Join our vibrant services every Sunday. Be refreshed, empowered, and built up in faith through God&apos;s holy word.
-                    </p>
-                    <div className="border-t border-white/10 pt-3 text-xs font-semibold text-[#FFC72C]">
-                      Service: 8:00 AM
-                    </div>
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="w-full rounded-lg border-[#FFC72C]/60 text-xs font-bold text-[#FFC72C] hover:bg-[#FFC72C] hover:text-[#14309c]"
-                    >
-                      <Link href="/sermons">Browse Sermons</Link>
-                    </Button>
-                  </div>
-                )}
+            {/* Dash Slide Carousel Indicators */}
+            {heroSlides.length > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-8">
+                {heroSlides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveSlideIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      idx === activeSlideIndex
+                        ? 'w-8 bg-[#FFC72C]'
+                        : 'w-5 bg-white/40 hover:bg-white/70'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
