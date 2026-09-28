@@ -359,7 +359,7 @@ export default function PublicHomePage() {
                 <Target className="h-5 w-5" />
               </div>
               <h3 className="font-serif text-xl font-bold text-slate-900">Our Mission</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 whitespace-pre-line">
                 {settings?.mission ||
                   'To build a vibrant, spirit-filled, and self-sustaining church that equips every member for Christian witness, disciple-making, compassionate outreach, and active service to God and humanity.'}
               </p>
@@ -371,7 +371,7 @@ export default function PublicHomePage() {
                 <Eye className="h-5 w-5" />
               </div>
               <h3 className="font-serif text-xl font-bold text-slate-900">Our Vision</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 whitespace-pre-line">
                 {settings?.vision ||
                   'To be a Christ-centered, scripture-guided church family in Ghana where lives are transformed by grace, spiritual gifts are nurtured, and God’s kingdom is manifested across all generations.'}
               </p>

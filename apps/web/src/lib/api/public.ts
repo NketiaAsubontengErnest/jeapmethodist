@@ -9,6 +9,9 @@ export interface PublicSettings {
   favicon_url?: string;
   hero_title?: string;
   hero_subtitle?: string;
+  about_text?: string;
+  mission?: string;
+  vision?: string;
   address?: string;
   phone?: string;
   email?: string;

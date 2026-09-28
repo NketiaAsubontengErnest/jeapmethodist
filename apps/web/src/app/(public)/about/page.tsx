@@ -97,7 +97,7 @@ export default function AboutPage() {
                 <Target className="h-6 w-6" />
               </div>
               <h3 className="font-serif text-2xl font-bold text-slate-900">Our Mission</h3>
-              <p className="text-sm leading-relaxed text-slate-600">
+              <p className="text-sm leading-relaxed text-slate-600 whitespace-pre-line">
                 {settings?.mission ||
                   'To build a vibrant, spirit-filled, and self-sustaining church that equips every member for Christian witness, disciple-making, compassionate outreach, and active service to God and humanity.'}
               </p>
@@ -109,7 +109,7 @@ export default function AboutPage() {
                 <Eye className="h-6 w-6" />
               </div>
               <h3 className="font-serif text-2xl font-bold text-slate-900">Our Vision</h3>
-              <p className="text-sm leading-relaxed text-slate-600">
+              <p className="text-sm leading-relaxed text-slate-600 whitespace-pre-line">
                 {settings?.vision ||
                   'To be a Christ-centered, scripture-guided church family in Ghana where lives are transformed by grace, spiritual gifts are nurtured, and God’s kingdom is manifested across all generations.'}
               </p>
