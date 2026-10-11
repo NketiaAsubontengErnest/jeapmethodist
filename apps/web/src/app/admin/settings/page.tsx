@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatMediaUrl, compressImage } from '@/lib/utils';
+import { cn, formatMediaUrl, compressImage } from '@/lib/utils';
 
 interface FieldSpec {
   key: keyof SettingsMap;
@@ -128,6 +128,7 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const [unlockedFields, setUnlockedFields] = useState<Record<string, boolean>>({});
+  const [activeSection, setActiveSection] = useState(SECTIONS[0].title);
 
   const logoFileRef = useRef<HTMLInputElement>(null);
   const faviconFileRef = useRef<HTMLInputElement>(null);
@@ -261,8 +262,33 @@ export default function SettingsPage() {
         })}
         className="space-y-6"
       >
+        <div className="flex flex-col gap-6 md:flex-row md:items-start">
+        <div
+          role="tablist"
+          aria-orientation="vertical"
+          className="flex gap-1 overflow-x-auto md:sticky md:top-4 md:w-56 md:shrink-0 md:flex-col md:overflow-visible"
+        >
+          {SECTIONS.map((section) => (
+            <button
+              key={section.title}
+              type="button"
+              role="tab"
+              aria-selected={activeSection === section.title}
+              onClick={() => setActiveSection(section.title)}
+              className={cn(
+                'whitespace-nowrap rounded-md px-3 py-2 text-left text-sm font-medium transition-colors',
+                activeSection === section.title
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
+            >
+              {section.title}
+            </button>
+          ))}
+        </div>
+        <div className="min-w-0 flex-1">
         {SECTIONS.map((section) => (
-          <Card key={section.title}>
+          <Card key={section.title} role="tabpanel" hidden={activeSection !== section.title}>
             <CardHeader>
               <CardTitle className="text-base">{section.title}</CardTitle>
               <CardDescription>{section.description}</CardDescription>
@@ -358,6 +384,8 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         ))}
+        </div>
+        </div>
 
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={mutation.isPending}>
