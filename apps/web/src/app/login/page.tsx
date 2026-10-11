@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Cross, Mail, Lock, LogIn, ArrowLeft, Loader2 } from 'lucide-react';
+import { Cross, Mail, Lock, LogIn, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { ApiError } from '@/lib/api-client';
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['public-settings'],
@@ -47,7 +48,13 @@ export default function LoginPage() {
       await login(values.email, values.password);
       router.push('/admin/dashboard');
     } catch (error) {
-      setServerError(error instanceof Error ? error.message : 'Something went wrong. Please try again.');
+      if (error instanceof ApiError) {
+        setServerError(error.message);
+      } else if (error instanceof TypeError) {
+        setServerError('Cannot reach the server. Check your internet connection and try again.');
+      } else {
+        setServerError(error instanceof Error ? error.message : 'Something went wrong. Please try again.');
+      }
     }
   };
 
@@ -195,13 +202,21 @@ export default function LoginPage() {
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   aria-invalid={!!errors.password}
-                  className="pl-10 h-11 rounded-xl border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 ring-offset-white focus-visible:ring-[#14309c] shadow-sm"
+                  className="pl-10 pr-11 h-11 rounded-xl border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 ring-offset-white focus-visible:ring-[#14309c] shadow-sm"
                   {...register('password')}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-700"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
               {errors.password && <p className="text-xs text-destructive font-medium">{errors.password.message}</p>}
             </div>
