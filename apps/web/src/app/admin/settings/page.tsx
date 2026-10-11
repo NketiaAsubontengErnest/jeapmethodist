@@ -262,11 +262,10 @@ export default function SettingsPage() {
         })}
         className="space-y-6"
       >
-        <div className="flex flex-col gap-6 md:flex-row md:items-start">
+        <div className="flex flex-col gap-6">
         <div
           role="tablist"
-          aria-orientation="vertical"
-          className="flex gap-1 overflow-x-auto md:sticky md:top-4 md:w-56 md:shrink-0 md:flex-col md:overflow-visible"
+          className="flex gap-1 overflow-x-auto border-b pb-2"
         >
           {SECTIONS.map((section) => (
             <button
