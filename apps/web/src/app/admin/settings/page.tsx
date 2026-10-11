@@ -25,6 +25,7 @@ interface FieldSpec {
 
 interface SectionSpec {
   title: string;
+  tab: string;
   description: string;
   fields: FieldSpec[];
 }
@@ -32,6 +33,7 @@ interface SectionSpec {
 const SECTIONS: SectionSpec[] = [
   {
     title: 'Church identity',
+    tab: 'Church identity',
     description: 'Shown throughout the public website, headers, footers, and browser tab.',
     fields: [
       { key: 'church_name', label: 'Church / Denomination name', placeholder: 'Methodist Church Ghana' },
@@ -44,6 +46,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Contact & Secretariat hours',
+    tab: 'Contact details',
     description: 'Displayed on the Contact, Visit Us, Header, and Footer sections.',
     fields: [
       { key: 'address', label: 'Physical Location / Address', textarea: true, placeholder: 'Methodist Church Ghana, Cathedral Avenue, Accra / Circuit Headquarters' },
@@ -55,6 +58,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Sunday & Mid-Week Service Schedule',
+    tab: 'Service times',
     description: 'Displayed on Visit Us, Contact, Header, and Footer pages.',
     fields: [
       { key: 'sunday_service_1', label: '1st Sunday Service', placeholder: '1st Service (Fante / Vernacular) — 7:00 AM' },
@@ -66,6 +70,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'About the church',
+    tab: 'About us',
     description: 'Used on the About page.',
     fields: [
       { key: 'about_text', label: 'About text', textarea: true },
@@ -75,6 +80,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Offline Giving details & Categories',
+    tab: 'Giving setup',
     description: 'Manage giving categories/purposes shown on the public Giving page, and manual payment instructions.',
     fields: [
       { key: 'giving_categories', label: 'Giving Categories / Purposes (comma-separated list)', textarea: true, placeholder: 'Tithe (10%), Sunday Offertory, Annual Harvest Pledge, Building & Capital Fund, Class Monthly Dues, Welfare Relief, General Donation' },
@@ -85,6 +91,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Online Giving & Payment Gateways (Paystack & Moolre)',
+    tab: 'Payment setup',
     description: 'Configure payment provider keys for online tithes, offertory, and harvest donations.',
     fields: [
       { key: 'active_payment_gateway', label: 'Active Gateway Mode', placeholder: 'paystack, moolre, both, or momo_only' },
@@ -99,6 +106,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Social media',
+    tab: 'Social links',
     description: 'Only configured networks are shown on the public footer & header.',
     fields: [
       { key: 'facebook_url', label: 'Facebook URL', type: 'url', placeholder: 'https://facebook.com/...' },
@@ -112,6 +120,7 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     title: 'Homepage & footer',
+    tab: 'Homepage & footer',
     description: 'The hero banner text on the homepage and the footer note.',
     fields: [
       { key: 'hero_title', label: 'Hero title' },
@@ -281,7 +290,7 @@ export default function SettingsPage() {
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
-              {section.title}
+              {section.tab}
             </button>
           ))}
         </div>
