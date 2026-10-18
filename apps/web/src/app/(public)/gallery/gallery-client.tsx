@@ -104,24 +104,26 @@ export default function GalleryClient() {
   );
 
   return (
-    <div className="space-y-12">
-      {/* Hero Banner Header — Royal Blue & Gold Aesthetic */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#14309c] p-10 text-white shadow-2xl border border-blue-800 text-center max-w-4xl mx-auto">
+    <div className="flex flex-col">
+      {/* HERO SECTION — Royal Blue with first banner image */}
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8 text-white">
         <HeroBackground />
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 -mt-20 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
-        <div className="relative z-10 space-y-4">
-          <Badge className="bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold uppercase text-[11px] tracking-widest px-3 py-1">
-            Visual Storytelling &amp; Live Streams
-          </Badge>
-          <h1 className="font-serif text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Church Photo Gallery &amp; Live Streams
-          </h1>
-          <p className="text-base text-slate-300 max-w-2xl mx-auto">
-            Browse our photo albums, relive past services and choir ministrations, and watch live broadcasts on YouTube &amp; Facebook.
-          </p>
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="max-w-3xl space-y-6">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
+              Visual Storytelling &amp; Live Streams
+            </span>
+            <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Church Photo Gallery &amp; Live Streams
+            </h1>
+            <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
+              Browse our photo albums, relive past services and choir ministrations, and watch live broadcasts on YouTube &amp; Facebook.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
+      <div className="mx-auto w-full max-w-7xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
       {/* Filter Tabs */}
       <div className="flex justify-center">
         <Tabs value={filterType} onValueChange={(v: string) => setFilterType(v as typeof filterType)}>
@@ -427,6 +429,7 @@ export default function GalleryClient() {
           </DialogContent>
         </Dialog>
       )}
+      </div>
     </div>
   );
 }

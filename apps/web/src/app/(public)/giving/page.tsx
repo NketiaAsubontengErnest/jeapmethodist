@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { HeroBackground } from '@/components/public/hero-background';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -180,15 +181,20 @@ export default function GivingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <h1 className="font-serif text-4xl font-bold text-slate-900 sm:text-5xl tracking-tight">
-            Online Giving
-          </h1>
+    <div className="min-h-screen bg-white">
+      {/* HERO SECTION — Royal Blue with first banner image */}
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8 text-white">
+        <HeroBackground />
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="max-w-3xl space-y-6">
+            <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Online Giving
+            </h1>
+          </div>
         </div>
+      </section>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         {/* Giving Scripture Banner — Royal Blue & Crimson Accent */}
         <div className="bg-gradient-to-r from-[#0f2478] via-[#14309c] to-[#5C1615] text-white rounded-2xl p-8 sm:p-10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-[#FFC72C]/30">
           <div className="space-y-2 max-w-2xl">

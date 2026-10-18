@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, History, BookOpen } from 'lucide-react';
+import { HeroBackground } from '@/components/public/hero-background';
 
 export const metadata: Metadata = {
   title: 'Church History | Methodist Church Ghana',
@@ -66,8 +67,9 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       {/* ── HERO BANNER ── */}
-      <section className="bg-[#14309c] px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center space-y-5">
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:py-24 sm:px-6 lg:px-8">
+        <HeroBackground />
+        <div className="relative z-10 mx-auto max-w-4xl text-center space-y-5">
           <Badge className="bg-[#FFC72C]/20 border border-[#FFC72C]/40 text-[#FFC72C] font-bold text-xs uppercase tracking-widest hover:bg-[#FFC72C]/20">
             Heritage of Faith
           </Badge>

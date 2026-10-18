@@ -1,9 +1,9 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { fetchPublicSermonBySlug, SermonItem } from '@/lib/api/public';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { HeroBackground } from '@/components/public/hero-background';
 import { ChevronLeft, Calendar, User, BookOpen, Headphones, Video, Share2 } from 'lucide-react';
 
 export const revalidate = 60;
@@ -45,49 +45,51 @@ export default async function SermonDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Back Link */}
-        <div>
-          <Link
-            href="/sermons"
-            className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" /> Back to Sermon Library
-          </Link>
-        </div>
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* HERO SECTION — Royal Blue with first banner image */}
+      <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8 text-white">
+        <HeroBackground />
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="max-w-3xl space-y-6">
+            <Link
+              href="/sermons"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#FFC72C] hover:underline"
+            >
+              <ChevronLeft className="w-4 h-4" /> Back to Sermon Library
+            </Link>
 
-        {/* Sermon Title Header */}
-        <div className="bg-white border border-border rounded-2xl p-6 sm:p-10 shadow-sm space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            {sermon.scripture && (
-              <Badge className="bg-blue-50 text-primary border-transparent">
-                <BookOpen className="w-3.5 h-3.5 mr-1 inline" /> {sermon.scripture}
-              </Badge>
-            )}
-            {sermon.tags && (
-              <Badge variant="outline" className="border-gold-300 bg-gold-50 text-gold-700">
-                {sermon.tags}
-              </Badge>
-            )}
-          </div>
-
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-foreground leading-tight">
-            {sermon.title}
-          </h1>
-
-          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground pt-2 border-t border-border">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-primary" />
-              <span className="font-semibold text-foreground">{sermon.speaker}</span>
+            <div className="flex flex-wrap items-center gap-3">
+              {sermon.scripture && (
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
+                  <BookOpen className="w-3.5 h-3.5" /> {sermon.scripture}
+                </span>
+              )}
+              {sermon.tags && (
+                <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-white">
+                  {sermon.tags}
+                </span>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span>{new Date(sermon.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+
+            <h1 className="font-serif text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              {sermon.title}
+            </h1>
+
+            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-200">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-[#FFC72C]" />
+                <span className="font-semibold text-white">{sermon.speaker}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[#FFC72C]" />
+                <span>{new Date(sermon.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
         {/* Audio Player Card */}
         {sermon.audioUrl && (
           <Card className="rounded-2xl border-border border-l-4 border-l-gold-500 bg-white shadow-sm">

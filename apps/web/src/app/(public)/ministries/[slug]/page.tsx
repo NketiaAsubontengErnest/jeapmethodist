@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { fetchPublicMinistryBySlug, MinistryPublicDetail } from '@/lib/api/public';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Clock, MapPin, User, Send, Users } from 'lucide-react';
+import { HeroBackground } from '@/components/public/hero-background';
 
 export const revalidate = 60;
 
@@ -51,7 +52,8 @@ export default async function MinistryDetailPage({ params }: Props) {
     <div className="flex flex-col min-h-screen bg-white text-slate-900">
       {/* 1. HERO SECTION — Royal Blue #14309c Background */}
       <section className="relative overflow-hidden bg-[#14309c] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 text-white">
-        <div className="mx-auto max-w-4xl space-y-6">
+        <HeroBackground />
+        <div className="relative z-10 mx-auto max-w-4xl space-y-6">
           <div>
             <Link
               href="/ministries"

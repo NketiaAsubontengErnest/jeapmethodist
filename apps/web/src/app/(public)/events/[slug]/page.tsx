@@ -5,6 +5,7 @@ import { fetchPublicEventBySlug, EventItem } from '@/lib/api/public';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, Calendar, Clock, MapPin, UserCheck, Share2, Send } from 'lucide-react';
+import { HeroBackground } from '@/components/public/hero-background';
 
 export const revalidate = 60;
 
@@ -51,7 +52,8 @@ export default async function EventDetailPage({ params }: Props) {
     <div className="flex flex-col min-h-screen bg-white text-slate-900">
       {/* 1. HERO SECTION — Royal Blue #14309c Background */}
       <section className="relative overflow-hidden bg-[#14309c] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 text-white">
-        <div className="mx-auto max-w-4xl space-y-6">
+        <HeroBackground />
+        <div className="relative z-10 mx-auto max-w-4xl space-y-6">
           {/* Back Link */}
           <div>
             <Link
