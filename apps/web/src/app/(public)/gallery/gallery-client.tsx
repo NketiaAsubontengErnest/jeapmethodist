@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { fetchPublicGallery, type MediaItem } from '@/lib/api/media';
 import { fetchAlbumById } from '@/lib/api/albums';
+import { HeroBackground } from '@/components/public/hero-background';
 import { Folder, Image as ImageIcon, Loader2, Play, Radio, Tv, X, ArrowLeft, ExternalLink } from 'lucide-react';
 
 function getThumbnailUrl(item: MediaItem): string | null {
@@ -106,6 +107,7 @@ export default function GalleryClient() {
     <div className="space-y-12">
       {/* Hero Banner Header — Royal Blue & Gold Aesthetic */}
       <div className="relative overflow-hidden rounded-3xl bg-[#14309c] p-10 text-white shadow-2xl border border-blue-800 text-center max-w-4xl mx-auto">
+        <HeroBackground />
         <div className="absolute left-1/2 top-0 -translate-x-1/2 -mt-20 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
         <div className="relative z-10 space-y-4">
           <Badge className="bg-amber-500/20 border border-amber-500/40 text-amber-400 font-bold uppercase text-[11px] tracking-widest px-3 py-1">

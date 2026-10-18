@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchPublicSettings } from '@/lib/api/public';
 import { ShieldCheck, Heart, Users, BookOpen, Target, Eye, ChevronRight, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { HeroBackground } from '@/components/public/hero-background';
 
 export default function AboutPage() {
   const { data: settings } = useQuery({
@@ -21,7 +22,8 @@ export default function AboutPage() {
     <div className="flex flex-col min-h-screen bg-white text-slate-900">
       {/* 1. HERO SECTION — Royal Blue #14309c Background */}
       <section className="relative overflow-hidden bg-[#14309c] px-4 py-16 sm:px-6 sm:py-24 lg:px-8 text-white">
-        <div className="mx-auto max-w-7xl">
+        <HeroBackground />
+        <div className="relative z-10 mx-auto max-w-7xl">
           <div className="grid items-center gap-12 lg:grid-cols-12">
             <div className="space-y-6 lg:col-span-8">
               <span className="inline-flex items-center gap-2 rounded-full border border-[#FFC72C]/40 bg-[#FFC72C]/10 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#FFC72C]">
