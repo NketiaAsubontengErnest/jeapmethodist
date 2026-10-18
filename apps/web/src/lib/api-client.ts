@@ -32,18 +32,63 @@ interface ApiFetchOptions extends RequestInit {
   skipAuth?: boolean;
 }
 
+/** Fired when the session can no longer be refreshed, so AuthProvider can sign the user out. */
+export const AUTH_EXPIRED_EVENT = 'auth:expired';
+
+// Shared by concurrent 401s so only one refresh call is made — refresh tokens
+// are rotated, so parallel refreshes would invalidate each other.
+let refreshInFlight: Promise<boolean> | null = null;
+
+function refreshAccessToken(): Promise<boolean> {
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const res = await fetch(`${API_URL}/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (!res.ok) return false;
+        const data = (await res.json()) as { accessToken?: string };
+        if (!data.accessToken) return false;
+        accessToken = data.accessToken;
+        return true;
+      } catch {
+        return false;
+      }
+    })().finally(() => {
+      refreshInFlight = null;
+    });
+  }
+  return refreshInFlight;
+}
+
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
   const { skipAuth, headers, ...rest } = options;
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...rest,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(!skipAuth && accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...headers,
-    },
-  });
+  const send = () =>
+    fetch(`${API_URL}${path}`, {
+      ...rest,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(!skipAuth && accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...headers,
+      },
+    });
+
+  let response = await send();
+
+  // The 15-minute access token expires while the dashboard stays open; silently
+  // renew it from the refresh cookie and retry once instead of failing the page.
+  if (response.status === 401 && !skipAuth && accessToken) {
+    if (await refreshAccessToken()) {
+      response = await send();
+    } else {
+      accessToken = null;
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+    }
+  }
 
   const isJson = response.headers.get('content-type')?.includes('application/json');
   const body = isJson ? await response.json() : undefined;
