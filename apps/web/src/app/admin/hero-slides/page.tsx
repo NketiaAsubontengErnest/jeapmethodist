@@ -139,6 +139,7 @@ export default function HeroSlidesAdminPage() {
       toast.success('Hero slide uploaded successfully!');
       queryClient.invalidateQueries({ queryKey: ['admin-hero-slides'] });
       queryClient.invalidateQueries({ queryKey: ['public-gallery-home'] });
+      queryClient.invalidateQueries({ queryKey: ['public-hero-banner'] });
       setSelectedFile(null);
       setPreviewUrl(null);
       setSlideTitle('');
@@ -167,6 +168,7 @@ export default function HeroSlidesAdminPage() {
       toast.success('Hero slide linked successfully!');
       queryClient.invalidateQueries({ queryKey: ['admin-hero-slides'] });
       queryClient.invalidateQueries({ queryKey: ['public-gallery-home'] });
+      queryClient.invalidateQueries({ queryKey: ['public-hero-banner'] });
       setExternalUrl('');
       setUrlSlideTitle('');
       setUrlSlideDescription('');
@@ -204,6 +206,7 @@ export default function HeroSlidesAdminPage() {
       toast.success('Hero slide removed.');
       queryClient.invalidateQueries({ queryKey: ['admin-hero-slides'] });
       queryClient.invalidateQueries({ queryKey: ['public-gallery-home'] });
+      queryClient.invalidateQueries({ queryKey: ['public-hero-banner'] });
       setDeletingId(null);
     },
     onError: (err) => {

@@ -150,9 +150,10 @@ export class MediaService implements OnModuleInit {
   async findPublicGallery(params: {
     type?: MediaType;
     albumId?: string;
+    category?: string;
     limit?: number;
   }) {
-    const { type, albumId, limit = 50 } = params;
+    const { type, albumId, category, limit = 50 } = params;
 
     const typeFilter: Prisma.MediaWhereInput = type
       ? type === MediaType.VIDEO
@@ -167,8 +168,24 @@ export class MediaService implements OnModuleInit {
     const where: Prisma.MediaWhereInput = {
       ...typeFilter,
       ...(albumId ? { albumId } : {}),
-      OR: [{ category: null }, { category: { not: 'identity' } }],
+      ...(category
+        ? { category }
+        : { OR: [{ category: null }, { category: { not: 'identity' } }] }),
     };
+
+    // Callers asking for a single category (e.g. the page-banner image) only
+    // need those rows — skip the albums query and its photo payload.
+    if (category) {
+      const items = await this.prisma.media.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        include: {
+          album: { select: { id: true, title: true, slug: true } },
+        },
+      });
+      return { items, albums: [] };
+    }
 
     const [items, albums] = await Promise.all([
       this.prisma.media.findMany({

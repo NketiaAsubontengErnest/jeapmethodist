@@ -12,8 +12,10 @@ import { formatMediaUrl } from '@/lib/utils';
  */
 export function HeroBackground() {
   const { data } = useQuery({
-    queryKey: ['public-gallery-home'],
-    queryFn: () => fetchPublicGallery({ limit: 50 }),
+    queryKey: ['public-hero-banner'],
+    // Banner images are stored as large base64 data URIs, so fetch only the
+    // first hero slide instead of the whole gallery on every public page.
+    queryFn: () => fetchPublicGallery({ category: 'hero_slide', limit: 1 }),
     staleTime: 5 * 60 * 1000,
   });
 

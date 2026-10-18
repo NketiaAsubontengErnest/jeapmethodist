@@ -40,10 +40,11 @@ export function fetchMediaAdmin(params: {
   return apiFetch<PaginatedResult<MediaItem>>(`/media/admin?${query.toString()}`);
 }
 
-export function fetchPublicGallery(params: { type?: MediaType; albumId?: string; limit?: number } = {}) {
+export function fetchPublicGallery(params: { type?: MediaType; albumId?: string; category?: string; limit?: number } = {}) {
   const query = new URLSearchParams();
   if (params.type) query.set('type', params.type);
   if (params.albumId) query.set('albumId', params.albumId);
+  if (params.category) query.set('category', params.category);
   if (params.limit) query.set('limit', String(params.limit));
   return apiFetch<{ items: MediaItem[]; albums: AlbumItem[] }>(`/media/public/gallery?${query.toString()}`);
 }

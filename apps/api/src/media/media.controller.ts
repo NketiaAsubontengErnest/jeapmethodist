@@ -53,11 +53,13 @@ export class MediaController {
   getPublicGallery(
     @Query('type') type?: MediaType,
     @Query('albumId') albumId?: string,
+    @Query('category') category?: string,
     @Query('limit') limit = '50',
   ) {
     return this.service.findPublicGallery({
       type,
       albumId,
+      category,
       limit: parseInt(limit, 10) || 50,
     });
   }
